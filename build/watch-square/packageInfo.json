@@ -1,0 +1,10 @@
+{
+  "originType": "native",
+  "toolkit": "1.0.9-beta.24",
+  "buildTime": "2026/02/09 23:23",
+  "node": "v18.15.0",
+  "platform": "win32",
+  "arch": "x64",
+  "appCommit": "5752f6c7",
+  "commit": "2b772929"
+}

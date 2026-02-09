@@ -1,0 +1,201 @@
+{
+  "type": "list",
+  "attr": {
+    "scrollbar": "true",
+    "title": "true"
+  },
+  "styleObjectId": 331959032,
+  "children": [
+    {
+      "type": "list-item",
+      "attr": {
+        "type": "li"
+      },
+      "bind": 1,
+      "events": {
+        "click": "goBack"
+      },
+      "children": [
+        {
+          "type": "div",
+          "class": "vwTitleWrapper",
+          "style": {
+            "alignItems": "center",
+            "flexDirection": "column",
+            "height": "80px",
+            "justifyContent": "flex-end",
+            "width": "100%"
+          },
+          "children": [
+            {
+              "type": "div",
+              "class": "vwTitle",
+              "style": {
+                "alignItems": "center",
+                "justifyContent": "center"
+              },
+              "children": [
+                {
+                  "type": "vw-icon",
+                  "attr": {
+                    "icon": "arrow-left",
+                    "size": "sm"
+                  },
+                  "bind": 3
+                },
+                {
+                  "type": "text",
+                  "attr": {
+                    "value": "我的书架"
+                  },
+                  "style": {
+                    "color": "#ffffff",
+                    "fontSize": "40px",
+                    "fontWeight": "bold",
+                    "marginRight": "48px"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "list-item",
+      "children": [
+        {
+          "type": "div",
+          "style": {
+            "height": "20px"
+          }
+        }
+      ]
+    },
+    {
+      "type": "list-item",
+      "$shown": "function () { return this.bookList.length === 0; }",
+      "attr": {
+        "type": "li"
+      },
+      "bind": 2,
+      "shown": true,
+      "children": [
+        {
+          "type": "div",
+          "class": "wrapper empty",
+          "children": [
+            {
+              "type": "vw-icon",
+              "attr": {
+                "icon": "delete"
+              },
+              "bind": 3
+            },
+            {
+              "type": "div",
+              "class": "wrapper",
+              "children": [
+                {
+                  "type": "text",
+                  "attr": {
+                    "value": "暂无书籍"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "list-item",
+      "$repeat": "bookList",
+      "attr": {
+        "type": "book"
+      },
+      "bind": 2,
+      "class": "bookItemWrapper",
+      "repeat": [],
+      "children": [
+        {
+          "type": "div",
+          "bind": 1,
+          "class": "book-item",
+          "events": {
+            "$click": "function (evt) { return this.openBookDetail(this.$item, evt); }"
+          },
+          "children": [
+            {
+              "type": "div",
+              "class": "book-cover",
+              "children": [
+                {
+                  "type": "text",
+                  "attr": {
+                    "$value": "function () { return this.$item.name.substring(0, 1); }"
+                  },
+                  "bind": 1,
+                  "class": "book-cover-text"
+                }
+              ]
+            },
+            {
+              "type": "div",
+              "class": "book-info",
+              "children": [
+                {
+                  "type": "marquee",
+                  "attr": {
+                    "$value": "$item.name"
+                  },
+                  "bind": 1,
+                  "class": "book-title"
+                },
+                {
+                  "type": "text",
+                  "attr": {
+                    "$value": "function () { return '' + '已读' + (' ' + this.$item.progress) + '% (' + (Number(this.$item.currentChapter) || 0) + '/' + (Number(this.$item.chapterCount) || 1) + '章)'; }"
+                  },
+                  "bind": 1,
+                  "class": "book-progress"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "div",
+          "attr": {
+            "slot": "right"
+          },
+          "bind": 1,
+          "class": "slot",
+          "events": {
+            "$click": "function (evt) { return this.deleteBook(this.$item, evt); }"
+          },
+          "children": [
+            {
+              "type": "image",
+              "attr": {
+                "objectFit": "scale-down",
+                "src": "/assets/images/icon-delete.png"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "list-item",
+      "children": [
+        {
+          "type": "div",
+          "style": {
+            "height": "80px"
+          }
+        }
+      ]
+    }
+  ]
+}

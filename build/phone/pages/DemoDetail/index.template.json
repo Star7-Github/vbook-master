@@ -1,0 +1,29 @@
+{
+  "type": "div",
+  "class": "wrapper",
+  "style": {
+    "alignItems": "center",
+    "flexDirection": "column",
+    "justifyContent": "center",
+    "marginBottom": "0px",
+    "marginLeft": "50px",
+    "marginRight": "50px",
+    "marginTop": "0px"
+  },
+  "styleObjectId": 465862127,
+  "children": [
+    {
+      "type": "text",
+      "attr": {
+        "$value": "text"
+      },
+      "bind": 1,
+      "class": "title",
+      "style": {
+        "color": "#000000",
+        "fontSize": "40px",
+        "textAlign": "center"
+      }
+    }
+  ]
+}

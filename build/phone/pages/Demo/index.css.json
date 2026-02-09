@@ -1,0 +1,23 @@
+{
+  "1302357824": {
+    ".wrapper": {
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    ".wrapper .title": {
+      "fontSize": "35px",
+      "textAlign": "center",
+      "color": "#000000"
+    },
+    ".wrapper .btn": {
+      "width": "275px",
+      "height": "60px",
+      "borderRadius": "35px",
+      "backgroundColor": "#09ba07",
+      "color": "#ffffff",
+      "fontSize": "25px",
+      "marginTop": "35px"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "331959032": {
+    ".wrapper": {
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    ".vwTitleWrapper": {
+      "height": "80px",
+      "width": "100%",
+      "flexDirection": "column",
+      "justifyContent": "flex-end",
+      "alignItems": "center"
+    },
+    ".vwTitleWrapper .vwTitle": {
+      "alignItems": "center",
+      "justifyContent": "center"
+    },
+    ".vwTitleWrapper .vwTitle text": {
+      "color": "#ffffff",
+      "fontSize": "40px",
+      "fontWeight": "bold",
+      "marginRight": "48px"
+    },
+    ".empty": {
+      "width": "100%",
+      "paddingTop": "140px"
+    },
+    ".empty text": {
+      "color": "#ffffff"
+    },
+    ".bookItemWrapper": {
+      "paddingTop": "0px",
+      "paddingRight": "10px",
+      "paddingBottom": "0px",
+      "paddingLeft": "10px"
+    },
+    ".bookItemWrapper .book-item": {
+      "width": "100%",
+      "backgroundColor": "#262626",
+      "marginBottom": "10px",
+      "borderRadius": "30px",
+      "paddingTop": "15px",
+      "paddingRight": "15px",
+      "paddingBottom": "15px",
+      "paddingLeft": "15px",
+      "flexDirection": "row",
+      "alignItems": "center"
+    },
+    ".bookItemWrapper .book-item .book-cover": {
+      "width": "80px",
+      "height": "90px",
+      "borderRadius": "15px",
+      "backgroundColor": "#334455",
+      "marginRight": "20px",
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    ".bookItemWrapper .book-item .book-cover .book-cover-text": {
+      "fontSize": "40px",
+      "color": "#ffffff",
+      "fontWeight": "bold"
+    },
+    ".bookItemWrapper .book-item .book-info": {
+      "flexDirection": "column",
+      "justifyContent": "center"
+    },
+    ".bookItemWrapper .book-item .book-info .book-title": {
+      "width": "300px",
+      "doubleEndedShadowColor": "#262626",
+      "color": "#FFFFFF",
+      "fontSize": "30px"
+    },
+    ".bookItemWrapper .book-item .book-info .book-progress": {
+      "color": "#808080",
+      "fontSize": "24px",
+      "lineHeight": "24px",
+      "marginTop": "10px"
+    },
+    ".bookItemWrapper .book-item ": {
+      "opacity:active": 0.3
+    },
+    ".bookItemWrapper .slot": {
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "backgroundColor": "#262626",
+      "width": "100px",
+      "borderRadius": "30px",
+      "marginBottom": "10px",
+      "marginRight": "10px"
+    },
+    ".bookItemWrapper .slot ": {
+      "opacity:active": 0.3
+    },
+    ".bookItemWrapper .slot image": {
+      "width": "50px"
+    },
+    ".empty-state": {
+      "flex": 1,
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    ".empty-state .empty-text": {
+      "color": "#808080",
+      "fontSize": "30px"
+    }
+  }
+}

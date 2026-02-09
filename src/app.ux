@@ -1,0 +1,241 @@
+<script>
+  import network from '@blueos.network.fetch'
+  import sysFetch from '@system.fetch'
+  import file from '@blueos.storage.file'
+  import prompt from '@blueos.window.prompt'
+  const downloadTasks = {}
+  function getFetch() {
+    if (sysFetch && typeof sysFetch.fetch === 'function') {
+      return (options) => sysFetch.fetch(options)
+    }
+    if (typeof network === 'function') return network
+    if (network && typeof network.fetch === 'function') {
+      return (options) => network.fetch(options)
+    }
+    return null
+  }
+  function ensureDir(path) {
+    return new Promise((resolve) => {
+      file.mkdir({
+        uri: path,
+        recursive: true,
+        success: () => resolve({ success: true }),
+        fail: (data, code) => {
+          file.access({
+            uri: path,
+            success: () => resolve({ success: true }),
+            fail: (d, c) => resolve({ success: false, msg: code }),
+          })
+        },
+      })
+    })
+  }
+  function listFiles(uri) {
+    return new Promise((resolve) => {
+      file.list({
+        uri,
+        success: (data) => resolve(data.fileList || []),
+        fail: () => resolve([]),
+      })
+    })
+  }
+  function checkFileExists(uri) {
+    return new Promise((r) =>
+      file.access({ uri, success: () => r(true), fail: () => r(false) })
+    )
+  }
+  function saveChapterFile(dir, index, content) {
+    return new Promise((r) =>
+      file.writeText({
+        uri: `${dir}/${index}.txt`,
+        text: content,
+        success: () => r(true),
+        fail: (data, code) => {
+          prompt.showToast({ message: `保存失败: ${code}` })
+          r(false)
+        },
+      })
+    )
+  }
+  function downloadChapterOne(bookId, index) {
+    return new Promise((resolve) => {
+      const fetchFn = getFetch()
+      if (!fetchFn) {
+        prompt.showToast({ message: 'Fetch未初始化' })
+        resolve(null)
+        return
+      }
+      fetchFn({
+        url: `http://127.0.0.1:23101/api/novel/chapter?id=${bookId}&index=${index}`,
+        method: 'GET',
+        responseType: 'text',
+        success: (res) => {
+          if (res.code === 200 || res.code === 206) {
+            resolve(res.data)
+          } else {
+            prompt.showToast({ message: `下载错${index}: ${res.code}` })
+            resolve(null)
+          }
+        },
+        fail: (data, code) => {
+          prompt.showToast({ message: `网络连不上${index}: ${code}` })
+          resolve(null)
+        },
+      })
+    })
+  }
+  async function downloadLoop(book) {
+    const bookId = book.id
+    const count = parseInt(book.chapterCount) || 0
+
+    // 0. Save Metadata
+    const bookMeta = {
+      id: book.id,
+      name: book.name,
+      chapterCount: book.chapterCount,
+      currentChapter: 0,
+      isOffline: false,
+    }
+    const fileName = `book_${book.id}.json`
+    file.writeText({
+      uri: `internal://files/${fileName}`,
+      text: JSON.stringify(bookMeta),
+    })
+    // 1. Directory
+    const dirPath = `internal://files/book_data_${book.id}`
+    const dirRes = await ensureDir(dirPath)
+    if (!dirRes.success) {
+      prompt.showToast({ message: `目录创建失败: ${book.name}` })
+      downloadTasks[bookId].status = 'error'
+      return
+    }
+    // Pre-load existing files to avoid slow sequential checks
+    const fileList = await listFiles(dirPath)
+    console.log(`[App] Book ${book.name} existing files: ${fileList.length}`)
+
+    // Show loading hint for large lists
+    if (fileList.length > 100) {
+      prompt.showToast({ message: `正在检查已下载章节...` })
+    }
+
+    if (fileList.length > 0) {
+      const f = fileList[0]
+      const fname = f.filename || (f.uri ? f.uri.split('/').pop() : 'N/A')
+      if (fileList.length <= 100) {
+        prompt.showToast({ message: `首文件: ${fname} (总${fileList.length})` })
+      }
+    } else {
+      prompt.showToast({ message: `无缓存文件 (总0)` })
+    }
+
+    // Build existing set with batching to avoid blocking
+    const existingSet = new Set()
+    for (let i = 0; i < fileList.length; i++) {
+      const f = fileList[i]
+      let name = f.filename
+      if (!name && f.uri) {
+        const parts = f.uri.split('/')
+        name = parts[parts.length - 1]
+      }
+      existingSet.add(name)
+
+      // Yield to avoid blocking every 200 items
+      if (i % 200 === 0 && i > 0) {
+        await new Promise((r) => setTimeout(r, 1))
+      }
+    }
+    let task = downloadTasks[bookId]
+    let consecutiveFailCount = 0
+    let totalFailCount = 0
+
+    for (let i = 0; i < count; i++) {
+      if (downloadTasks[bookId].status !== 'running') break
+
+      if (consecutiveFailCount > 50) {
+        prompt.showToast({ message: `${book.name} 失败过多，请稍后重试以补全` })
+        task.status = 'error'
+        break
+      }
+
+      const chapterFileName = `${i}.txt`
+      if (existingSet.has(chapterFileName)) {
+        consecutiveFailCount = 0
+        if (i % 50 === 0) await new Promise((r) => setTimeout(r, 1))
+      } else {
+        try {
+          const text = await downloadChapterOne(book.id, i)
+          if (text) {
+            await saveChapterFile(dirPath, i, text)
+            existingSet.add(chapterFileName)
+            consecutiveFailCount = 0
+          } else {
+            consecutiveFailCount++
+            totalFailCount++
+            console.log(
+              `[App] Download fail ch ${i}, consecutive: ${consecutiveFailCount}`
+            )
+          }
+        } catch (e) {
+          consecutiveFailCount++
+          totalFailCount++
+          console.log(`[App] Download error ch ${i}: ${e}`)
+        }
+      }
+
+      task.progress = Math.floor(((i + 1) / count) * 100)
+    }
+
+    task.status = 'done'
+
+    if (totalFailCount === 0) {
+      bookMeta.isOffline = true
+      file.writeText({
+        uri: `internal://files/${fileName}`,
+        text: JSON.stringify(bookMeta),
+      })
+      prompt.showToast({ message: `${book.name} 下载完成` })
+    } else {
+      prompt.showToast({
+        message: `${book.name} 缺${totalFailCount}章，点下载可补全`,
+      })
+    }
+  }
+  export default {
+    onCreate() {},
+    start(book) {
+      if (
+        downloadTasks[book.id] &&
+        downloadTasks[book.id].status === 'running'
+      ) {
+        prompt.showToast({ message: '正在后台下载中...' })
+        return
+      }
+      downloadTasks[book.id] = {
+        id: book.id,
+        progress: 0,
+        status: 'running',
+        name: book.name,
+      }
+      prompt.showToast({ message: `已加入后台下载: ${book.name}` })
+      downloadLoop(book)
+    },
+    getTask(bookId) {
+      return downloadTasks[bookId]
+    },
+    getRunningTask() {
+      for (const key in downloadTasks) {
+        if (downloadTasks[key].status === 'running') {
+          return downloadTasks[key]
+        }
+      }
+      return null
+    },
+    clearTask(bookId) {
+      if (downloadTasks[bookId]) {
+        downloadTasks[bookId].status = 'cancelled'
+        delete downloadTasks[bookId]
+        console.log(`[App] Cleared task for book ${bookId}`)
+      }
+    },
+  }
+</script>
