@@ -2,57 +2,12 @@
   "type": "div",
   "class": "wrapper",
   "style": {
-    "backgroundColor": "#000000",
-    "flexDirection": "column"
+    "alignItems": "center",
+    "flexDirection": "column",
+    "justifyContent": "center"
   },
   "styleObjectId": 937831808,
   "children": [
-    {
-      "type": "div",
-      "bind": 1,
-      "class": "header",
-      "events": {
-        "click": "handleBack"
-      },
-      "style": {
-        "alignItems": "center",
-        "backgroundColor": "#1a1a1a",
-        "flexDirection": "row",
-        "height": "96px",
-        "paddingBottom": "0px",
-        "paddingLeft": "30px",
-        "paddingRight": "30px",
-        "paddingTop": "0px",
-        "width": "100%"
-      },
-      "children": [
-        {
-          "type": "text",
-          "attr": {
-            "value": "<"
-          },
-          "class": "back-btn",
-          "style": {
-            "color": "#ffffff",
-            "fontSize": "40px",
-            "marginRight": "20px"
-          }
-        },
-        {
-          "type": "text",
-          "attr": {
-            "$value": "titleText"
-          },
-          "bind": 1,
-          "class": "header-title",
-          "style": {
-            "color": "#ffffff",
-            "flex": 1,
-            "fontSize": "36px"
-          }
-        }
-      ]
-    },
     {
       "type": "div",
       "$shown": "isLoading",
@@ -72,10 +27,53 @@
     {
       "type": "list",
       "$shown": "function () { return !this.isLoading && this.showRanges; }",
+      "attr": {
+        "scrollbar": "true",
+        "title": "true"
+      },
       "bind": 2,
       "class": "range-list",
       "shown": false,
       "children": [
+        {
+          "type": "list-item",
+          "attr": {
+            "type": "li"
+          },
+          "bind": 1,
+          "events": {
+            "click": "handleBack"
+          },
+          "children": [
+            {
+              "type": "div",
+              "class": "vwTitleWrapper",
+              "children": [
+                {
+                  "type": "div",
+                  "class": "vwTitle",
+                  "children": [
+                    {
+                      "type": "vw-icon",
+                      "attr": {
+                        "icon": "arrow-left",
+                        "size": "sm"
+                      },
+                      "bind": 3
+                    },
+                    {
+                      "type": "text",
+                      "attr": {
+                        "$value": "titleText"
+                      },
+                      "bind": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
         {
           "type": "list-item",
           "$repeat": "ranges",
@@ -104,10 +102,53 @@
     {
       "type": "list",
       "$shown": "function () { return !this.isLoading && !this.showRanges; }",
+      "attr": {
+        "scrollbar": "true",
+        "title": "true"
+      },
       "bind": 2,
       "class": "chapter-list",
       "shown": false,
       "children": [
+        {
+          "type": "list-item",
+          "attr": {
+            "type": "li"
+          },
+          "bind": 1,
+          "events": {
+            "click": "handleBack"
+          },
+          "children": [
+            {
+              "type": "div",
+              "class": "vwTitleWrapper",
+              "children": [
+                {
+                  "type": "div",
+                  "class": "vwTitle",
+                  "children": [
+                    {
+                      "type": "vw-icon",
+                      "attr": {
+                        "icon": "arrow-left",
+                        "size": "sm"
+                      },
+                      "bind": 3
+                    },
+                    {
+                      "type": "text",
+                      "attr": {
+                        "$value": "titleText"
+                      },
+                      "bind": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
         {
           "type": "list-item",
           "$repeat": "chapters",
@@ -131,13 +172,10 @@
             },
             {
               "type": "text",
-              "$shown": "$item.cached",
               "attr": {
                 "value": "已缓存"
               },
-              "bind": 2,
-              "class": "cached-tag",
-              "shown": false
+              "class": "cached-tag"
             }
           ]
         }

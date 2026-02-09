@@ -2,28 +2,25 @@
   "937831808": {
     ".wrapper": {
       "flexDirection": "column",
-      "backgroundColor": "#000000"
+      "justifyContent": "center",
+      "alignItems": "center"
     },
-    ".header": {
-      "height": "96px",
+    ".vwTitleWrapper": {
+      "height": "80px",
       "width": "100%",
-      "flexDirection": "row",
+      "flexDirection": "column",
+      "justifyContent": "flex-end",
+      "alignItems": "center"
+    },
+    ".vwTitleWrapper .vwTitle": {
       "alignItems": "center",
-      "paddingTop": "0px",
-      "paddingRight": "30px",
-      "paddingBottom": "0px",
-      "paddingLeft": "30px",
-      "backgroundColor": "#1a1a1a"
+      "justifyContent": "center"
     },
-    ".back-btn": {
+    ".vwTitleWrapper .vwTitle text": {
+      "color": "#ffffff",
       "fontSize": "40px",
-      "color": "#ffffff",
-      "marginRight": "20px"
-    },
-    ".header-title": {
-      "fontSize": "36px",
-      "color": "#ffffff",
-      "flex": 1
+      "fontWeight": "bold",
+      "marginRight": "48px"
     },
     ".loading": {
       "justifyContent": "center",
@@ -33,39 +30,21 @@
     ".loading-text": {
       "color": "#ffffff"
     },
-    ".chapter-list": {
-      "flex": 1,
-      "flexDirection": "column",
-      "paddingTop": "10px",
-      "paddingRight": "10px",
-      "paddingBottom": "10px",
-      "paddingLeft": "10px"
-    },
     ".chapter-item": {
       "height": "100px",
       "borderBottomColor": "#333333",
       "borderBottomWidth": "1px",
-      "justifyContent": "flex-start",
-      "alignItems": "center",
       "paddingTop": "0px",
       "paddingRight": "20px",
       "paddingBottom": "0px",
       "paddingLeft": "20px"
     },
     ".chapter-text": {
-      "color": "#cccccc",
+      "color": "#ffffff",
       "fontSize": "30px",
       "lines": 1,
       "textOverflow": "ellipsis",
       "flex": 1
-    },
-    ".range-list": {
-      "flex": 1,
-      "flexDirection": "column",
-      "paddingTop": "10px",
-      "paddingRight": "10px",
-      "paddingBottom": "10px",
-      "paddingLeft": "10px"
     },
     ".range-item": {
       "height": "100px",

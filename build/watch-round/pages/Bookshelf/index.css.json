@@ -77,6 +77,25 @@
       "lineHeight": "24px",
       "marginTop": "10px"
     },
+    ".bookItemWrapper .book-item ": {
+      "opacity:active": 0.3
+    },
+    ".bookItemWrapper .slot": {
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "backgroundColor": "#262626",
+      "width": "100px",
+      "borderRadius": "50px",
+      "marginBottom": "10px",
+      "marginRight": "30px"
+    },
+    ".bookItemWrapper .slot ": {
+      "opacity:active": 0.3
+    },
+    ".bookItemWrapper .slot image": {
+      "width": "50px"
+    },
     ".empty-state": {
       "flex": 1,
       "justifyContent": "center",

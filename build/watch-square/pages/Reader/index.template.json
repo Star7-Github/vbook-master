@@ -292,8 +292,8 @@
           "style": {
             "justifyContent": "space-between",
             "paddingBottom": "0px",
-            "paddingLeft": "50px",
-            "paddingRight": "50px",
+            "paddingLeft": "70px",
+            "paddingRight": "70px",
             "paddingTop": "0px",
             "width": "100%"
           },

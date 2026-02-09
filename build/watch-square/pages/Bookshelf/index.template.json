@@ -116,14 +116,15 @@
       },
       "bind": 2,
       "class": "bookItemWrapper",
-      "events": {
-        "$click": "function (evt) { return this.openBookDetail(this.$item, evt); }"
-      },
       "repeat": [],
       "children": [
         {
           "type": "div",
+          "bind": 1,
           "class": "book-item",
+          "events": {
+            "$click": "function (evt) { return this.openBookDetail(this.$item, evt); }"
+          },
           "children": [
             {
               "type": "div",
@@ -160,6 +161,26 @@
                   "class": "book-progress"
                 }
               ]
+            }
+          ]
+        },
+        {
+          "type": "div",
+          "attr": {
+            "slot": "right"
+          },
+          "bind": 1,
+          "class": "slot",
+          "events": {
+            "$click": "function (evt) { return this.deleteBook(this.$item, evt); }"
+          },
+          "children": [
+            {
+              "type": "image",
+              "attr": {
+                "objectFit": "scale-down",
+                "src": "/assets/images/icon-delete.png"
+              }
             }
           ]
         }

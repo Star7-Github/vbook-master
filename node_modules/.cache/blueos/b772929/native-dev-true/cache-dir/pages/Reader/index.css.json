@@ -74,9 +74,9 @@
       "width": "100%",
       "justifyContent": "space-between",
       "paddingTop": "0px",
-      "paddingRight": "50px",
+      "paddingRight": "70px",
       "paddingBottom": "0px",
-      "paddingLeft": "50px"
+      "paddingLeft": "70px"
     },
     ".topBar.square .info-row .info-time": {
       "fontSize": "26px",

@@ -19,12 +19,8 @@
         </div>
       </div>
     </list-item>
-    <list-item
-      type="book"
-      class="bookItemWrapper"
-      for="{{bookList}}"
-      onclick="openBookDetail($item)">
-      <div class="book-item">
+    <list-item type="book" class="bookItemWrapper" for="{{bookList}}">
+      <div class="book-item" @click="openBookDetail($item)">
         <div class="book-cover">
           <text class="book-cover-text">
             {{ $item.name.substring(0, 1) }}
@@ -38,6 +34,11 @@
             }}/{{ Number($item.chapterCount) || 1 }}章)
           </text>
         </div>
+      </div>
+      <div @click="deleteBook($item)" slot="right" class="slot">
+        <image
+          src="/assets/images/icon-delete.png"
+          object-fit="scale-down"></image>
       </div>
     </list-item>
     <list-item>
@@ -367,6 +368,27 @@
           line-height: 24px;
           margin-top: 10px;
         }
+      }
+      :active {
+        opacity: 0.3;
+      }
+    }
+    .slot {
+      .wrapper();
+      background-color: #262626;
+      width: 100px;
+      border-radius: 30px;
+      margin-bottom: 10px;
+      margin-right: 10px;
+      :active {
+        opacity: 0.3;
+      }
+      image {
+        width: 50px;
+      }
+      @media screen and (device: watch-round) {
+        border-radius: 50px;
+        margin-right: 30px;
       }
     }
   }
