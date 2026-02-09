@@ -1,0 +1,246 @@
+<template>
+  <stack>
+    <div class="page">
+      <div class="shelf-trans">
+        <div class="itemWrapper" @click="navigateTo(itemShelf.path)">
+          <div class="shelf">
+            <div class="img">
+              <img src="{{itemShelf.icon}}" />
+            </div>
+            <text>{{ itemShelf.name }}</text>
+          </div>
+        </div>
+        <div class="itemWrapper" @click="navigateTo(itemTrans.path)">
+          <div class="trans">
+            <div class="img">
+              <img src="{{itemTrans.icon}}" />
+            </div>
+            <text>{{ itemTrans.name }}</text>
+          </div>
+        </div>
+      </div>
+      <div class="setting" @click="navigateTo(itemSetting.path)">
+        <div class="img">
+          <img src="{{itemSetting.icon}}" />
+        </div>
+        <text>{{ itemSetting.name }}</text>
+      </div>
+    </div>
+    <div
+      if="{{downloadTask && this.$device.deviceType == 'watch-square'}}"
+      class="global-progress"
+      @click="handleTaskClick">
+      <marquee>
+        {{ downloadTask.name }}
+      </marquee>
+      <div class="progress-detail">
+        <text>下载：</text>
+        <text>{{ downloadTask.progress }}%</text>
+      </div>
+    </div>
+    <div
+      if="{{downloadTask && this.$device.deviceType == 'watch-round'}}"
+      class="global-progress"
+      @click="handleTaskClick">
+      <div class="progress-detail">
+        <marquee>{{ downloadTask.name }}</marquee>
+        <text>下载</text>
+      </div>
+      <text>{{ downloadTask.progress }}%</text>
+    </div>
+    <!-- progress模拟 -->
+    <!-- <div
+      if="{{this.$device.deviceType == 'watch-square'}}"
+      class="global-progress"
+      @click="handleTaskClick">
+      <marquee>DemoDemoDemoDemoDemoDemoDemoDemoDemoDemo</marquee>
+      <div class="progress-detail">
+        <text>下载：</text>
+        <text>100%</text>
+      </div>
+    </div>
+    <div
+      if="{{this.$device.deviceType == 'watch-round'}}"
+      class="global-progress"
+      @click="handleTaskClick">
+      <div class="progress-detail">
+        <marquee>DemoDemoDemoDemoDemo</marquee>
+        <text>下载</text>
+      </div>
+      <text>100%</text>
+    </div> -->
+  </stack>
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+
+  export default {
+    data: {
+      itemShelf: {
+        name: '我的书架',
+        path: '/pages/Bookshelf',
+        color: '#3399ff',
+        icon: '/assets/images/mybook.png',
+      },
+      itemTrans: {
+        name: '传书到表',
+        path: '/pages/Transfer',
+        color: '#3399ff',
+        icon: '/assets/images/network.png',
+      },
+      itemSetting: {
+        name: '设置关于',
+        path: '/pages/Settings',
+        color: '#3399ff',
+        icon: '/assets/images/more.png',
+      },
+      downloadTask: null,
+    },
+    onInit() {
+      console.log('首页菜单 初始化')
+      this.pollTimer = null
+    },
+    onShow() {
+      this.startPolling()
+    },
+    onHide() {
+      if (this.pollTimer) clearInterval(this.pollTimer)
+    },
+    onDestroy() {
+      if (this.pollTimer) clearInterval(this.pollTimer)
+    },
+    startPolling() {
+      if (!this.$app || !this.$app.$def || !this.$app.$def.getRunningTask)
+        return
+
+      if (this.pollTimer) clearInterval(this.pollTimer)
+
+      this.checkTask()
+      this.pollTimer = setInterval(() => {
+        this.checkTask()
+      }, 1000)
+    },
+    checkTask() {
+      const task = this.$app.$def.getRunningTask()
+      if (task) {
+        this.downloadTask = {
+          name: task.name,
+          progress: task.progress || 0,
+        }
+      } else {
+        this.downloadTask = null
+      }
+    },
+    handleTaskClick() {
+      router.push({ uri: 'pages/Transfer' })
+    },
+    navigateTo(path) {
+      if (path === '/pages/Reader') {
+        // 继续阅读需要知道上次读哪本书，这里暂跳到书架，实际应读 Storage
+        router.push({ uri: '/pages/Bookshelf' })
+      } else {
+        router.push({ uri: path })
+      }
+    },
+  }
+</script>
+
+<style lang="less">
+  stack {
+    width: 100%;
+    height: 100%;
+  }
+  text {
+    color: #ffffff;
+    font-size: 30%;
+    @media screen and (device: watch-round) {
+      font-size: 28px;
+    }
+  }
+  .wrapper {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .page {
+    .wrapper();
+    padding: 10px;
+    @media screen and (device: watch-round) {
+      padding: 50px;
+    }
+  }
+  .img {
+    .wrapper();
+    border-radius: 100px;
+    margin: 5px 0 10px 0px;
+    height: 100px;
+    width: 100px;
+    @media screen and (device: watch-round) {
+      height: 80px;
+      width: 80px;
+    }
+  }
+  .shelf-trans {
+    .itemWrapper {
+      padding: 5px;
+      .shelf,
+      .trans {
+        .wrapper();
+        background-color: #262626;
+        padding: 20px 30px;
+        border-radius: 30px;
+        width: 100%;
+        height: 40%;
+        @media screen and (device: watch-round) {
+          height: auto;
+        }
+      }
+      :active {
+        opacity: 0.5;
+      }
+    }
+  }
+  .setting {
+    background-color: #262626;
+    width: 100%;
+    margin: 5px;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    border-radius: 30px;
+    height: 25%;
+    @media screen and (device: watch-round) {
+      height: auto;
+    }
+    .img {
+      margin: 5px 20px 5px 0px;
+    }
+    :active {
+      opacity: 0.5;
+    }
+  }
+  .global-progress {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    @media screen and (device: watch-round) {
+      margin-bottom: 2px;
+    }
+    marquee,
+    text {
+      color: #d3d3d3;
+      font-size: 24px;
+      line-height: 30px;
+    }
+    marquee {
+      width: auto;
+      padding: 0 20px;
+      @media screen and (device: watch-round) {
+        width: 180px;
+        padding: 0;
+      }
+    }
+  }
+</style>

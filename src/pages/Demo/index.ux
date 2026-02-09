@@ -1,0 +1,51 @@
+<template>
+  <div class="wrapper">
+    <text class="title">{{ title }}</text>
+    <input
+      class="btn"
+      type="button"
+      value="跳转到详情页"
+      onclick="onDetailBtnClick"
+    />
+  </div>
+</template>
+
+<script>
+export default {
+  data: {
+    title: '欢迎体验应用开发'
+  },
+
+  onInit() {},
+
+  onDetailBtnClick() {
+    // 跳转到应用内的某个页面，router 用法详见：文档 -> 接口 -> 页面路由
+    global.router.push({
+      uri: '/pages/DemoDetail'
+    })
+  }
+}
+</script>
+
+<style lang="scss">
+@import './../../assets/styles/style.scss';
+
+.wrapper {
+  @include flex-box-mixins(column, center, center);
+  .title {
+    font-size: 7 * $size-factor;
+    text-align: center;
+    color: $black;
+  }
+
+  .btn {
+    width: 55 * $size-factor;
+    height: 12 * $size-factor;
+    border-radius: 7 * $size-factor;
+    background-color: $brand;
+    color: $white;
+    font-size: 5 * $size-factor;
+    margin-top: 7 * $size-factor;
+  }
+}
+</style>

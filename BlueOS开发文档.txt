@@ -1,0 +1,8173 @@
+(此文档用于帮助AI生成蓝河应用项目代码，，代码生成请给出完整的蓝河项目结构和完整的index.ux页面代码。文档中UI组件只有概述部分，代码中导入和使用到哪部分API能力请标明) 
+一.教程：
+1.快速开始
+1.1概述
+概述
+更新时间：2025-01-16 19:58:38
+
+蓝河应用开发采用类 web 开发范式，使用 UI 组件来搭建页面布局，使用样式来描述组件和页面的效果，使用 Javascript 来进行业务逻辑的开发。蓝河应用支持 MVVM（Model-View-ViewModel）的架构，通过数据绑定视图的方式，数据发生变化时，会自动触发 UI 的更新。
+
+
+如果开发者是首次接触蓝河应用，并希望立即开始编写代码，请从 构建首个蓝河应用 开始。
+
+蓝河应用系统能力开放概览
+蓝河应用具备完备的开放能力，支持在健康、运动、出行、娱乐等全场景的应用的高效开发。
+
+十二大系统能力
+系统能力	描述
+应用框架	1. 功能组件：Page、Service、Widget；
+2. 通知能力：Event、Notification、Toast；
+3. 页面路由；
+4. 后台管理、窗口管理，包管理；
+UI 组件	1. 基础组件、容器组件、表单组件、画布组件、导航组件；
+2. 系统风格 UI 组件；
+3. MVVM 编程模型；
+4. 弹性布局，自适应布局；
+5. 属性动画、SVG 矢量动画，帧动画；
+AI 能力	1. AI 算法能力：视觉算法、语音算法、自然语言处理；
+2. AI 服务引擎：支持调用连接端的强算力设备上的端侧大模型和云端大模型；
+功能组件包括 Chain、Agent、Memory、Tools，LLM API、PromptTemplete;
+连接能力	1. 开放组件 Kit: HealthKit、ShareKit、KeyKit、RelayKit；
+2. BlueXlink: 发现、连接、传输、策略、协议适配；
+运动健康能力	1. 睡眠数据、运动数据 ；
+2. 健康数据：心率、卡路里；
+3. 运动识别：行走、跑步、骑行、游泳、跳绳... ；
+4. 姿态识别：久坐、站立；
+通信能力	1. 蓝牙、NFC ；
+2. 上传下载 ；
+3. 数据请求 ；
+4.WebSocket；
+多媒体能力	1. 原子音乐播放组件；
+2. 图像/音频编解码；
+3. 音频录制、播放；
+4. 音频管理；
+数据存储能力	1. 存储空间管理；
+2. K-V 存储；
+3. 文件存储；
+4. 数据共享；
+电话能力	1. 通话、短信；
+2. 蜂窝数据；
+3. 网络搜索；
+4. SIM 卡管理；
+基础硬件能力	1. 位置服务；
+2. 振动；
+3. 屏幕管理；
+4. 电源管理；
+5. 传感器：佩戴状态、抬腕、计步、罗盘、加速度、陀螺仪、气压；
+基础软件能力	1. 系统设置；
+2. 全球化；
+2. 解压缩、序列化；
+安全能力	1. 权限机制；
+2. 加解密算法库；
+3. 应用沙箱；
+两套 API
+为了兼顾高效开发和高性能，蓝河应用提供了两套 API，Javascript API 和 Native API
+
+Javascript API 提供了完整的开放能力， 支持开发者高效率地完成应用的开发。
+Native API 主要聚焦高性能场景，以及方便开发者对原有代码的复用。
+三种应用形态
+蓝河应用支持应用、表盘、快捷卡片三种应用形态。
+
+应用：它具有完整的功能，可以支持多页面，支持复杂的 UI 交互，支持应用间的跳转和数据交换。它可以在后台运行，在特定场景可以长期运行。
+表盘：它具备装饰属性， 也代表了用户的个性化选择。支持普通和 AOD 两种显示模式，支持动态交互和 20 多种数据展示。支持三种开发方案：AI 生成、表盘设计工具制作、代码编程实现。
+快捷卡片：是一种高效的信息展示方式，用户无需进入应用，在表盘界面只需左滑，即可查看信息和控制操作。
+
+蓝河表盘是一种非常重要的应用形态，蓝河应用致力于为用户提供丰富的表盘。为此蓝河开发套件共提供三种开发表盘方案，开发者既可以通过自然语言交互快速生成表盘（即将开放）、也可以使用设计图配置生成表盘（即将开放）、还可以使用代码编程实现功能更丰富的表盘。如果您需要了解更多关于代码编程实现表盘的方式请移步 表盘教程 与 UI 组件支持的表冠旋转 进行更详细的了解。
+
+通用开发流程
+一、准备开发环境
+BlueOS Studio 是面向蓝河应用开发推出的一款全新的一站式集成开发环境。开发者可以使用 BlueOS Studio 开发、调试和打包蓝河应用。BlueOS Studio 提供了丰富的功能和工具，可以极大地提高开发效率和代码质量。如果您想了解更多关于 BlueOS Studio 的功能和使用方法，请移步 BlueOS Studio 的详细教程。同时，您也可以 点击链接进入工具下载页面 ，安装 BlueOS Studio。
+
+二、开发 UI
+蓝河应用主要使用 UI 组件和样式进行界面的开发。UI 组件是蓝河应用 UI 开发的最小单元，蓝河应用提供了基础、表单，布局/容器、画布、导航、动画、系统风格等类型的一系列组件。 组件、样式、js 代码大部分都是写在 .ux 的文件中，您想进一步了解组件、样式、js 代码是如何组织的，可以移步 ux 文件 进行更详细的了解。
+
+
+在组件开发基础之上，蓝河应用还提供了丰富的样式支持，因此开发者可以开发出包含自己独特风格的蓝河应用。样式可以声明在<style>标签内也可以通过 style 属性以内联样式的形式声明在组件标签上，如果您想了解更多关于样式的详细信息，请移步 style 样式 。蓝河应用支持的通用样式情况的详细信息，可以移步了解 通用样式支持
+
+三、开发业务功能
+蓝河应用提供了 JS API 和 Native API 两种接口，以支撑高效和高性能的开发场景。开发者可以根据需要选择不同的接口进行开发，以获得更好的开发体验和应用性能。
+
+
+1.JS API 提供了完整的开放能力， 支持开发者高效率地完成应用的开发。开发者可以实现应用生命周期监听、系统弹窗、多设备互联等操作，如果您需要了解更多关于这些开放能力的信息，请移步 JS 功能接口 进行了解。
+
+
+2.Native API 主要聚焦高性能场景，支持 Posix API 以及部分系统能力如连接能力、数据存储能力、通信能力等。如果您需要了解 Native API 更详细的信息，请移步 Native API 。
+
+四、开发调试
+在开发的过程中，可以首先使用 BlueOS Studio 的 实时预览 查看开发的界面效果。此外，开发者经常会遇到到 UI 问题、网络问题、内存问题等，BlueOS Studio 也提供了对应的分析面板，例如： UI 调试 、 网络调试 、 内存调试 、 查阅日志 ，助力开发者更高效地定位问题。
+
+
+开发完成后，开发人员需要对应用进行测试。BlueOS Studio 提供了 自动化测试的功能 ，助力开发者提高测试效率。
+
+五、发布
+开发测试完成后，就来到了最后的发布环节，开发者可以使用 BlueOS Studio 的打包功能，将开发的应用打成 rpk 包。
+
+
+打包完成后，前往发布平台发布后，蓝河操作系统的用户即可使用到对应的蓝河应用。
+
+六、快应用开发支持
+蓝河系统支持快应用标准，可以使用 BlueOS Studio 进行快应用的开发，快应用开发技术文档请参考快应用官网。
+
+
+1.2构建首个蓝河应用
+构建首个蓝河应用
+更新时间：2025-01-16 19:58:38
+
+本文将从开发工具、新建项目、安装依赖、调试项目、打包等方面入手，让您学习后，可以构建首个蓝河应用。
+
+开发
+开发者可以使用 BlueOS Studio 开发、调试和打包蓝河应用。以下所有的操作均在 BlueOS Studio 中完成，开发者可以点击链接进入工具下载页面，先安装 BlueOS Studio 。
+
+一、新建项目
+新建方法如下：
+
+点击欢迎页「新建工程」、或菜单栏「新建工程」、或快捷入口处「新建工程」，打开新建工程界面；
+点击「下一步」 ，填写项目名称、项目路径、应用名称和应用包名，点击「完成」，BlueOS Studio 会在项目路径下，新建项目并自动打开。
+createProject
+二、安装依赖
+准备工作：安装并配置 Node 环境。
+在 BlueOS Studio，我们提供了方便的方式来安装依赖，如下图示，只要点击「安装依赖」按钮，即可。
+安装完毕之后，点击「重新启动编译」按钮，即能重新编译；之后编写代码，就能在预览区实时查看效果，而无需其他任何操作。
+install
+三、文件组织说明
+├── scripts                   工具脚本文件
+├── src
+│   ├── assets                公用资源
+│   │   ├── images            图片资源
+│   │   └── styles            应用样式
+│   ├── pages                 页面目录
+│   │   ├── Demo              应用首页
+│   │   └── DemoDetail        应用详情页
+│   ├── app.ux                入口文件。
+│   └── manifest.json         项目配置文件，配置应用图标、页面路由等
+└── jsconfig.json             js 配置文件，用于语法校验
+└── package.json              定义项目需要的各种模块及配置信息
+四、开发调试
+BlueOS Studio 支持实时预览功能，开发者只需保存修改后的代码，即可在右侧模拟器实时预览修改效果。你可以通过 BlueOS Studio 下方提供的 DevTools 面板，进行调试样式、查看请求等操作。
+simulatorPreview
+
+
+
+开发者可以跟着下面的步骤，一步步完成第一个蓝河应用的构建。
+
+1.构建 UI
+安装依赖后，即可打开 "src/pages/Demo/index.ux"文件，设置 <template> 标签内容，来构建页面 UI。<template> 标签示例如下：
+
+<template>
+  <div class="wrapper">
+    <text>Hello World</text>
+  </div>
+</template>
+2.设置页面样式
+在"src/pages/Demo/index.ux"文件中，新增<style>标签，对页面中文本、按钮等 UI 设置宽高、字体大小、间距等样式。<style>标签示例如下：
+
+<style>
+  .wrapper {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  text {
+    font-size: 50px;
+    lines: 2;
+  }
+</style>
+3.处理业务逻辑
+在"src/pages/Demo/index.ux"文件中，新增<script>标签处理业务逻辑。在初始<template>的基础上，我们添加一个 button 类型的 input 组件，作为按钮响应用户点击，从而实现业务逻辑。
+
+<template>
+  <div class="wrapper">
+    <text>Hello World</text>
+    <input type="button" class="button" value="click" onclick="buttonClick" />
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {},
+
+    buttonClick(event) {
+      console.log('click event fired')
+    },
+  }
+</script>
+
+<style>
+  .button {
+    width: 400px;
+    height: 80px;
+    align-items: center;
+    color: #ffffff;
+    background-color: #1890ff;
+    border-radius: 15px;
+  }
+</style>
+4.在右侧模拟器实时预览。第一个页面效果如下图所示：
+
+examplePreview
+五、打包
+开发完成后，可以使用 BlueOS Studio 打包出应用 rpk 包，步骤如下：
+
+点击顶部工具栏的「打包 」按钮，可以选择包类型和环境变量，包类型可选 release 和 debug，release 包需要填写信息生成签名后，再行打包；环境变量可选 production、development 和 test，根据环境不同可调用不同的后台接口而不用手动修改代码；
+打包成功之后，会在 dist 目录下生成相应的 rpk 包，可以「打开 rpk 所在位置」；
+打包成功之后，可以点击前往开放平台上传 rpk 包。
+package
+
+
+
+packageSuccess
+
+2.基础指南
+
+框架简介
+框架简介
+更新时间：2025-01-16 19:58:38
+
+蓝河应用框架采用了类 web 开发范式，具有学习成本低，开发效率高的特点。框架提供了丰富的 UI 组件与样式，开发者可以因此高效搭建界面。同时框架提供了两套 API 接口，开发者可以按需选择。
+
+数据绑定
+数据绑定可以让数据与视图非常简单地保持同步。当做数据修改的时候，只需要在逻辑层修改数据，视图层就会做相应的更新。数据绑定的具体使用参看数据绑定 。
+
+路由管理
+框架负责管理整个应用的页面路由，实现页面间的无缝切换，管理每个页面的完整生命周期。开发者需要将页面在 manifest.json 中进行注册，在代码中通过框架提供的接口方法实现页面的切换。具体使用参看manifest 文件、页面路由和页面启动模式。
+
+UI 组件
+提供了基础、表单，布局/容器、画布、导航、动画、系统风格等类型的一系列组件。通过参看UI 组件，您可以了 UI 组件解更详细的信息。
+
+API 接口
+蓝河应用提供了 JS API 和 Native API 两种接口，以支撑高效和高性能的开发场景。如果您需要了解更多关于这些开放能力的信息，请移步JS 功能接口与Native API进行了解。
+
+生命周期
+生命周期是指在程序运行的过程中，程序从创建、运行到销毁的整个过程。在这个过程中，程序会经历多个状态和阶段，每个阶段都会触发一些特定的回调函数，用于执行相应的操作和处理，这些回调函数被称为生命周期函数。
+
+
+蓝河应用提供了自定义组件、页面与应用的生命周期函数，让开发者有机会在特定阶段运行相应的代码。如果您需要了解更多关于生命周期的信息，请移步生命周期
+
+上一篇
+构建首个蓝河应用
+下一篇
+文件组织
+文件组织
+文件组织
+更新时间：2025-01-16 19:58:38
+
+本文对项目的文件目录及相关内容进行了介绍，包括蓝河应用文件结构讲解，配置信息、新增页面等
+
+项目介绍
+通过 BlueOS Studio 新建一个项目，这个项目已经包含了项目配置与示例页面的初始代码，项目根目录主要结构如下：
+
+├── scripts                   工具脚本文件
+├── src
+│   ├── assets                公用资源
+│   │   ├── images            图片资源
+│   │   └── styles            应用样式
+│   ├── pages                 页面目录
+│   │   ├── Demo              应用首页
+│   │   └── DemoDetail        应用详情页
+│   ├── app.ux                app.ux文件。
+│   └── manifest.json         项目配置文件，配置应用图标、页面路由等
+└── jsconfig.json             js 配置文件，用于语法校验
+└── package.json              定义项目需要的各种模块及配置信息
+目录的简要说明如下：
+src：项目源文件夹
+app.ux 文件用于全局 JavaScript 逻辑和应用生命周期管理，详见
+配置信息
+每个应用都要有专属的名称，图标等，这些信息都需要在manifest.json文件中配置。详见文档manifest 文件
+
+应用包名（package）
+应用包名，是区别于其他应用的唯一标识
+
+推荐采用 com.company.module 的格式，示例如下：
+
+{
+  "package": "com."应用类型" .Just"
+}
+应用名称（name）
+应用名称，6 个汉字以内，与应用商店保存的名称一致；框架提供保存到桌面的功能，桌面上显示的应用名即为此属性
+
+示例如下：
+
+{
+  "name": "Just“…” "
+}
+应用图标（icon）
+规则为正方形（不能是圆角），且务必无白边
+
+{
+  "icon": "/assets/images/logo.png"
+}
+应用版本名称、版本号（versionName、versionCode）
+应用版本名称、版本号为开发者的应用包维护的版本信息
+
+应用版本名称为主版本.次版本格式
+
+应用版本号为整数，从1开始，每次更新上架请自增 1
+
+示例如下：
+
+{
+  "versionName": "1.0",
+  "versionCode": 1
+}
+配置接口列表（features）
+在使用接口时，需要先在 manifest 中声明接口。在每个接口文档的顶部，都附有声明接口的配置代码
+
+以 fetch 网络请求为例，示例如下：
+
+{
+  "features": [{ "name": "blueos.communication.network.fetch" }]
+}
+新增页面
+新增及配置页面，需要依赖manifest.json中router配置
+
+router
+router，路由，用于定义页面的实际地址、跳转地址。如果 ux 页面没有配置路由，则不参与项目编译。一个目录下最多只能存在一个主页面文件（不包括组件文件）
+
+首页 (router.entry)
+首页，即应用平台启动时默认打开的页面。首页需配置为应用中某页面的名称，即在<ProjectName>/src目录下，页面目录的相对路径
+
+假设工程根目录如下所示
+
+└── src
+    └── Demo                  页面目录，存放各自页面私有的资源文件和组件文件
+        └── index.ux          页面文件，文件名不必与父文件夹相同（推荐index.ux）
+假设首页为 Demo 目录下的 index.ux 文件，则首页对应的页面名称为Demo
+
+{
+  "router": {
+    "entry": "Demo"
+  }
+}
+页面路由对象（router.pages）
+页面路由对象，key 为页面名称（<ProjectName>/src目录下，页面目录的相对路径），value 为页面具体路由配置，key 不要重复
+
+页面具体路由配置（router.pages 的 value）包括以下属性：
+
+component：页面对应的 ux 文件名
+path：页面路径，不填则默认为页面名称（<ProjectName>/src目录下，页面目录的相对路径）
+示例如下：
+
+假设工程根目录如下所示
+
+└── src
+    |── Demo                  页面目录，存放各自页面私有的资源文件和组件文件
+    |   └── index.ux          页面文件，文件名不必与父文件夹相同（推荐index.ux）
+    └── Doc
+        └── Layout            页面目录，存放各自页面私有的资源文件和组件文件
+            └── index.ux      页面文件，文件名不必与父文件夹相同（推荐index.ux）
+当页面名称（router.pages 的 key）为Demo时，对应的页面配置（router.pages 的 value）包括：
+
+component：页面对应的 ux 文件名index
+path：页面路径，默认为页面名称Demo
+{
+  "router": {
+    "pages": {
+      "Demo": {
+        "component": "index"
+      },
+      "Doc/Layout": {
+        "component": "index"
+      }
+    }
+  }
+}
+现在，开发者就可以通过/Demo访问到 Demo 目录下的 index.ux 页面了
+
+上一篇
+框架简介
+下一篇
+manifest文件
+manifest文件
+manifest 文件
+更新时间：2025-01-16 19:58:38
+
+manifest.json 文件中包含了应用描述、接口声明、页面路由信息
+
+manifest
+属性	类型	默认值	必填	描述
+package	String	-	是	应用包名，确认与原生应用的包名不一致，
+推荐采用 com.company.module 的格式，
+如：com." 软件类型".just
+name	String	-	是	应用名称，6 个汉字以内，与应用商店保存的名称一致，用于在桌面图标、弹窗等处显示应用名称
+icon	String	-	是	应用图标，提供 114x114 大小的即可
+versionName	String	-	否	应用版本名称，如："1.0"
+versionCode	Integer	-	是	应用版本号，从1自增，推荐每次重新上传包时versionCode+1
+features	Array	-	否	接口列表，绝大部分接口都需要在这里声明，否则不能调用，详见每个接口的文档说明
+config	Object	-	是	系统配置信息，详见下面说明
+router	Object	-	是	路由信息，详见下面说明
+deviceTypeList	Array<String>	watch	否	可选值有：watch, watch-square, watch-round, tv , car, phone
+display	Object	-	否	UI 显示相关配置，详见下面说明
+permissions	Array	-	否	权限申请示例:[{ "name": "watch.permission.LOCATION" }]
+appCategory	Array<String>	-	是	应用类别,可选值详见下文应用类别说明,最多 2 个分类
+应用类别说明 appCategory
+注：appCategory 属性要求开发者必填，如有开发者未填，系统将设置为['other']。
+
+类别	说明
+business	商业类应用
+education	教育类应用
+pastime	娱乐类应用
+finance	财务类应用
+games	游戏类应用
+lifestyle	生活方式类应用
+medical	医疗类应用
+music	音乐类应用
+news	新闻类应用
+photography	摄影类应用
+reference	参考资料类应用
+social	社交类应用
+sports	体育类应用
+travel	旅游类应用
+utilities	实用工具类应用
+video	视频类应用
+weather	天气类应用
+navigation	导航类应用
+book	书籍类应用
+shopping	购物类应用
+podcasts	播客类应用
+audiobooks	音频书籍类应用
+radio	电台类应用
+other	其它类应用
+config
+用于定义系统配置和全局数据。
+
+属性	类型	默认值	描述
+designWidth	Integer	-	页面设计基准宽度，根据实际设备宽度来缩放元素大小，建议使用 466
+router
+用于定义页面的组成和相关配置信息，如果页面没有配置路由信息，则在编译打包时跳过。
+
+属性	类型	默认值	必填	描述
+entry	String	-	是	首页名称
+pages	Object	-	是	页面配置列表，key 值为页面名称（对应页面目录名，例如 Hello 对应'Hello'目录），value 为页面详细配置 page，详见下面说明
+示例代码：
+
+{
+  "router": {
+    "entry": "Demo",
+    "errorPage": "ErrorPage",
+    "pages": {
+      "Demo": {
+        "component": "index"
+      },
+      "ErrorPage": {
+        "component": "index"
+      }
+    }
+  }
+}
+router.pages
+用于定义单个页面路由信息。
+
+属性	类型	默认值	必填	描述
+component	String	-	是	页面对应的组件名，与 ux 文件名保持一致，例如'hello' 对应 'hello.ux'，目前仅支持 index.ux
+path	String	/<页面名称>	否	页面路径，例如“/user”,不填则默认为/<页面名称>。
+path 必须唯一,不能和其他 page 的 path 相同。
+下面 page 的 path 因为缺失,会被设置为“/Index”：
+"Index": {"component": "index"}
+launchMode	String	standard	否	声明页面的启动模式，支持"singleTask"，"standard"两种页面启动模式。
+标识为"singleTask"模式时每次打开目标页面都会打开已有的目标页面并回调 onRefresh 生命周期函数，清除该页面上打开的其他页面，没有打开过此页面时会创建新的目标页面实例。
+标识为"standard"模式时会每次打开新的目标页面（多次打开目标页面地址时会存在多个相同页面）
+followHand	String	enable	否	配置页面是否支持右滑跟手，disable：不支持；enable：支持
+display
+用于定义与 UI 显示相关的配置。
+
+如果在 display 对象下定义以下属性值，则生效范围为此蓝河应用全部页面；
+
+属性	类型	默认值	描述
+backgroundColor	String	#000	窗口背景颜色
+权限列表说明
+权限名	需要导入的模块	需要权限申请的具体接口	说明	权限错误码
+watch.permission.LOCATION	import geolocation from '@blueos.hardware.geolocation'	geolocation.getLocation(OBJECT)
+geolocation.subscribe(OBJECT)
+geolocation.unsubscribe()	位置信息	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+watch.permission.STEP_COUNTER	import sensor from '@blueos.hardware.sensor'	sensor.subscribeStepCounter(OBJECT)	计步传感器	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+watch.permission.DEVICE_INFO	import device from '@blueos.hardware.device'	device.getId(OBJECT)
+device.getDeviceId(OBJECT)
+device.getSerial(OBJECT)	设备信息	400: 拒绝授予权限 , 402: 权限错误（未声明该权限）
+watch.permission.RECORD	import record from '@blueos.multimedia.record'	record.start(OBJECT)
+record.stop(OBJECT)
+record.release(OBJECT)	录音	400: 拒绝授予权限, 401: 敏感权限不能在后台运行, 402: 权限错误（未声明该权限）
+watch.permission.BLUETOOTH	import bluetooth from '@blueos.communication.bluetooth.bluetooth'
+import bluetooth from '@vivo.bluetooth'	bluetooth.getBindState()
+bluetooth.startBind(OBJECT)
+bluetooth.confirmBind(OBJECT)
+bluetooth.cancelBind(OBJECT)
+bluetooth.startDevicesDiscovery(OBJECT)
+bluetooth.onDevicefound = function(data)
+bluetooth.stopDevicesDiscovery(OBJECT)
+bluetooth.getConnectedDevices(OBJECT)
+bluetooth.getPairedDevices(OBJECT)
+bluetooth.createConnection(OBJECT)
+bluetooth.closeConnection (OBJECT)
+bluetooth.pair(OBJECT)
+bluetooth.unpair(OBJECT)
+bluetooth.subscribeBind(OBJECT)
+bluetooth.clearBindData(OBJECT)
+bluetooth.replyPhone(OBJECT)
+bluetooth.onadapterstatechange = function(data)	允许使用设备蓝牙	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+watch.permission.READ_HEALTH_DATA	import health from '@blueos.health.health'
+import health from '@vivo.health'	health.getRecentSamples(Object)
+health.subscribeSample(Object)
+health.unsubscribeSample(Object)
+health.getTodayStatistic(Object)
+health.subscribeTodayStatistic(Object)
+health.unsubscribeTodayStatistic(Object)	读取健康数据	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+上一篇
+文件组织
+下一篇
+ux文件
+ux文件
+UX 文件
+更新时间：2025-01-16 19:58:38
+
+APP、页面和自定义组件均通过 ux 后缀文件编写，ux 后缀文件由 template 模板、style 样式和javascript 代码 3 个部分组成，一个典型的页面 ux 后缀文件示例如下：
+
+<template>
+  <!-- template里只能有一个根节点 -->
+  <div class="demo-page">
+    <text class="title">欢迎打开{{title}}</text>
+    <!-- 点击跳转详情页 -->
+    <input class="btn" type="button" value="跳转到详情页" onclick="routeDetail" />
+  </div>
+</template>
+
+<style>
+  .demo-page {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .title {
+    font-size: 40px;
+    text-align: center;
+  }
+
+  .btn {
+    width: 550px;
+    height: 86px;
+    margin-top: 75px;
+    border-radius: 43px;
+    background-color: #09ba07;
+    font-size: 30px;
+    color: #ffffff;
+  }
+</style>
+
+<script>
+  import router from '@blueos.app.router'
+
+  export default {
+    // 页面级组件的数据模型
+    data: {
+      title: '示例页面',
+    },
+    routeDetail() {
+      // 跳转到应用内的某个页面，router用法详见：文档->接口->页面路由
+      router.push({
+        uri: '/DemoDetail',
+      })
+    },
+  }
+</script>
+app.ux
+当前app.ux编译后会包含manifest配置信息，所以请不要删除/**manifest**/的注释内容标识。
+
+您可以在<script>中引入一些公共的脚本，并暴露在当前 app 的对象上，如下所示，然后就可以在页面 ux 文件的 ViewModel 中，通过this.$app.$def.util访问。
+
+<script>
+  /**
+   * 应用级别的配置，供所有页面公用
+   */
+  import util from './util'
+
+  export default {
+    showMenu: util.showMenu,
+    createShortcut: util.createShortcut,
+    util,
+  }
+</script>
+上一篇
+manifest文件
+下一篇
+style样式
+style样式
+style 样式
+更新时间：2025-01-16 19:58:38
+
+用于描述 template 模板的组件样式，决定组件应该如何显示
+
+样式布局采用 CSS Flexbox（弹性盒）样式，针对部分原生组件，对 CSS 进行了少量的扩充以及修改
+
+为了解决屏幕适配问题，所有与大小相关的样式（例如 width、font-size）均以基准宽度（默认 750px）为基础，根据实际屏幕宽度进行缩放
+
+文件导入
+支持@import导入外部文件
+
+<style>
+  @import './style.css';
+  .a {
+  }
+</style>
+模板内部样式
+支持使用 style、class 属性来控制组件的样式
+
+<!-- 内联inline -->
+<div style="color: #f00; margin: 10px;" />
+<!-- class声明 -->
+<div class="normal append" />
+伪类
+css 伪类是选择器中的关键字，用于指定要选择元素的特殊状态。
+
+名称	支持组件	描述
+:active	通用	表示被用户激活的元素，如：被用户按下的按钮。
+选择器
+支持的选择器有：
+
+选择器	样例	样例描述
+.class	.intro	选择所有拥有 class="intro" 的组件
+#id	#firstname	选择拥有 id="firstname" 的组件
+tag	div	选择所有 div 组件
+,	.a, .b	选择所有 class=“.a” 以及 class=“.b”的组件
+#id .class tag	.page .body text	支持 id,class,tag 的后代选择器，也可以使用">"表示直接后代
+<style>
+  /* 单个选择器 */
+  text {
+  }
+  .class-abc {
+  }
+  #idAbc {
+  }
+  /* 后代选择 */
+  .doc-page #testTag div text {
+  }
+  .doc-page #test-class .class1 {
+  }
+  .doc-page #testId #testIdId1 {
+  }
+  /* 直接后代选择 */
+  .doc-page #testTag .flex-column > text {
+  }
+  /* 同一样式适应多个选择器 */
+  .font-text,
+  .font-comma {
+  }
+</style>
+注意，选择器声明的变化可能会导致元素重新绘制。为了减少选择器变化引起的 DOM 更新数量，当前只支持：CSS 声明的多个选择器中最后一个规则的变更对 DOM 的更新
+
+<template>
+  <div class="{{docBody}}">
+    <text class="{{rowDesc}}">描述内容</text>
+  </div>
+</template>
+
+<style>
+  .doc-body .row-desc1 {
+    color: #ff0000;
+  }
+  .doc-body .row-desc2 {
+    color: #0000ff;
+  }
+  .doc-body2 .row-desc1 {
+    color: #00ff00;
+  }
+</style>
+
+<script>
+  export default {
+    // 页面级组件的数据模型
+    data: {
+      rowDesc: 'row-desc1',
+      docBody: 'doc-body',
+    },
+  }
+</script>
+以上的代码示例，当我们把rowDesc变量从row-desc1变为row-desc2时是通知 Native 更新节点样式，但是如果把docBody变量从doc-body变为doc-body2，是不会通知 DOM 更新的。
+
+因为doc-body不是最后一个选择器，非末尾的选择器变更有可能影响很多 DOM 元素，从而影响到渲染性能
+
+选择器优先级
+当前样式的选择器的优先级计算保持与浏览器一致，是浏览器 CSS 渲染的一个子集（仅支持：inline, id, class, tag, 后代，直接后代）
+
+多条 CSS 声明可以匹配到同一个元素 如 div，应用在该元素上的 CSS 声明总体优先级是：inline > #id > .class > tag，这四大类匹配到该元素的多个 CSS 声明，如：#page .class-div和.page .class-div，其优先级按照各选择器的权值高低之和来比较
+
+ID选择器（例如: #hello）的权值为 10000
+
+类选择器（例如: .example）的权值为 100
+
+类型选择器（例如: h1）的权值为 1
+
+css 的优先级计算文档也可以查看 MDN 文档 入门
+
+那么以下 CSS 声明计算的权值为：
+
+#page的权值为：10000
+
+#page .class-div的权值为：10100
+
+#page .class-div text的权值为 10101
+
+#page #body .container div text的权值为：20102
+
+因此：
+
+#page .class-div和.page .class-div比较，权值不一样，权值高优先级高；如果权值相同，则按照声明顺序：后者覆盖前者
+样式预编译
+目前蓝河应用支持less与sass的预编译，具体教程也可以参考[这里]
+
+<!--导入外部文件, 代替style内部样式-->
+<style lang="less" src="./lessFile.less"></style>
+
+<!--合并外部文件-->
+<style lang="less">
+  @import './lessFile.less';
+  .page-less {
+    #testTag {
+      .less-font-text,
+      .less-font-comma {
+        font-size: 60px;
+      }
+    }
+  }
+</style>
+媒体查询
+媒体查询（Media Query）在移动设备上应用十分广泛，开发者经常需要根据设备的大致类型或者特定的特征和设备参数（例如屏幕分辨率）来修改应用的样式。为此媒体查询提供了如下功能：
+
+1.针对设备和应用的属性信息，可以设计出相匹配的布局样式。 2.当屏幕发生动态改变时（比如分屏、横竖屏切换），应用页面布局同步更新。
+
+CSS 语法规则
+使用@media 来引入查询语句，具体规则如下：
+
+@media [media-type] [and|not|only] [(media-feature)] {
+  CSS-Code;
+}
+举例：
+/* level3的写法, 表示：宽度小于30dp时生效 */
+@media (max-width: 30) {
+  .box {
+    background-color: red;
+  }
+}
+/* level4的写法，比level3更清晰简洁，表示：宽度小于30dp时生效 */
+@media (width <= 30) {
+  .box {
+    background-color: red;
+  }
+}
+/* 多条件写法，表示：宽度大于400dp且小于700dp时生效 */
+@media screen and (min-width: 400) and (max-width: 700) {
+  .box {
+    background-color: red;
+  }
+}
+/* 多条件level4写法，表示：宽度大于400dp且小于700dp时生效  */
+@media (400 <= width <= 700) {
+  .box {
+    background-color: red;
+  }
+}
+/* 多条件写法，表示：方表和手机上生效 */
+@media screen and (device: watch-square) or screen and (device: phone) {
+  .box {
+    background-color: red;
+  }
+}
+页面中引用资源
+通过@import 方式引入媒体查询，具体使用方法如下：
+
+@import url [media-type] [and|not|only] [(media-feature) ];
+例如：
+
+@import '../common/style.css' screen and (min-width: 600) and (max-width: 1200);
+动态修改样式
+动态修改样式有多种方式，包括但不限于以下：
+
+修改 class：更新组件的 class 属性中使用的变量的值
+修改内联 style：更新组件的 style 属性中的某个 CSS 的值
+修改绑定的对象：通过绑定的对象控制元素的样式
+修改绑定的样式字符串：通过样式字符串控制元素的样式
+示例如下：
+
+<template>
+  <div style="flex-direction: column;">
+    <!-- 修改 class -->
+    <text class="normal-text {{ className }}" onclick="changeClassName">点击我修改文字颜色</text>
+    <!-- 修改内联 style -->
+    <text style="color: {{ textColor }}" onclick="changeInlineStyle">点击我修改文字颜色</text>
+    <!-- 修改绑定的对象 -->
+    <text style="{{ styleObj }}" onclick="changeStyleObj">点击我修改文字颜色</text>
+    <!-- 修改绑定的样式字符串  -->
+    <text style="{{ styleText }}" onclick="changeStyleText">点击我修改文字颜色</text>
+  </div>
+</template>
+
+<style>
+  .normal-text {
+    font-weight: bold;
+  }
+  .text-blue {
+    color: #0faeff;
+  }
+  .text-red {
+    color: #f76160;
+  }
+</style>
+
+<script>
+  export default {
+    data: {
+      className: 'text-blue',
+      textColor: '#0faeff',
+      styleObj: {
+        color: '#f00',
+      },
+      styleText: 'color: #0f0',
+    },
+    changeClassName() {
+      this.className = 'text-red'
+    },
+    changeInlineStyle() {
+      this.textColor = '#f76160'
+    },
+    changeStyleObj() {
+      this.styleObj = {
+        color: '#00f',
+      }
+    },
+    changeStyleText() {
+      this.styleText = 'color: #0f0'
+    },
+  }
+</script>
+引入 less/scss 预编译
+less 篇
+less 语法入门请参考less 中文官网 学习
+
+使用 less 请先安装相应的类库：less、less-loader，
+
+npm i less less-loader
+在<style>标签上添加属性lang="less"
+
+<template>
+  <div class="tutorial-page">
+    <text id="title">less示例!</text>
+  </div>
+</template>
+<style lang="less">
+  /* 引入外部less文件 */
+  @import './style.less';
+  /* 使用less */
+</style>
+scss 篇
+scss 语法入门请参考 [scss 中文官网]学习
+
+使用 scss 请在蓝河应用项目下执行以下命令安装相应的类库：node-sass、sass-loader，
+
+npm i node-sass sass-loader
+在<style>标签上添加属性lang="scss" 示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <text id="title">less示例!</text>
+  </div>
+</template>
+
+<style lang="scss">
+  /* 引入外部scss文件 */
+  @import './style.scss';
+  /* 使用scss */
+</style>
+媒体类型
+类型	说明
+screen	按屏幕相关参数进行媒体查询。
+媒体逻辑操作
+开发者可以使用逻辑操作符组合多个媒体特性的查询条件，编写复杂的媒体查询。
+
+类型	说明
+and	and 运算符用于将多个媒体特性组合到一个单独的媒体查询中，要求每个链接的特性返回 true，则此时查询为真。
+not	not 运算符用于否定媒体查询，如果查询不返回 false，则返回 true。如果出现在逗号分隔的列表中，它只会否定应用它的特定查询。如果使用 not 运算符，则必须指定显式媒体类型。例如：not screen and (min-width: 400) and (max-width: 700)注：not 关键字不能用于否定单个功能表达式，它会作用于整个媒体查询。
+only	only 运算符仅用于整个查询匹配应用样式,蓝河应用处理以 only 开头的关键词时将会忽略 only。如果使用 only 运算符，必须指定媒体类型。例如：only screen and (min-width: 400) and (max-width: 700)
+,(逗号)	逗号分隔效果等同于 or 逻辑操作符。当使用逗号分隔的媒体查询时，如果任何一个媒体查询返回真，样式就是有效的。例如：(orientation: landscape), (height >= 690)。
+or	or 运算符用于将多个媒体特性比较语句组合到一个媒体查询语句中，只要有其中一条媒体特性比较语句返回 true，查询成立。例如：(min-width: 400) or (max-width: 700)
+<=	小于等于。例如： (400 <= width)。
+>=	大于等于。例如： (500 >= height)。
+<	小于。例如： (400 < width)。
+>	大于。例如： (500 > height)。
+媒体特性
+类型	说明	查询时是否带单位	支持单位
+height	定义输出设备中的页面可视区域高度。	否	dp
+min-height	定义输出设备中的页面可视区域最小高度。	否	dp
+max-height	定义输出设备中的页面可视区域最大高度。	否	dp
+width	定义输出设备中的页面可视区域宽度。	否	dp
+min-width	定义输出设备中的页面可视区域最小宽度。	否	dp
+max-width	定义输出设备中的页面可视区域最大宽度。	否	dp
+orientation	定义屏幕处于横屏模式还是竖屏模式，支持属性：portrait（竖屏）、landscape（横屏）。	否	无
+aspect-ratio	定义输出设备中的页面可见区域宽高比，比例值需要按照 x / y 的格式，例如 1 / 2。	否	无
+min-aspect-ratio	定义输出设备中的页面可见区域最小宽高比，参数要求同上。	否	无
+max-aspect-ratio	定义输出设备中的页面可见区域最大宽高比，参数要求同上。	否	无
+device	device 的可选值为:phone、watch、car、tv、pad、watch-square、watch-round，watch 默认 watch-square	否	无
+上一篇
+ux文件
+下一篇
+javascript代码
+javascript代码
+javascript 代码
+更新时间：2025-01-16 19:58:38
+
+用来定义页面数据和实现生命周期接口
+
+语法
+支持 ES6 语法
+
+模块声明
+蓝河应用中支持ES6的module标准，使用import引入 js 依赖，同时支持 CommonJs 规范，使用require引入 js 依赖（具体参看功能接口部分文档说明）
+
+// 首先在 `manifest.json` 中配置 `fetch` 接口
+
+// require引入
+const fetch = require('@blueos.communication.network.fetch')
+
+// import引入
+import fetch from '@blueos.communication.network.fetch'
+代码引用
+JS 代码引用推荐使用 import 来导入, 例如：
+
+import utils from '../Common/utils.js'
+注意： 蓝河应用环境不是 node 环境，不要引用 node 原生模块，如 import fs from 'fs'
+
+对象
+蓝河应用的组件对象提供了一些属性和方法，用于控制组件的渲染、数据处理、组件逻辑等方面
+
+页面级组件对象
+属性	类型	描述
+data	Object | Function	页面级组件的数据模型，能够转换为 JSON 对象；属性名不能以$或_开头, 不要使用 for, if, show, tid 等保留字
+如果是函数，返回结果必须是对象，在组件初始化时会执行函数获取结果作为 data 的值
+使用 data 方式声明的属性会被外部数据覆盖，因此存在一定安全风险。
+示例
+<template>
+  <div class="wrapper">
+    <text>{{title}]</text>
+  </div>
+</template>
+
+<script>
+export default {
+  data: {
+    title: 'Hello Word'
+  },
+}
+</script>
+自定义组件对象
+属性	类型	描述
+data	Object | Function	自定义组件的数据模型，能够转换为 JSON 对象；属性名不能以$或_开头, 不要使用 for, if, show, tid 等保留字
+如果是函数，返回结果必须是对象，在组件初始化时会执行函数获取结果作为 data 的值
+props	Array | Object	定义组件外部可传入的所有属性；属性名不能以$或_开头, 不要使用 for, if, show, tid 等保留字
+在模板代码中，请使用短横线分隔命名代替驼峰命名。如，属性定义 props: ['propA']，可通过<tag prop-a='xx'>方式传递到组件内部
+示例
+<template>
+  <div class="wrapper">
+    <text>{{title}]</text>
+    <text>{{name}]</text>
+  </div>
+</template>
+
+<script>
+export default {
+  data: {
+    title: 'child component'
+  },
+  props: ['name']
+}
+</script>
+想了解更多信息可以参考自定义组件
+
+公共对象
+属性	类型	描述
+$app	Object	应用对象
+$page	Object	页面对象
+$valid	Boolean	页面对象是否有效
+$device	{ deviceType: string }	获取当前设备类型。watch-square：方形手表，watch-round：圆形手表
+应用对象
+可通过$app访问
+
+属性	类型	描述
+$def	Object	使用this.$app.$def获取在app.ux中暴露的对象
+方法
+公共方法
+属性	类型	参数	描述
+$element	Function	id: String 组件 id	获取指定 id 的组件调用来对应的组件方法
+$set	Function	key: String 属性名称
+value: Any	添加数据属性，用法：this.$set('key',value)
+事件方法
+属性	类型	参数	描述
+$watch	Function	data: String 属性名, 支持'a.b.c'格式，不支持数组索引
+handler: String 事件句柄函数名, 函数的第一个参数为新的属性值，第二个参数为旧的属性值	动态添加属性/事件绑定，属性必须在 data 中定义，handler 函数必须在<script>定义；当属性值发生变化时事件才被触发用法：this.$watch('a','handler')
+应用方法
+可通过$app访问
+
+属性	类型	参数	描述
+exit	Function	无	退出蓝河应用，结束应用生命周期。
+调用方法：this.$app.exit()
+该 feature 依赖 blueos.app.app, 请确保在 manifest.json 中引入
+
+页面方法
+可通过$page访问
+
+属性	类型	参数	描述
+setStopGestureQuit	Function	Number	是否屏蔽手势返回，1 - 屏蔽。0 - 不屏蔽。
+调用方法：this.$page.setStopGestureQuit(1)
+该 feature 依赖 blueos.app.router, 请确保在 manifest.json 中引入
+
+上一篇
+style样式
+下一篇
+页面布局
+页面布局
+页面布局
+更新时间：2025-01-16 19:58:37
+
+蓝河应用使用的是 Flex 布局方式。
+
+盒模型
+蓝河应用布局框架使用 border-box 模型，具体表现与宽高边距计算可参考 MDN 文档 box-sizing， 暂不支持 content-box 模型与手动指定 box-sizing 属性。
+
+布局所占宽度 Width：
+
+Width = width(包含padding-left + padding-right + border-left + border-right)
+
+布局所占高度 Height:
+
+Height = height(包含padding-top + padding-bottom + border-top + border-bottom)
+
+长度单位
+px
+与传统 web 页面不同，px是相对于项目配置基准宽度的单位，已经适配了移动端屏幕，其原理类似于rem
+
+开发者只需按照设计稿确定框架样式中的 px 值即可。
+
+首先，我们需要定义项目配置基准宽度，它是项目的配置文件（<ProjectName>/src/manifest.json）中config.designWidth的值
+
+然后， 设计稿1px与框架样式1px转换公式如下：
+
+设计稿1px / 设计稿基准宽度 = 框架样式1px / 项目配置基准宽度
+示例如下：
+
+若设计稿宽度为 640px，元素 A 在设计稿上的宽度为 100px，实现的两种方案如下：
+
+方案一：
+
+修改项目配置基准宽度：将项目配置基准宽度设置为设计稿基准宽度，则框架样式1px等于设计稿1px
+
+设置项目配置基准宽度，在项目的配置文件（<ProjectName>/src/manifest.json）中，修改config.designWidth：
+{
+  "config": {
+    "designWidth": 640
+  }
+}
+设置元素 A 对应的框架样式：
+width: 100px;
+方案二：
+
+不修改项目配置基准宽度：若当前项目配置的项目配置基准宽度为 466，设元素 A 的框架样式 xpx，由转换公式得：100 / 640 = x / 466
+
+设置元素 A 对应的框架样式：
+width: 73px;
+设置定位
+position 将支持三种属性值：relative、absolute 和 fixed，并且默认值为 relative，入门可以参考MDN 文档
+
+设置样式
+开发者可以使用内联样式、tag选择器、class选择器、id选择器来为组件设置样式
+
+同时也可以使用并列选择、后代选择器设置样式
+
+详细的文档可以查看此处
+
+注意: template 的样式读取范围，只包括内联样式与当前 ux 文件的<style>标签内的样式与引入的 css/less/scss，如果一个 ux 文件被包装成自定义组件并被其他父组件引用，其样式并不能响应父组件的样式。
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <text style="color: #FF0000;">内联样式</text>
+    <text id="title">ID选择器</text>
+    <text class="title">class选择器</text>
+    <text>tag选择器</text>
+  </div>
+</template>
+
+<style>
+  .tutorial-page {
+    flex-direction: column;
+  }
+  /* tag选择器 */
+  text {
+    color: #0000ff;
+  }
+  /* class选择器（推荐） */
+  .title {
+    color: #00ff00;
+  }
+  /* ID选择器 */
+  #title {
+    color: #00a000;
+  }
+  /* 并列选择 */
+  .title,
+  #title {
+    font-weight: bold;
+  }
+  /* 后代选择器 */
+  .tutorial-page text {
+    font-size: 42px;
+  }
+  /* 直接后代选择器 */
+  .tutorial-page > text {
+    text-decoration: underline;
+  }
+</style>
+通用样式
+通用样式如 margin,padding 等属性可以点击此处
+
+Flex 布局示例
+框架使用Flex布局，关于Flex布局可以参考外部文档A Complete Guide to Flexbox
+
+flex 布局的支持也可以在官网文档的通用样式查询
+
+div 组件为最常用的 Flex 容器组件，具有 Flex 布局的特性；text、a、span、label 组件为文本容器组件，其它组件不能直接放置文本内容
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <div class="item">
+      <text>item1</text>
+    </div>
+    <div class="item">
+      <text>item2</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  .tutorial-page {
+    /* 交叉轴居中 */
+    align-items: center;
+    /* 纵向排列 */
+    flex-direction: column;
+  }
+  .tutorial-page > .item {
+    /* 有剩余空间时，允许被拉伸 */
+    /*flex-grow: 1;*/
+    /* 空间不够用时，不允许被压缩 */
+    flex-shrink: 0;
+    /* 主轴居中 */
+    justify-content: center;
+    width: 200px;
+    height: 100px;
+    margin: 10px;
+    background-color: #ff0000;
+  }
+</style>
+上一篇
+javascript代码
+下一篇
+页面路由
+页面路由
+页面路由
+更新时间：2025-01-16 19:58:38
+
+了解如何打开页面、回退，并传递参数
+
+组件 a 切换页面
+切换页面
+组件 a 可通过配置 href 属性跳转到应用内的页面
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <!-- 以'/'开头的应用内页面的路径 -->
+    <a href="/PageParams/receiveparams">跳转到接收参数页面</a>
+    <!-- 以非'/'开头的应用内页面的名称 -->
+    <a href="PageParams/receiveparams">跳转到接收参数页面</a>
+    <!-- 特殊的,如果uri的值是'/',则跳转到path为'/'的页,没有则跳转到首页-->
+    <a href="/">跳转到首页</a>
+  </div>
+</template>
+传递参数
+通过组件 a 实现页面切换时，可以通过'?key=value'的方式添加参数，支持参数为变量
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <!-- 添加参数 -->
+    <a href="/PageParams/receiveparams?key=Hello, world!">携带参数key1跳转</a>
+    <!-- 添加变量参数 -->
+    <a href="/PageParams/receiveparams?key={{title}}">携带参数key2跳转</a>
+  </div>
+</template>
+
+<style>
+  .tutorial-page {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  a {
+    margin-top: 75px;
+    font-size: 30px;
+    color: #09ba07;
+    text-decoration: underline;
+  }
+</style>
+
+<script>
+  export default {
+    data: {
+      title: 'Hello, world!',
+    },
+    onInit() {
+      console.log('组件a切换页面并传递参数')
+    },
+  }
+</script>
+接口 router 切换页面
+切换页面
+router 接口在使用前，需要先导入模块
+
+router.push(OBJECT) / router.replace(OBJECT) 支持的参数 uri 与组件 a 的 href 属性完全一致
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <input class="btn" type="button" value="跳转到接收参数页面" onclick="routePagePush"></input>
+    <input class="btn" type="button" value="跳转到接收参数页面，当前页面无法返回" onclick="routePageReplace"></input>
+    <input class="btn" type="button" value="返回上一页" onclick="routePageBack"></input>
+    <input class="btn" type="button" value="清空页面记录，仅保留当前页面" onclick="routePageClear"></input>
+  </div>
+</template>
+
+<style>
+  .tutorial-page {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .btn {
+    width: 550px;
+    height: 86px;
+    margin-top: 75px;
+    border-radius: 43px;
+    background-color: #09ba07;
+    font-size: 30px;
+    color: #ffffff;
+  }
+</style>
+
+<script>
+  // 导入模块
+  import router from '@blueos.app.router'
+
+  export default {
+    onInit () {
+      console.log('接口router切换页面')
+    },
+    routePagePush () {
+      // 跳转到应用内的某个页面
+      router.push({
+        uri: '/PageParams/receiveparams'
+      })
+    },
+    routePageReplace () {
+      // 跳转到应用内的某个页面，当前页面无法返回
+      router.replace({
+        uri: '/PageParams/receiveparams'
+      })
+    },
+    routePageBack () {
+      // 返回上一页面
+      router.back()
+    },
+    routePageClear () {
+      // 清空所有历史页面记录，仅保留当前页面
+      router.clear()
+    }
+  }
+</script>
+传递参数
+router 接口的参数 params 可配置页面跳转时需要传递的参数
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <input class="btn" type="button" value="携带参数跳转页面" onclick="routePagePushWithParams"></input>
+    <input class="btn" type="button" value="携带参数跳转页面，当前页面无法返回" onclick="routePageReplaceWithParams"></input>
+  </div>
+</template>
+
+<style>
+  .tutorial-page {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .btn {
+    width: 550px;
+    height: 86px;
+    margin-top: 75px;
+    border-radius: 43px;
+    background-color: #09ba07;
+    font-size: 30px;
+    color: #ffffff;
+  }
+</style>
+
+<script>
+  // 导入模块
+  import router from '@blueos.app.router'
+
+  export default {
+    data: {
+      title: 'Hello, world!'
+    },
+    onInit () {
+      console.log('接口router切换页面并传递参数')
+    },
+    routePagePushWithParams () {
+      // 跳转到应用内的某个页面
+      router.push({
+        uri: '/PageParams/receiveparams',
+        params: { key: this.title }
+      })
+    },
+    routePageReplaceWithParams () {
+      // 跳转到应用内的某个页面，当前页面无法返回
+      router.replace({
+        uri: '/PageParams/receiveparams',
+        params: { key: this.title }
+      })
+    }
+  }
+</script>
+接收参数
+现在，开发者已经掌握了通过组件 a 和接口 router 在页面之间传递参数的方法，如何接收参数呢？
+
+其实很简单，组件 a 和接口 router 传递的参数的接收方法完全一致：在页面的 ViewModel 的data属性中声明使用的属性
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <text>page</text>
+    <!-- template中显示页面传递的参数 -->
+    <text>{{key}}</text>
+  </div>
+</template>
+
+<style>
+  .tutorial-page {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+
+<script>
+  export default {
+    data: {
+      key: '',
+    },
+    onInit() {
+      console.log('接收参数')
+
+      // js中输出页面传递的参数
+      console.info('key: ' + this.key)
+    },
+  }
+</script>
+上一篇
+页面布局
+下一篇
+数据绑定
+数据绑定
+数据绑定
+更新时间：2025-01-16 19:58:37
+
+蓝河应用提供了数据绑定 UI 组件的方式，当数据发生变化时，会自动触发 UI 组件的更新。
+
+绑定方法
+用法上，开发者可以在组件上使用 "{{varname}}" ，即双大括号内放置变量的形式，即可将变量绑定在 UI 组件上。
+
+示例如下
+<template>
+  <div>
+    <text>{{title}}</text>
+    <input type="button" value="changeTitle" onclick="changeTitle" />
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      title: 'Hello World!',
+    },
+    changeTitle() {
+      this.title = 'Hello 蓝河应用'
+    },
+  }
+</script>
+注意事项
+响应式数据必须先在 data 上静态声明或者使用 this.$set 动态添加，不能直接使用 this.title = 'hello' 添加。
+
+错误示例
+<script>
+  export default {
+    data: {},
+    onInit() {
+      this.title = 'Hello 蓝河应用'
+    },
+  }
+</script>
+上一篇
+页面路由
+下一篇
+列表渲染
+列表渲染
+更新时间：2025-01-16 19:58:37
+
+在蓝河应用如果要实现列表渲染，我们会用到 for 指令。 for 指令用于循环输出一个数组类型的数据。
+
+for指令根据源数据数组渲染列表，支持的写法如下（其中{{}}可以省略）：
+
+- `for="{{list}}"`：`list`为源数据数组，默认的数组元素名为`$item`
+- `for="{{value in list}}"`：`value`为自定义的数组元素名，默认的数组元素索引名为`$idx`。`list`可以为常数，写法如：`for="{{value in 10}}"`
+- `for="{{(index, value) in list}}"`：`index`为自定义的数组元素索引名，`value`为自定义的数组元素名。`list`可以为常数，写法如：`for="{{(index, value) in 10}}"`
+for指令的tid属性用于指定数组元素的唯一 Id，若未指定，默认使用数组索引($idx)作为唯一 Id。tid属性的作用在于元素节点重用，优化 for 循环的重绘效率
+
+示例
+<template>
+  <div class="tutorial-page">
+    <!-- 方式1：默认$item代表数组中的元素, $idx代表数组中的索引 -->
+    <div class="tutorial-row" for="{{list}}" tid="uniqueId">
+      <text>{{$idx}}.{{$item.name}}</text>
+    </div>
+    <!-- 方式2：自定义元素变量名称 -->
+    <div class="tutorial-row" for="value in list" tid="uniqueId">
+      <text>{{$idx}}.{{value.name}}</text>
+    </div>
+    <!-- 方式3：自定义元素、索引的变量名称 -->
+    <div class="tutorial-row" for="(personIndex, personItem) in list" tid="uniqueId">
+      <text>{{personIndex}}.{{personItem.name}}</text>
+    </div>
+  </div>
+</template>
+
+<style lang="less">
+  .tutorial-page {
+    flex-direction: column;
+    .tutorial-row {
+      width: 85%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+  }
+</style>
+
+<script>
+  export default {
+    data: {
+      list: [
+        { name: 'aa', uniqueId: 1 },
+        { name: 'bb', uniqueId: 2 },
+        { name: 'cc', uniqueId: 3 },
+      ],
+    },
+    onInit() {
+      console.log('指令for')
+    },
+  }
+</script>
+示例代码中，在渲染页面时，div.tutorial-row的结构，会根据 script 中的数据 list 的定义，被循环的生成多个。tid="uniqueId"，数组元素的某个属性名，不一定叫 uniqueId。 它类似于 React 的 key={item.uniqueId}或 vue 的 track-by={ uniqueId }, 用于优化渲染速度。当数据修改时，数据不改变的 dom 不会被重新渲染，已经改变的数据所在的 dom 才会被重新渲染， 因此我们必须保证 uniqueId 这个属性值在每个数组元素都不一样。
+
+注意
+for 指令只能循环数组，不能循环对象。当 for 指令与 if 指令共存于一个标签时， if 指令的优先级优于 for 指令。为了方便未看文档的新人快速上手项目，不建议这两个指令共存于同一个标签。自定义变量表示 for 指令的数组索引和数组元素时，变量名不可以用$或_开头；使用tid属性时应注意：
+
+tid属性指定的数据属性必须存在，否则可能导致运行异常
+tid属性指定的数据属性要保证唯一，否则可能导致性能问题
+tid属性目前不支持表达式。
+条件渲染
+条件渲染
+更新时间：2025-01-16 19:58:37
+
+条件渲染有 2 种：if/elif/else 和 show。它们的区别在于：if 为 false 时，组件会从 DOM 中移除，而 show 仅仅是渲染时不可见，组件依然存在于 DOM 中;
+
+if 指令
+if 条件渲染，是指 if/elif/else 这 3 个相关指令，用于控制是否增加或者删除组件；
+
+if/elif/else 节点必须是相邻的兄弟节点
+
+<template>
+  <div>
+    <text if="{{display}}">Hello-1</text>
+    <text elif="{{display}}">Hello-2</text>
+    <text else>Hello-3</text>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      display: false,
+    },
+  }
+</script>
+show 指令
+show 指令，是指是否显示组件，用于控制组件的显示状态，并不会从 DOM 结构中删除;
+
+show 等同于 visible=none, 主要用于在原生组件上声明；
+
+show 指令开始支持在自定义组件上进行声明，当这样使用时，等同于在该自定义子组件的根节点上使用 show 指令；
+
+对于之前版本，自定义组件不支持 show 指令的需求，可以通过 props 传入参数，在自己内部使用 show 来控制是否可见；
+
+<template>
+  <text show="{{visible}}">Hello</text>
+</template>
+
+<script>
+  export default {
+    data: {
+      visible: false,
+    },
+  }
+</script>
+if 与 show 区别
+当 if/elif 指令的值为 false 时，节点会从页面中移除，当 if/elif 指令值为 true，组件会动态插入节点中；
+
+当 show 指令的值为 true 时，节点可见， 当其值为 false 时，组件不可见，但节点仍会保留在页面 DOM 结构中
+事件处理
+概述
+更新时间：2025-01-16 19:58:37
+
+通过在 UI 组件上绑定事件，开发者可以实现蓝河应用与用户之间的交互。
+
+绑定事件
+用法上，开发者可以使用 on (可以用@简写代替) 来绑定事件，如：onclick,onchange 可简写成 @click,@change，并在事件触发时执行对应的 JavaScript 业务代码。
+
+示例如下
+<template>
+  <div class="tutorial-page">
+    <text id="elNode1" class="{{ elClassName + 1 }}" disabled="false" onclick="onClickHandler"
+      >组件节点1</text
+    >
+    <text
+      id="elNode2"
+      class="class-static-1 {{ elClassName + 2 }}"
+      onclick="onClickHandler2('参数1', argName)"
+      >组件节点2</text
+    >
+  </div>
+</template>
+
+<style lang="less">
+  .tutorial-page {
+    flex-direction: column;
+  }
+</style>
+
+<script>
+  export default {
+    data: {
+      elClassName: 'class-dynamic',
+      argName: '动态参数',
+    },
+    onClickHandler(evt) {
+      // 事件类型，参数详情
+      console.info(`触发事件：类型：${evt.type}, 详情： ${JSON.stringify(evt.detail)}`)
+
+      if (evt.target) {
+        console.info(`触发事件：节点：${evt.target.id}, ${evt.target.attr.disabled}`)
+      }
+    },
+    onClickHandler2(arg1, arg2, evt) {
+      // 事件类型，事件参数，target
+      console.info(`触发事件：类型：${evt.type}, 参数： ${arg1}, ${arg2}`)
+    },
+  }
+</script>
+事件传参
+UI 组件可以向绑定的事件方法传递自定义参数。
+
+示例如下
+<template>
+  <div class="demo-page">
+    <text for="{{list}}" key="{{$idx}}" onclick="handle($idx,$item,total)">{{$item}}</text>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      list: [1, 2, 3, 4, 5],
+      total: 0,
+    },
+    handle(idx, item, total, $evt) {
+      console.log(idx)
+      console.log(item)
+      console.log(total)
+      console.log($evt)
+    },
+  }
+</script>
+回调函数被调用时，会在参数列表末尾自动添加一个 evt 参数，通过 evt 参数开发者可以访问回调事件相关上下文数据。
+
+
+UI 组件还支持许多其他的事件绑定，如果您想进一步了解，请移步通用事件。
+自定义组件
+自定义组件
+更新时间：2025-01-16 19:58:37
+
+熟悉自定义组件的开发，了解父子组件之间的通信方式，如：props，data。
+
+组件自定义
+开发页面时开发者必须用到各种 UI 组件，如：text、div，这些组件是由蓝河系统提供的；如果开发一个复杂的页面，开发者把所有的 UI 部分写在一个文件的<template>，那代码的可维护性将会很低，并且模块之间容易产生不必要的耦合关系。
+
+为了更好的组织逻辑与代码，可以把页面按照功能拆成多个模块，每个模块负责其中的一个功能部分，最后页面将这些模块引入管理起来，传递业务与配置数据完成代码分离，那么这就是自定义组件的意义。
+
+自定义组件是开发者使用 .ux 文件编写的 UI 组件，可以对数据、事件、方法进行个性化管理。
+
+示例如下：
+
+<template>
+  <div class="tutorial-page">
+    <text class="tutorial-title">自定义组件:</text>
+    <text>{{ say }}</text>
+    <text>{{ obj.name }}</text>
+  </div>
+</template>
+
+<style lang="less">
+  .tutorial-page {
+    flex-direction: column;
+    padding-top: 20px;
+
+    .tutorial-title {
+      font-weight: bold;
+    }
+  }
+</style>
+
+<script>
+  // 子组件
+  export default {
+    data: {
+      say: 'hello',
+      obj: {
+        name: '蓝河应用',
+      },
+    },
+    /*
+      data（）{
+      return {
+          say:'hello',
+          obj:{
+            name:'vivo手表应用'
+          }
+      }
+      },
+    */
+    onInit() {
+      console.log('我是子组件')
+    },
+  }
+</script>
+自定义组件中数据模型只能使用data 属性，data 类型可以是 Object 或 Function。如果是函数，返回结果必须是对象。
+
+组件使用
+组件引入
+蓝河应用中是通过<import>标签引入组件,如下面代码所示
+
+<import name="XXX" src="XXX"></import>
+<import>标签中的的src属性指定自定义组件的地址，name属性指定在父组件中引用该组件时使用的标签名称
+
+示例如下：
+
+<import name="comp-part1" src="./part1"></import>
+
+<template>
+  <div class="tutorial-page">
+    <text class="tutorial-title">引入组件：</text>
+    <comp-part1></comp-part1>
+  </div>
+</template>
+
+<style lang="less">
+  .tutorial-page {
+    flex-direction: column;
+    padding: 20px 10px;
+
+    .tutorial-title {
+      font-weight: bold;
+    }
+  }
+</style>
+
+<script>
+  // 父组件
+  export default {
+    data: {},
+    onInit() {
+      console.log('引入组件')
+    },
+  }
+</script>
+自定义组件的生命周期
+属性	类型	参数	返回值	描述	触发时机
+onInit	Function	无	无	监听初始化	当数据驱动化完成时触发
+onReady	Function	无	无	监听模板创建完成	当模板创建完成时触发
+onDestroy	Function	无	无	监听组件销毁	当销毁时触发
+父子组件通信
+父组件通过 Prop 向子组件传递数据
+父组件向子组件传递数据，通过在子组件的props属性中声明对外暴露的属性名称，然后在组件引用标签上声明传递的父组件数据，详见Props
+
+示例如下：
+
+<!-- 子组件 -->
+<template>
+  <div class="child-demo">
+    <text class="title">子组件:</text>
+    <text>{{ say }}</text>
+    <text>{{ propObject.name }}</text>
+  </div>
+</template>
+<script>
+  export default {
+    props: {
+      say:{},
+      propObject:{}
+    }
+
+    onInit() {
+      console.info(`外部传递的数据：`, this.say, this.propObject)
+    },
+  }
+</script>
+<!-- 父组件 -->
+<import name="comp" src="./comp"></import>
+<template>
+  <div class="parent-demo">
+    <comp say="{{say}}" prop-object="{{obj}}"></comp>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      say:'hello'
+      obj:{
+        name:'child-demo'
+      }
+    }
+  }
+</script>
+子组件对父组件通信
+当子组件对数据进行改造后，把最终数据交给父组件甚至往上，往往有以下办法
+
+父组件传递的数据本身就是对象，子组件直接修改对象中的属性，父组件的值也会发生改变，不推荐这种;
+子组件通过$emit()触发在 UI 组件上绑定的自定义事件来执行父组件的方法
+emit 示例如下
+父组件监听子组件事件
+
+<import name="comp" src="./comp.ux"></import>
+<template>
+  <div class="parent-demo">
+    <text>我是父组件count:{{count}}</text>
+    <comp count="{{count}}" @child-evt="emitEvt"></comp>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      count: 20,
+    },
+    emitEvt(evt) {
+      this.count = evt.count
+    },
+  }
+</script>
+子组件触发事件
+
+<template>
+  <div class="child-demo">
+    <text>我是子组件一count:{{compCount}}</text>
+    <input type="button" @click='addHandler' value='add'></input>
+  </div>
+</template>
+<script>
+  export default {
+    props: {
+      count:{}
+    },
+    data(){
+        return{
+            compCount:this.count
+        }
+    },
+    addHandler(){
+        this.compCount ++
+        this.$emit('childEvt',{
+            count:this.compCount
+        })
+    },
+  }
+</script>
+生命周期
+生命周期
+更新时间：2025-01-16 19:58:37
+
+了解页面生命周期与状态，应用生命周期
+
+生命周期图
+
+页面生命周期
+onInit
+监听页面初始化。当页面完成初始化时调用，只触发一次
+
+onReady
+监听页面创建完成。当页面完成创建可以显示时触发，只触发一次
+
+参数
+无
+
+onShow
+监听页面显示。当进入页面时，或者当前页面被弹框覆盖时触发
+
+参数
+无
+
+onHide
+监听页面隐藏。当页面跳转离开时，或者覆盖当前页面的弹框消失时触发
+
+参数
+无
+
+onDestroy
+监听页面退出。当页面跳转离开（不进入导航栈）时触发
+
+参数
+无
+
+onBackPress()
+监听返回动作。当用户执行返回操作时触发。只有当前页面配置了 followHand : disable，该接口才生效。
+
+参数
+无
+
+返回值
+类型	描述
+Boolean	返回 true 表示页面自己处理返回逻辑，返回 false 表示使用默认的返回逻辑，不返回值会作为 false 处理； 注意：该函数不支持声明为异步函数（即：使用async标识），因为返回值代表界面要立即响应用户操作；
+onRefresh
+监听页面重新打开。
+
+1.当页面在 manifest 中 launchMode 标识为'singleTask'时，仅会存在一个目标页面实例，用户多次打开目标页面时触发此函数。
+该回调中参数为重新打开该页面时携带的参数。
+详见页面启动模式
+
+参数
+参数名	类型	描述
+query	Object	通过 deeplink、router.push 等接口传入的 uri 中 query 解析成的对象，或者 router.push 等接口传入的 params 对象
+onKey
+监听按键响应。当按键被触发时回调
+
+参数
+参数名	类型	描述
+event	Object	被触发的按键事件
+event 参数
+参数名	类型	描述
+keyCode	Number	按下的键位，0：下键(电源键)，1：上键
+keyAction	Number	按下或弹起的动作 0：按下 1：短按弹起 2：长按弹起
+repeatCount	Number	连续按的次数，按键在长按的时候，会连续产生多个按下事件，这个时候第一个按下事件的 repeatCount 为 0，之后的按下事件 repeatCount 会递增。
+示例代码：
+onKey(event) {
+  console.log(`key pressed! ${JSON.stringify(event)}`);
+  console.info(`触发页面生命周期 onKey`)
+}
+onConfigurationChanged
+监听系统语言改变
+
+参数
+参数名	类型	描述
+event	Object	应用配置发生变化的事件
+event 参数：
+
+参数名	类型	描述
+type	String	应用配置发生变化的原因类型，支持的 type 值如下所示
+event 中type 现在支持的参数值如下：
+
+参数值	描述
+locale	应用语言、地区变化而发生改变
+示例代码：
+
+onConfigurationChanged(evt) {
+  if (event && event.type && event.type === 'locale') {
+    console.log('locale or language changed!')
+  }
+}
+onPalmOver
+监听手掌覆盖事件
+
+参数
+无
+
+返回值
+true 表示不将事件继续传递给 launcher，其他值或者不返回都会将事件继续传递给 launcher。
+
+示例代码：
+
+onPalmOver(evt) {
+  console.info(`大手掌事件 onPalmOver`)
+  return true;
+}
+页面的生命周期接口的调用顺序
+打开页面 A：onInit() -> onReady() -> onShow()
+在页面 A 打开页面 B：onHide()
+从页面 B 返回页面 A：onShow()
+自定义组件的生命周期
+自定义组件，指的是通过 import 标签引入的 ViewModel 组件
+
+属性	类型	参数	返回值	描述	触发时机
+onInit	Function	无	无	监听初始化	当数据驱动化完成时触发
+onReady	Function	无	无	监听模板创建完成	当模板创建完成时触发
+onDestroy	Function	无	无	监听组件销毁	当销毁时触发
+应用生命周期
+onCreate()
+监听应用创建，应用创建时调用。
+
+参数
+无
+
+onDestroy()
+监听应用销毁，应用销毁时调用。
+
+参数
+无
+
+onShow()
+应用显示在前台时调用。
+
+参数
+无
+
+onHide()
+应用退到后台时调用。
+
+参数
+无
+
+app.ux 对象的属性
+app.ux 对象指的是：开发者在app.ux中<script>节点内要导出的对象
+3.进阶指南
+
+表盘
+快捷卡片
+后台运行
+后台运行
+更新时间：2025-01-16 19:58:38
+
+概述
+为了节省系统资源，通常情况下，应用切换到后台后将会暂停运行，等到再次切换回前台时继续运行。但音乐\运动等类型的应用， 退到后台后可能仍然需要继续运行，为满足此类需求，加入了对后台运行的支持。
+
+后台运行模式的工作原理如下:
+在应用切换到后台时，系统将会检查是否满足后台运行的条件，如果满足，应用将继续运行，否则将被暂停。此条件包括：
+
+manifest.json 中声明了后台运行接口
+
+当前至少有一个（已在 manifest.json 中声明的）后台运行接口正在运行
+
+处于后台运行中的应用，如果所有后台运行接口均运行结束，系统将会启动倒计时。倒计时结束后，如果仍未有后台运行接口被调用， 应用将会退出后台运行模式，暂停运行。
+
+实践建议:
+后台运行需要消耗较多的系统资源，应用需要根据自身需求审慎使用。针对申请后台运行的应用，上线审核时将会审核其后台运行的需求是否合理。
+
+后台运行接口的导入和后台执行的工作放到 app.ux 中，而不是放到页面中，以免避免页面切换和销毁的影响。
+
+配置方法
+manifest.json 中声明所需的后台运行接口。后台运行接口包括：
+
+音频播放：blueos.multimedia.audio
+
+多媒体： blueos.multimedia.media
+
+录音：blueos.multimedia.record
+
+上传下载：blueos.communication.network.request
+
+地理位置：blueos.hardware.geolocation
+
+{
+  "package": "com.hybrid.demo.sample",
+   ......
+
+  "config": {
+    "logLevel": "trace",
+    "background": {
+      "features":[
+        "blueos.multimedia.audio",
+        "blueos.multimedia.media",
+        "blueos.multimedia.record",
+        "blueos.communication.network.request",
+        "blueos.hardware.geolocation"
+      ]
+     }
+   ......
+}
+页面启动模式
+页面启动模式
+更新时间：2025-01-16 19:58:38
+
+用于定义页面的启动行为
+
+静态声明
+在 manifest 文件中页面路由信息 router.page 可增加启动模式字段 launchMode，用于声明该页面的启动模式
+
+页面启动模式参数：
+属性	类型	默认值	必填	描述
+launchMode	String	standard	否	声明页面的启动模式，支持"singleTask"，"standard"两种页面启动模式。
+标识为"singleTask"模式时每次打开目标页面都会打开已有的目标页面并回调 onRefresh 生命周期函数，清除该页面上打开的其他页面，没有打开过此页面时会创建新的目标页面实例。
+标识为"standard"模式时会每次打开新的目标页面（多次打开目标页面地址时会存在多个相同页面）
+示例：
+{
+  "router": {
+    "entry": "PageA",
+    "pages": {
+      "PageA": {
+        "launchMode": "singleTask",
+        "component": "index"
+      },
+      "PageB": {
+        "launchMode": "standard",
+        "component": "index"
+      },
+      "PageC": {
+        "launchMode": "singleTask",
+        "component": "index"
+      }
+    }
+  }
+}
+打开页面的行为逻辑：
+
+若按顺序启动 PageA -> PageB -> PageC -> PageB -> PageC -> PageA
+
+打开 PageA，首次打开时页面栈为空 页面栈为PageA
+打开 PageB，PageB 的启动模式为 standard，即在 PageA 之上新建 PageB 的页面实例并显示 页面栈为PageA,PageB
+打开 PageC，首次打开 PageC，即在 PageB 之上新建 PageC 的页面实例并显示 页面栈为PageA,PageB,PageC
+打开 PageB，PageB 的启动模式为 standard，即在 PageC 之上新建 PageB 的页面实例并显示 页面栈为PageA,PageB,PageC,PageB
+打开 PageC，PageC 页面实例已存在，即销毁 PageC 之上的页面实例 PageB，回到之前打开的 PageC 的页面实例并回调此页面生命周期的 onRefresh 函数 页面栈为PageA,PageB,PageC
+打开 PageA，PageA 页面实例已存在，即销毁 PageA 之上的页面实例 PageB 和 PageC，回到之前打开的 PageA 的页面实例并回调此页面生命周期的 onRefresh 函数 页面栈为PageA
+屏幕适配
+屏幕适配
+更新时间：2025-01-16 19:58:38
+
+蓝河操作系统支持对不同尺寸和不同形状的屏幕的适配能力。
+
+1.等比放缩
+在 manifest 文件中配置designWidth字段的设计基准宽度，蓝河应用便可以自动完成等比缩放。
+
+// manifest.json
+{
+  "config": {
+    "designWidth": 466
+  }
+}
+如上示例中designWidth配置为 466px，那么所有的 px 单位使用都会按照 466px 的基准宽度换算。如下示例中显示为宽高都是屏幕宽度一半。
+
+.box {
+  width: 233px;
+  height: 233px;
+}
+2.非等比屏幕
+在非等比屏幕下，使用等比缩放或许不是开发想要的效果，这里蓝河应用提供了使用绝对宽度的方案来实现您想要的布局。
+
+dp 单位
+px 会使布局产生等比缩放效果，而 dp 为绝对的屏幕尺寸。
+
+以宽度为示例，设备 dp 的计算方法如下：
+
+屏幕宽度dp值 = 设备屏幕分辨率的宽度 / DPR
+上述公式中 DPR 的取值可以查如下表格得到
+
+规格	取值	说明
+ldpi	0.75	低密度屏幕(~120dpi)
+mdpi	1	中密度屏幕(~160dpi)(基准密度)
+hdpi	1.5	高密度屏幕(~240dpi)
+xhdpi	2.0	加高密度屏幕(~320dpi)
+xxhdpi	3.0	超超高密度屏幕(~480dpi)
+xxxhdpi	4.0	超超超高密度屏幕(~640dpi)
+引入 DP 单位，开发者可以解决 非等比例的屏幕适配 ;比如:在 DPR 为 3 的小屏幕上希望内容显示较少，设置元素 的宽度 dp 较小，在 DPR 为 3 的大屏幕上希望内容显示较多，设置元素的宽度 dp 较大;该单位可以像 px 单位 一样，用于常⻅的 DOM 元素的宽度、高度上。如下示例
+
+.box {
+  width: 50dp;
+  height: 50dp;
+}
+3.媒体查询
+结合 dp 值，设备类型，开发者可以针对不同屏幕和设备写不同样式。如下示例：
+
+/* 方表和手机上生效 */
+@media screen and (device: watch-square) or screen and (device: phone) {
+  .box {
+    background-color: red;
+  }
+}
+更多内容参考媒体查询
+
+4.获取设备类型
+在 template 或者 js 中，如果我们想差异性处理组件和逻辑，可以判断当前的设备类型。
+
+如下示例，在布局中判断设备类型
+
+<div>
+  <header-of-square if="$device.deviceType == 'watch-square'">
+  <header-of-round elif="$device.deviceType == 'watch-round'">
+</div>
+$device 的详细文档异步公共对象
+
+5. 资源管理
+资源是与您的应用程序捆绑和部署的文件，可在运行时访问。常⻅的资源类型 包括静态数据(例如 JSON 文件)、配置文件、图标和图像(JPEG、WebP、GIF、动画 WebP/GIF、PNG、BMP 和 WBMP)。您的程序，或将运行在各种不同类型设备(屏幕分辨率也有差异);为追求最佳效果，在不同场 景、设备、分辨率，您需要为之匹配不同的资源;这里提供一套匹配规则，使得您的应用，可以轻松与设备状态相 匹配。在项目根目录 resources 文件夹下，您可以按需创建 json 格式的配置文件;其规则是:以 res 为前缀;用 - 作 连接;根据需要添加限定词(涵盖内容及顺序为: 设备类型 > 屏幕密度);默认文件为:res- defaults.json。
+
+├── resources
+  │── res-pad.json
+  │── res-watch.json
+  └── res-defaults.json
+5.1 resources 规则
+1、res-watch-分辨率-手表形状-屏幕密度.json，短线连接的为限定词，限定词顺序为：分辨率 > 表盘形状 > 屏幕密度。
+
+2、其中分辨率、手表形状和屏幕密度如无需要可以不用写
+
+3、分辨率使用 宽 x 高的形式，x 为英文字母 X 的小写
+
+4、 屏幕密度的枚举为：ldpi/mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi
+
+5、手表形状枚举值为：square 和 round
+
+6、 默认资源名为：res-defaults.json
+
+7、 资源的命中权重大小为：分辨率 (1000) > 表盘形状 (100) > 屏幕密度 (10)
+
+为方便理解资源的生效顺序，我们可以假设下权重: 分辨率 = 1000, 表盘形状 = 100, 屏幕密度 = 10，以下权重越高则越会优先命中并生效。
+
+// 匹配402x402，方形手表，屏幕密度120
+// 权重：1110
+res-watch-402x402-square-ldpi.json
+
+// 匹配402x402，圆形手表
+// 权重：1100
+res-watch-402x402-round.json
+
+// 匹配方形手表
+// 权重：100
+res-watch-square.json
+
+// 匹配402x402的手表
+// 权重：1000
+res-watch-402x402.json
+
+// 匹配手表密度为120dpi
+// 权重：10
+res-watch-ldpi.json
+
+// 匹配手表
+res-watch.json
+
+// 匹配所有资源作为兜底
+res-defaults.json
+5.2 resources 配置
+下面示例演示了如何配置 pad 和 watch 两种设备的资源的配置
+
+// resources/res-pad.json
+{
+  "image": {
+    "logo": "/common/pad/logo.png",
+    "banner": "/common/pad/banner.png"
+  },
+  "colors": {
+    "headerBackGround": "#ffffff"
+  }
+}
+// resources/res-watch.json
+{
+  "image": {
+    "logo": "/common/watch/logo.png",
+    "banner": "/common/watch/banner.png"
+  },
+  "colors": {
+    "headerBackGround": "#fff000"
+  }
+}
+5.3 $res 方法
+配置完 resources 后就可以使用$res 在 template 和 script 中使用了
+
+属性	类型	参数	描述
+$res	Function	path: String 资源路径	根据开发者配置的 resources 和当前系统的参数返回对应的资源
+示例：
+
+<template>
+  <div style="background-color: {{ $res('colors.headerBackGround') }}">
+    <image src="{{ $res('image.banner') }}"></image>
+  </div>
+</template>
+<script>
+  export default {
+    onInit() {
+      console.log(this.$res('image.banner'))
+    }
+  }
+</script>
+4.最佳实践
+
+概览
+概览
+更新时间：2025-01-16 19:58:38
+
+1 前言
+本章节介绍关于蓝河应用框架中高性能的开发规范，此规范将指导开发者基于蓝河应用框架开发出高效、稳定的蓝河应用软件。为保证您开发出高质量的软件产品，请尽量遵守这些指导规范。
+
+2 使用说明
+后面文档中的示例代码尽可能提供正例、反例两种示例，使读者可以对比两种方案的优劣，帮助读者 理解规则。本规范中的示例仅作展示说明，不代表真实可运行的完整代码。
+
+3 推荐级别
+【强烈】强烈推荐编码人员必须遵守
+
+【建议】推荐使用的做法，除了特殊场景一般都要遵守
+
+【鼓励】鼓励开发人员遵守
+精简data上数据
+精简 data 上数据
+更新时间：2025-01-16 19:58:38
+
+一般来讲 data 上的数据都是有响应式追踪地，首先一定要保证 data 的数据在视图中使用到了，其次要尽可能的简化 data 上面的数据。
+
+不渲染的数据不定义在 data 上
+推荐级别：强烈
+
+不需要数据绑定或页面间传递的数据，不要定义在 data 里
+
+反例
+
+<template>
+  <text>{{a}}</text>
+</template>
+
+<script>
+  export default {
+    data: {
+      a: 'hello',
+      b: 'world',
+    },
+    onInit() {
+      this.a = this.a + this.b
+    },
+  }
+</script>
+正例
+
+<template>
+  <text>{{a}}</text>
+</template>
+
+<script>
+  const b = 'world'
+  export default {
+    data: {
+      a: 'hello',
+    },
+    onInit() {
+      this.a = this.a + b
+    },
+  }
+</script>
+简化 data 上数据
+推荐级别：建议
+
+动态绑定的数据结构应去除冗余信息，尽可能的简单合理
+
+反例
+
+<template>
+  <list>
+    <list-item for="{{list}}">
+      <text>{{ $item.name }}</text>
+      <image src="{{ $item.icon }}"></image>
+    </list-item>
+  </list>
+</template>
+
+<script>
+  const getSportsList = () => {
+    return [
+      {
+        name: 'Football',
+        description: 'A team sport played with ...',
+        category: 'Team Sports',
+        icon: 'football.png',
+      },
+      {
+        name: 'Basketball',
+        description: 'A team sport in which two teams, ...',
+        category: 'Team Sports',
+        icon: 'basketball.png',
+      },
+      {
+        name: 'Tennis',
+        description: 'A racket sport that can be ...',
+        category: 'Individual Sports',
+        icon: 'tennis.png',
+      },
+    ]
+  }
+  export default {
+    data: {
+      sports: [],
+    },
+    onInit() {
+      this.sports = getSportsList()
+    },
+  }
+</script>
+正例
+
+<template>
+  <list>
+    <list-item for="{{list}}">
+      <text>{{ $item.name }}</text>
+      <image src="{{ $item.icon }}"></image>
+    </list-item>
+  </list>
+</template>
+
+<script>
+  const getSportsList = () => {
+    return [
+      {
+        name: 'Football',
+        description: 'A team sport played with ...',
+        category: 'Team Sports',
+        icon: 'football.png',
+      },
+      {
+        name: 'Basketball',
+        description: 'A team sport in which two teams, ...',
+        category: 'Team Sports',
+        icon: 'basketball.png',
+      },
+      {
+        name: 'Tennis',
+        description: 'A racket sport that can be ...',
+        category: 'Individual Sports',
+        icon: 'tennis.png',
+      },
+    ]
+  }
+  export default {
+    data: {
+      sports: [],
+    },
+    onInit() {
+      this.sports = getSportsList().map((item) => ({
+        name: item.name,
+        icon: item.icon,
+      }))
+    },
+  }
+</script>
+不使用动态属性修改 data 上数据
+推荐级别：强烈
+
+JavaScript 对象属性可以使用点号和方括号两种方式来访问和修改。然而，为了确保数据可以在编译时有效地捕捉和优化，强烈建议尽量避免使用方括号动态访问和修改对象的值。
+
+反例
+
+<template>
+  <div>
+    <text>{{person.name}}</text>
+    <text>{{person.location}}</text>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      person: {
+        name: 'Vance',
+        location: 'shenzhen',
+      },
+    },
+    onInit() {
+      const location = 'location'
+      this.person[location] = 'beijing'
+    },
+  }
+</script>
+正例
+
+<template>
+  <div>
+    <text>{{person.name}}</text>
+    <text>{{person.location}}</text>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      person: {
+        name: 'Vance',
+        location: 'shenzhen',
+      },
+    },
+    onInit() {
+      this.person.location = 'beijing'
+    },
+  }
+</script>
+避免过深的响应式数据层级
+推荐级别：鼓励
+
+对于动态绑定的数据，不宜嵌套层级过深。
+
+反例
+
+<template>
+  <div>
+    <text>{{obj.a.name}}</text>
+    <text>{{obj.b.name}}</text>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      obj: {
+        a: {
+          name: 'name a',
+        },
+        b: {
+          name: 'name b',
+        },
+      },
+    },
+  }
+</script>
+正例
+
+<template>
+  <div>
+    <text>{{obj.a}}</text>
+    <text>{{obj.b}}</text>
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      obj: {
+        a: 'name a',
+        b: 'name b',
+      },
+    },
+  }
+</script>
+减少代码体积
+减少代码体积
+更新时间：2025-01-16 19:58:38
+
+本节非常重要，优劣不同的写法会有明显的代码体积差异，而代码体积越小，会获得更快的加载速度。
+
+js 封装要支持 Treeshaking
+推荐级别：强烈
+
+统一支持 Treeshaking 是非常重要的，因为它可以在打包编译时移除未使用的代码，减小输出的文件大小。
+
+在进行 JavaScript 封装时，请牢记以下两点：
+
+在能使用函数实现的情况下，优先使用函数而非 class 或 Object。只有需要频繁创建实例的情况才需要考虑使用 class。
+
+慎重使用 export default 导出。如果你的模块有多个导出，可以考虑逐个导出而非使用 default 导出，这样可以更好地遵循 Treeshaking 的原则，因为 default 导出整个模块会被引入，而逐个导出只会引入需要的部分。
+
+反例 1
+
+const a = 1
+const b = () => {}
+// a和b被捆绑导出
+export default { a, b }
+反例 2
+
+// 同样的，a 和 b 被绑定在对象上面了，这里如果有使用class习惯的同学一定要注意这点
+export default class Utils {
+  a() {},
+  b() {}
+}
+反例 3
+
+// 这里和class一样
+export default function Utils() {
+  this.a = () => {}
+  this.b = () = {}
+}
+反例 4
+
+// 这里和class一样
+export default function Utils() {
+  return {
+    a() {},
+    b() {},
+  }
+}
+正例 1
+
+const a = 1
+const b = () => {}
+export { a, b }
+正例 2
+
+export const a = 1
+export const b = () => {}
+按需引入
+推荐级别：强烈
+
+需要使用的方法/变量/组件，才去 import 导入，不要导入用不到的内容到当前页面内。
+
+反例 1
+
+用到一个导入两个
+
+import { sayHi, sayBye } from './say.js'
+sayHi('Vance')
+反例 2
+
+import * as say from './say.js'
+say.sayHi('Vance')
+正例
+
+用到 sayHi 导入 sayHi
+
+import { sayHi } from './say.js'
+sayHi('Vance')
+不要使用 CommonJS 规范
+推荐级别：强烈
+
+虽然蓝河应用支持使用 require 这样子的写法，但一定要避免这样子写。
+
+反例
+
+const userInfo = require('./userInfo.js')
+正例
+
+import userInfo from './userInfo.js'
+// 注意这里的引入仅为示例，实际情况也要尽可能避 免userInfo 全量引入
+使用常量
+推荐级别：强烈
+
+使用常量可以让代码更好的维护，同时也可以达到 Treeshaking 的效果。
+
+反例
+
+const a = {
+  a1: 'a1',
+  a2: 'a2',
+  a3: 'a3',
+}
+
+const b = ['a1', 'a2', 'a3']
+正例
+
+const a1 = 'a1'
+const a2 = 'a2'
+const a3 = 'a3'
+const a = {
+  a1: a1,
+  a2: a2,
+  a3: a3,
+}
+
+const b = [a1, a2, a3]
+慎重引入第三方包
+推荐级别：建议
+
+引入外部 npm 包之前请特别留意包的体积大小，如果体积大要按需裁剪源码后再引入。非必要情况下尽量自己实现，不建议直接引入第三方 npm 包，因为那大多是适配 node、浏览器平台的，polyfill 代码较多，不适合嵌入式平台。
+
+反例
+
+import _ from 'lodash'
+export default {
+  onInit() {
+    const list = ['a', 'b', 'c']
+    _.join(list, '~')
+  },
+}
+正例
+
+export default {
+  onInit() {
+    const list = ['a', 'b', 'c']
+    list.join('~')
+  },
+}
+慎重 @import 样式
+推荐级别：强烈
+
+样式是没有做 Treeshaking 的，引入一个 css 样式文件，可能会打包进入无用的 css 代码。
+
+反例
+
+<template>
+  <div class="yellow">黄色</div>
+  <div class="black">黑色</div>
+  <div class="green">黄色</div>
+</template>
+<style>
+  @import './color.css';
+</style>
+正例
+
+<template>
+  <div>
+    <div class="yellow">黄色</div>
+    <div class="black">黑色</div>
+    <div class="green">黄色</div>
+  </div>
+</template>
+<style>
+  .yellow {
+    background-color: yellow;
+  }
+  .black {
+    background-color: black;
+  }
+  .green {
+    background-color: green;
+  }
+</style>
+页面 template 一定要小
+推荐级别：鼓励
+
+设计应用的时候，尽可能拆成多个页面去实现。不要使用 if 的方式，将页面的多个状态全写进一个页面文件里通过参数传递控制。
+
+反例
+
+<div>
+  <div if="{{status === 1}}">
+    <div>A功能的展示区域</div>
+    ...
+  </div>
+  <div if="{{status === 2}}">
+    <div>B功能的展示区域</div>
+    ...
+  </div>
+  <div if="{{status === 3}}">
+    <div>C功能的展示区域</div>
+    ...
+  </div>
+</div>
+正例
+
+//创建A页面 pageA.ux
+<template>
+  <div>A功能的展示区域</div>
+</template>
+
+//创建B页面 pageB.ux
+<template>
+  <div>B功能的展示区域</div>
+</template>
+
+//创建C页面 pageC.ux
+<template>
+  <div>C功能的展示区域</div>
+</template>
+避免 manifest 配置冗余
+推荐级别：建议
+
+文件也要遵循按需引入的原则，如 manifest 中的配置中，没用到的 feature、权限可以不写进来
+
+避免 i18n 配置冗余
+推荐级别：建议
+
+国际化 i18n 配置用不到的 key 要移除，另外如果只有一种语言请不要使用国际化配置。
+
+尽量使用箭头函数
+推荐级别：建议
+
+使用箭头函数代替 function，可以达到最大程度地减少代码体积。
+
+反例
+
+function getUserInfo() {}
+正例
+
+const getUserInfo = () => {}
+对象的属性或方法名称要简短
+推荐级别：建议
+
+对象上面的属性/方法名称，尽量的简短，这里是由于属性是无法 tree-shaking，过长的属性/方法名会占用代码体积。
+
+反例
+
+const user = {
+  userName: 'Vance',
+}
+正例
+
+const user = {
+  name: 'Vance',
+}
+区分生产环境和测试环境
+推荐级别：建议
+
+避免将调试阶段的数据、代码带到生产环境上，应该用编译时参数而非运行时参数来区分 编译环境变量
+
+合并公共样式
+推荐级别：鼓励
+
+应用中的重复样式应尽量抽成公共样式使用，避免在多个 class 里重复写相同样式。
+
+反例
+
+<template>
+  <div>
+    <div class="box1"></div>
+    <div class="box2"></div>
+    <text class="box3"></text>
+  </div>
+</template>
+
+<style>
+  .box1 {
+    width: 48px;
+    height: 48px;
+  }
+  .box2 {
+    background-color: #000000;
+    width: 48px;
+    height: 48px;
+  }
+  .box3 {
+    font-size: 60px;
+    width: 48px;
+    height: 48px;
+  }
+</style>
+正例
+
+<template>
+  <div>
+    <div class="box-size"></div>
+    <div class="box-size bg-color"></div>
+    <text class="box-size font-size"></text>
+  </div>
+</template>
+<style>
+  .box-size {
+    width: 48px;
+    height: 48px;
+  }
+  .bg-color {
+    background-color: #0000ff;
+  }
+  .font-size {
+    font-size: 60px;
+  }
+</style>
+减少初始化开销
+减少初始化开销
+更新时间：2025-01-16 19:58:38
+
+应用的初始化代码越复杂，那么创建应用或者页面的时间就会越长，这会影响到首屏渲染时间。
+
+不要引入耗时的自执行的模块
+推荐级别：强烈
+
+确保所有需要引入的文件中不包含耗时的自执行逻辑。因为耗时的自执行模块会在页面创建的过程中执行，从而延长页面的加载时间。
+
+反例
+
+// 这里的init是自执行的逻辑，会造成性能开销。
+import './init.js'
+export default {}
+正例
+
+export default {
+  onInit() {
+    // todo init
+  },
+}
+合理管理 app.ux 上的数据
+推荐级别：建议
+
+在app.ux中引入过多js，会延长应用的启动时间，从而影响应用的首屏显示时间。
+
+建议全局共享的状态放在app.ux上，而工具类方法可以在各个页面中独立引入。
+
+反例
+
+// app.ux
+import uitls from './uitls'
+export default {
+  uitls,
+}
+长页面分段加载
+推荐级别：建议
+
+先准备首屏的数据、模板和样式，等到首屏显示后再加载可视区域之外的内容。
+
+正例 1
+
+<template>
+  <div>
+    <div for="{{list}}">
+      <text>{{$item}}</text>
+    </div>
+  </div>
+</template>
+<script>
+  const listData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+  export default {
+    data: {
+      list: [],
+    },
+    onInit() {
+      // 首屏展示一部分数据
+      this.list = listData.slice(0, 6)
+    },
+    onShow() {
+      // onShow 后显示所有数据
+      this.list = listData
+    },
+  }
+</script>
+正例 2
+
+<template>
+  <div>
+    <div>part A</div>
+    <div if="{{showB}}">part B</div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      showB: false,
+    },
+    onShow() {
+      this.showB = true
+    },
+  }
+</script>
+减少运行时开销
+减少运行时开销
+更新时间：2025-01-16 19:58:38
+
+本节介绍的内容可以使得您的页面更加快速的更新。
+
+不在 css 中使用 id 选择器
+推荐级别：强烈
+
+当我们需要使用 js 操作组件时，需要给组件注册 id。 如果只需要在 css 中给组件添加样式，建议使用 class 选择器。
+
+反例 1
+
+<template>
+  <div id="red"></div>
+</template>
+<style>
+  #red {
+    color: red;
+  }
+</style>
+正例 1
+
+<template>
+  <div class="red"></div>
+</template>
+<style>
+  .red {
+    color: red;
+  }
+</style>
+反例 2
+
+<!-- 定义了id="root"但未使用 -->
+<template>
+  <div id="root"></div>
+</template>
+正例 2
+
+<template>
+  <div id="root"></div>
+</template>
+<script>
+  export default {
+    onInit() {
+      this.$element('root').animate()
+    },
+  }
+</script>
+避免 for 和 if 同时使用
+推荐级别：建议
+
+如果需要在 for 循环中使用条件判断，建议在 js 中将数据组织好再渲染。
+
+反例
+
+<template>
+  <div>
+    <div for="{{foodList}}" if="{{$item.vegetarian}}">
+      <text>{{$item.name}}</text>
+      <text>{{$item.category}}</text>
+    </div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      foodList: [
+        { name: 'Apple', category: 'Fruit', vegetarian: true },
+        { name: 'Chicken', category: 'Meat', vegetarian: false },
+        { name: 'Broccoli', category: 'Vegetable', vegetarian: true },
+        { name: 'Pizza', category: 'Fast Food', vegetarian: false },
+        { name: 'Yogurt', category: 'Dairy', vegetarian: true },
+      ],
+    },
+  }
+</script>
+正例
+
+<template>
+  <div>
+    <div for="{{vegetarianFoods}}">
+      <text>{{$item.name}}</text>
+      <text>{{$item.category}}</text>
+    </div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      vegetarianFoods: [],
+    },
+    onInit() {
+      this.vegetarianFoods = [
+        { name: 'Apple', category: 'Fruit', vegetarian: true },
+        { name: 'Chicken', category: 'Meat', vegetarian: false },
+        { name: 'Broccoli', category: 'Vegetable', vegetarian: true },
+        { name: 'Pizza', category: 'Fast Food', vegetarian: false },
+        { name: 'Yogurt', category: 'Dairy', vegetarian: true },
+      ].filter((food) => food.vegetarian === true)
+    },
+  }
+</script>
+区分 show 指令和 if 指令
+推荐级别：建议
+
+当使用条件渲染将元素隐藏时，if 指令会将组件从 DOM 中移除，而 show 仅仅是渲染是不可见。
+
+所以 if 指令会有更高的切换开销，而 show 指令会有更高的初始化开销。
+
+在实践，如果需要频繁切换显示/隐藏的元素使用 show 指令，反之用 if 指令。
+
+反例 1
+
+<!-- 下面示例中使用 show 元素依旧会被首屏渲染，分段加载失去意义 -->
+<template>
+  <div>
+    <div>分段加载的上半部分</div>
+    <div show="{{display}}">分段加载的下半部分</div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      display: false,
+    },
+    onShow() {
+      this.display = true
+    },
+  }
+</script>
+正例 1
+
+<template>
+  <div>
+    <div>分段加载的上半部分</div>
+    <div if="{{display}}">分段加载的下半部分</div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      display: false,
+    },
+    onShow() {
+      this.display = true
+    },
+  }
+</script>
+反例 2
+
+<!-- 下面示例中用户会频繁切换A和B两个区域，使用 if 不是一个好的选择。 -->
+<template>
+  <div>
+    <text @click="changeShow('A')">showA</text>
+    <text @click="changeShow('B')">showB</text>
+    <div if="{{status == 'A'}}">part A</div>
+    <div elif="{{status == 'B'}}">part B</div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      status: 'A',
+    },
+    changeShow(status) {
+      this.status = status
+    },
+  }
+</script>
+正例 2
+
+<template>
+  <div>
+    <text @click="changeShow('A')">showA</text>
+    <text @click="changeShow('B')">showB</text>
+    <div show="{{status == 'A'}}">part A</div>
+    <div show="{{status == 'B'}}">part B</div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      status: 'A',
+    },
+    changeShow(status) {
+      this.status = status
+    },
+  }
+</script>
+减少无效的组件嵌套
+推荐级别：建议
+
+在页面布局中，尽量减少组件的嵌套，比如 list-item 本身可以作为容器，不需在其内部要额外的 div 嵌套。
+
+反例
+
+<template>
+  <list>
+    <list-item>
+      <div>
+        <text>hello</text>
+        <image src="a.png"></image>
+      </div>
+    </list-item>
+  </list>
+</template>
+正例
+
+<template>
+  <list>
+    <list-item>
+      <text>hello</text>
+      <image src="a.png"></image>
+    </list-item>
+  </list>
+</template>
+减少非必要的组件抽象
+推荐级别：鼓励
+
+不要过度依赖自定义组件, 一个页面引入的自定义组件控制在 1~2 个是比较合理的。需要注意的是，自定义组件不管内容多少，相比于普通组件有经过 js 多走一层创建 vm 的开销，所以对过于简单的组合，也不建议为了通用性而多封装一个自定义组件。与此同时也要避免自定义组件的多层次且套。
+
+反例 1
+
+<import src="./components/heartRateBlock.ux" name="heartRate"></import>
+<import src="./components/calorieBlock.ux" name="calorie"></import>
+
+<template>
+  <div>
+    <heartRate></heartRate>
+    <calorie></calorie>
+  </div>
+</template>
+反例 2
+
+<import src="./components/heartRate.ux" name="heartRate"></import>
+
+<template>
+  <heartRate></heartRate>
+</template>
+减少页面复用
+推荐级别：鼓励
+
+设计应用的时候，尽可能拆成多个页面去实现。不要使用 if 的方式，将页面的多个状态全写进一个页面文件里通过参数传递控制。
+
+反例
+
+<template>
+  <div if="{{status === 1}}">
+    <div>A功能的展示区域</div>
+    ...
+  </div>
+  <div if="{{status === 2}}">
+    <div>B功能的展示区域</div>
+    ...
+  </div>
+  <div if="{{status === 3}}">
+    <div>C功能的展示区域</div>
+    ...
+  </div>
+</template>
+
+<script>
+  export default {
+    data: {
+      status: 1,
+    },
+  }
+</script>
+正例
+
+//创建A页面 pageA.ux
+<template>
+  <div>A功能的展示区域</div>
+</template>
+
+//创建B页面 pageB.ux
+<template>
+  <div>B功能的展示区域</div>
+</template>
+
+//创建C页面 pageC.ux
+<template>
+  <div>C功能的展示区域</div>
+</template>
+for 指令中指定 tid
+推荐级别：鼓励
+
+使用 for 指令的列表，存在删除 item 或者改变 item 顺序的情况，可以选择指定唯一的 tid。
+
+正例
+
+<template>
+  <text for="{{sportList}}" tid="id">{{$item.id}} {{$item.name}}</text>
+</template>
+
+<script>
+  export default {
+    data: {
+      sportList: [
+        { id: 'No.1', name: '游泳' },
+        { id: 'No.2', name: '跑步' },
+        { id: 'No.3', name: '登山' },
+      ],
+    },
+  }
+</script>
+避免高耗性能操作
+避免高耗性能操作
+更新时间：2025-01-16 19:58:38
+
+在蓝河应用上，一些比较消耗性能的操作是需要开发时记住的，下面将会介绍这些操作。
+
+避免使用后代选择器
+推荐级别：强烈
+
+后代选择器在 web 开发中可以非常好地避免样式污染。但是在蓝河应用中页面和组件天生就具有样式隔离的能力，不使用后代选择器可以更快的渲染页面。
+
+反例
+
+.list .item {
+  color: red;
+}
+正例
+
+.item {
+  color: red;
+}
+精简打印日志
+推荐级别：强烈
+
+非必须不建议打日志，如必要打印，日志的内容尽量简短。
+
+反例
+
+export default {
+  startWorkout(sportInfo) {
+    console.log(`sportInfo = ${JSON.stringfiy(sportInfo)}`)
+  },
+}
+正例
+
+export default {
+  startWorkout(sportInfo) {
+    console.log(`sportInfo.id = ${sportInfo.id}`)
+  },
+}
+减少对大对象使用 JSON.parse、JSON.stringify
+推荐级别：强烈
+
+在开发中，注意避免对大的 JS 对象使用 JSON.parse、JSON.stringify，这会影响性能。建议在服务端处理完数据后再返回给 js 应用
+
+减少使用 border-radius
+推荐级别：建议
+
+border-radius 为耗性能属性，非必须不使用组件圆角，在设计层面上避免出现圆角，如有图片出现圆角要首先考虑使用切图实现。
+
+避免后台渲染指令堆积
+如果您的应用常驻后台，那么后台刷新 UI 容易造成渲染指令堆积，影响性能，尽量避免这些行为。如果 Page 有接收 event 后刷新 UI 的行为，或者有类似行为可以使用暂存数据的方式避免后台刷新 UI
+
+// 临时变量暂存后台刷新数据
+let tempData
+export default {
+  data: {
+    bgData: [1, 2],
+    showing: false,
+  },
+  onInit() {
+    const evtId = event.subscribe({
+      eventName: 'new_data',
+      callback: (res) => {
+        if (!this.showing) {
+          tempData = res.data
+        } else {
+          this.bgData = res.data
+        }
+      },
+    })
+  },
+  onShow() {
+    this.showing = true
+    if (tempData) {
+      this.bgData = tempData
+    }
+  },
+  onHide() {
+    this.showing = false
+  },
+}
+退出页面释放监听
+退出页面释放监听
+更新时间：2025-01-16 19:58:38
+
+页面退出的时候取消监听绑定在页面的监听事件
+
+清除定时器
+推荐级别：强烈
+
+每使用一次 setTimeout / setInterval 时必须要在页面消毁时与其相匹配的 clearTimeout / clearInterval 调用，否则可能会导致持续地内存泄露。
+
+反例
+
+export default {
+  onInit() {
+    setTimeout(() => {
+      // todo something
+    }, 1000)
+
+    setInterval(() => {
+      // todo something
+    }, 1000)
+  },
+  onDestroy() {},
+}
+正例
+
+let t1, t2
+export default {
+  onInit() {
+    t1 = setTimeout(() => {
+      // todo something
+    }, 1000)
+
+    t2 = setInterval(() => {
+      // todo something
+    }, 1000)
+  },
+  onDestroy() {
+    // 解除内存占用
+    clearTimeout(t1)
+    clearInterval(t2)
+  },
+}
+取消监听事件
+推荐级别：强烈
+
+页面中使用的监听类接口(如 feature、C2JS 等)，页面退出时必须清除监听。原因同上。
+
+反例
+
+import event from '@blueos.app.event.eventManager'
+export default {
+  onInit() {
+    event.subscribe({
+      eventName: 'usual.event.SCREEN_AOD',
+      callback: function (res) {
+        // do something
+      },
+    })
+  },
+  onDestroy() {},
+}
+正例
+
+import event from '@blueos.app.event.eventManager'
+let eventIds = []
+export default {
+  onInit() {
+    eventIds.push(
+      event.subscribe({
+        eventName: 'usual.event.SCREEN_AOD',
+        callback: function (res) {
+          // do something
+        },
+      })
+    )
+  },
+  onDestroy() {
+    eventIds.forEach((evtId) => {
+      event.unsubscribe({ id: evtId })
+    })
+  },
+}
+资源文件优化
+资源文件优化
+更新时间：2025-01-16 19:58:38
+
+本章介绍主要针对 UI 设计师，UI 设计师需要在设计初期对图片的设计和切图规范有所了解，以帮助应用开发者尽量减少内存占用、提升帧率和性能。
+
+不使用大图片
+推荐级别：强烈
+
+图片尺寸应与界面尺寸匹配，使用超高清大图会影响性能且不必要。
+
+png 图片替代 svg 图片
+推荐级别：建议
+
+svg 只在有动画或动态修改属性等特殊场景时使用，一般情况下都使用 png 格式图片资源
+
+反例
+
+<image src="/assets/images/logo.svg"></image>
+正例
+
+<image src="/assets/images/logo.png"></image>
+删除冗余图片
+推荐级别：建议
+
+如果图片已经用不到了，需要及时的在项目中删除，否则冗余的图片会使得包体积增加。
+
+图片复用
+推荐级别：鼓励
+
+设计的图片尽量实现共用，来减少存储占用。比如：确定、取消、返回、选中、未选中等使用频繁的按钮。
+长列表优化
+长列表优化
+更新时间：2025-01-16 19:58:38
+
+本节会系统的介绍长列表的性能优化方法。
+
+当列表长度超长时，必定会影响页面的性能，下面的一系列措施会让您的长列表渲染和更新更加快速。
+
+for 指令中不使用表达式
+表达式会频繁触发 js 引擎执行，长列表中的表达式，可以改写成属性读取。
+
+推荐级别：强烈
+
+反例
+
+<template>
+  <div>
+    <div for="{{foodList}}">
+      <text>{{$item.vegetarian ? 'Vegetarian' : 'Non-Vegetarian'}}</text>
+      <text>{{$item.name}}</text>
+      <text>{{$item.category}}</text>
+    </div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      foodList: [
+        { name: 'Apple', category: 'Fruit', vegetarian: true },
+        { name: 'Chicken', category: 'Meat', vegetarian: false },
+        { name: 'Broccoli', category: 'Vegetable', vegetarian: true },
+        { name: 'Pizza', category: 'Fast Food', vegetarian: false },
+        { name: 'Yogurt', category: 'Dairy', vegetarian: true },
+      ],
+    },
+  }
+</script>
+正例
+
+<template>
+  <div>
+    <div for="{{foodList}}">
+      <text>{{$item.vegetarianStatus}}</text>
+      <text>{{$item.name}}</text>
+      <text>{{$item.category}}</text>
+    </div>
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      foodList: [
+        { name: 'Apple', category: 'Fruit', vegetarianStatus: 'Vegetarian' },
+        { name: 'Chicken', category: 'Meat', vegetarianStatus: 'Non-Vegetarian' },
+        { name: 'Broccoli', category: 'Vegetable', vegetarianStatus: 'Vegetarian' },
+        { name: 'Pizza', category: 'Fast Food', vegetarianStatus: 'Non-Vegetarian' },
+        { name: 'Yogurt', category: 'Dairy', vegetarianStatus: 'Vegetarian' },
+      ],
+    },
+  }
+</script>
+for 指令中避免使用自定义组件
+推荐级别：强烈
+
+自定义组件中会创建 vm，频繁而密集的 vm 创建对性能和内存都是很大的压力。
+
+for 指令中只使用 item 的数据
+推荐级别：强烈
+
+在 for 中不使用不属于列表本身的数据，否则会产生不必须的数据响应。
+
+反例
+
+<div for="{{list}}">
+  <text class="{{$item.num > count ? 'red' : 'blue'}}">{{$item.num}}</text>
+</div>
+<script>
+  export default {
+    data: {
+      count: 10,
+    },
+  }
+</script>
+正例
+
+<div for="{{list}}">
+  <text class="{{$item.className}}">{{$item.num}}</text>
+</div>
+分段懒加载
+推荐级别：强烈
+
+注意：下例子仅做懒加载方式参考，实际上还要加上其他优化方法。
+
+正例
+
+<template>
+  <div>
+    <div for="{{list}}">
+      <text>{{$item}}</text>
+    </div>
+  </div>
+</template>
+<script>
+  const listData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+  export default {
+    data: {
+      list: [],
+    },
+    onInit() {
+      this.list = listData.slice(0, 6)
+    },
+    onShow() {
+      this.list = listData
+    },
+  }
+</script>
+关注 onInit 的执行时间
+推荐级别：建议
+
+因为长列表数据比较多，所以在应用代码中也需要格外注意，使用 trace 关注 onInit 的执行时间。
+帧率优化指引
+帧率优化指引
+更新时间：2025-01-16 19:58:38
+
+本节介绍提升帧率的有效方法。
+
+不额外设置背景色
+如背景色为黑色，则不需要另外设置黑色（默认背景色为黑色）
+如父容器已经有背景颜色，则不需要单独给页面的容器设置一样的背景色
+给 div 组件设置宽高
+横向布局至少设置高度
+纵向布局至少设置宽度
+使用图片的原始尺寸
+image 组件上的宽高使用图片的原始尺寸
+background-image 上使用图片的原始尺寸
+4.其他
+
+编译环境变量
+编译环境变量
+更新时间：2025-01-16 19:58:38
+
+编译环境变量 process.env.NODE_ENV 用于在构建时判断生产环境或开发环境。它可以帮助在编译时去掉不必要构建的代码块。环境变量的一种使用场景是用于模拟器无法覆盖的能力，可以使用 JavaScript 来模拟这些情况。
+
+编译环境变量取值
+环境	取值
+开发环境	development
+正式环境	production
+使用示例
+let musicList = []
+
+if (process.env.NODE_ENV == 'development') {
+  // 开发环境假数据模拟
+  musicList = require('./musicList.js')
+} else if (process.env.NODE_ENV == 'production') {
+  // 正式环境获取真实数据
+  musicList = getMuisc()
+}
+
+export default {
+  onInit() {
+    console.log(musicList)
+  },
+}
+国际化
+国际化
+更新时间：2025-01-16 19:58:38
+
+蓝河应用平台的能力会覆盖多个国家地区，平台支持国际化(i18n)的能力后，可以做到让一个蓝河应用产品（一个 RPK 文件）同时支持多个语言版本的切换，开发者无需开发多个不同语言的源码项目，避免给项目维护带来困难。
+
+使用系统默认的语言，开发者配置国际化的方式非常简单，只需要定义资源与引用资源两个步骤即可；如果允许用户在蓝河应用中修改地区语言，请参考第三步获取更新语言；
+
+定义资源文件
+资源文件用于存放多个语言的业务信息定义，与其它技术平台类似（它们使用properties文件或者xml文件的格式），蓝河应用平台使用JSON文件保存资源定义；
+
+在项目源码src目录下定义i18n文件夹，内部放置每个语言地区下的资源定义文件即可；其中文件名定义为：zh-CN.json、zh.json；
+
+每个 JSON 文件的内容格式如下：
+
+{
+  "message": {
+    "pageA": {
+      "text": "pure-text-content",
+      "format": {
+        "object": "type-{name}",
+        "array": "type-{0}"
+      },
+      "plurals": {
+        "double": "car | cars",
+        "three": "no apples | one apple | {count} apples",
+        "format": {
+          "object": "type-{name}",
+          "array": "type-{0}"
+        }
+      }
+    }
+  }
+}
+页面中通过message.pageA.text类似的path引用对应内容"pure-text-content"；
+
+页面中引用资源
+页面中 i18n 的使用语法，主要体现在 ViewModel 的几个函数上，如：$t，这些方法可以在<template或<script>中使用；
+
+如下代码所示：
+
+<template>
+  <div>
+    <text>{{ $t('message.pageA.text') }}</text>
+    <text>{{ $t('message.pageA.format.object', { name: 'arg-object' }) }}</text>
+  </div>
+</template>
+
+<script>
+  export default {
+    onInit() {
+      // 简单格式化：
+      this.$t('message.pageA.text')
+      this.$t('message.pageA.format.object', { name: 'arg-object' })
+    },
+  }
+</script>
+简单格式化方法
+属性	类型	参数	描述
+$t	Function	path: String 资源路径
+arg0: object	array 格式化参数，非必要参数，根据系统语言完成简单的替换：this.$t('message.pageA.text')
+比如：
+
+// 示例：无额外参数的格式化
+// 输出："pure-text-content"
+this.$t('message.pageA.text')
+// 示例：额外参数为对象，替换引用内容中的绑定
+// 输出："type-arg-object"
+this.$t('message.pageA.format.object', { name: 'arg-object' })
+单复数格式化方法
+属性	类型	参数	描述
+$tc	Function	path: String 资源路径
+count: number 要表达的值	根据系统语言完成单复数替换：this.$tc('message.plurals.double')，注意：定义资源的内容通过 | 分隔为多个选项
+比如：
+
+// 示例：message的值为两个选项时，传递数值不为单数
+// 输出："cars"
+this.$tc('message.pageA.plurals.double', 0)
+// 示例：message的值为两个选项时，传递数值为单数
+// 输出："car"
+this.$tc('message.pageA.plurals.double', 1)
+// 示例：message的值为两个选项时，传递数值不为单数
+// 输出："cars"
+this.$tc('message.pageA.plurals.double', 2)
+
+// 示例：message的值为三个及以上的选项时，传递数值不为单数
+// 输出："no apples"
+this.$tc('message.pageA.plurals.three', 0)
+// 示例：message的值为三个及以上的选项时，传递数值为单数
+// 输出："one apple"
+this.$tc('message.pageA.plurals.three', 1)
+// 示例：message的值为三个及以上的选项时，传递数值不为单数
+// 输出："10 apples"
+this.$tc('message.pageA.plurals.three', 10)
+manifest 中的 name 的国际化
+此时可使用字符串模板声明，形如：${appName}
+
+例如下面：
+
+{
+  "package": "com.example.i18n",
+  "name": "${appName}",
+  "versionName": "1.0.0",
+  "versionCode": 1
+}
+此时 i18n 也必须有相应的配置信息
+
+// en.json
+{
+  "appName": "myApp"
+}
+// zh-CN.json
+{
+  "appName": "我的应用"
+}
+获取更新语言
+上面的能力用于资源内容的格式化，在某些场景下开发者可能需要获取当前系统的地区语言locale并进行更改，来完成不同的逻辑处理：
+
+比如：不同的 locale 对应的页面布局不同；
+比如：开发者为用户提供设置某种语言的能力；
+此时开发者，可以通过blueos.app.configuration接口来完成
+
+比如：
+
+import configuration from '@blueos.app.configuration'
+
+// 获取locale，后续开发者可以将locale设置为VM中的data属性，并在模板中判断以区分不同的布局
+const localeObject = configuration.getLocale()
+// 转换为字符串格式，如：'zh'或者'zh-CN'
+const locale = [localeObject.language, localeObject.countryOrRegion].filter((n) => !!n).join('-')
+
+console.info(`获取当前locale：${locale}`)
+设置多当前语言(setLocale)为系统接口，普通应用无法调用。
+
+import configuration from '@blueos.app.configuration'
+
+// 设置locale成功后，通过VM的生命周期函数 onConfigurationChanged 触发
+configuration.setLocale({
+  language: 'zh',
+  countryOrRegion: 'CN',
+})
+修改地区语言后的回调
+当用户在系统设置或者通过 configuration.setLocale 切换地区语言，都会触发 onConfigurationChanged 回调，且返回来的 event.type 值为locale
+
+示例代码
+
+// 监听语言、地区变化
+onConfigurationChanged(event) {
+  if (event && event.type && event.type === 'locale') {
+    console.log('locale or language changed!')
+  }
+}
+二。UI组件
+1.通用
+概述
+概述
+更新时间：2025-01-16 19:58:36
+
+UI 组件是编写整个界面的基础。蓝河系统的组件拥有多项核心能力，包括属性、样式、事件和方法，同时还支持表冠旋转相关的事件处理和复杂动画，让您的界面更加生动有趣。
+
+通用能力介绍
+能力	简述
+通用事件	即所有组件都支持的事件回调
+通用属性	即所有组件都支持的属性。开发者可以在所有的组件标签上都使用通用属性
+通用样式	即所有组件都可以支持的样式，它们均与 css 的属性样式用法保持一致
+通用方法	提供给所有组件调用的方法
+UI 组件支持的表冠旋转	提供支持表冠旋转的 UI 组件与对应属性
+颜色样式	支持颜色值类型
+动画样式	支持开发者制作动画，提供了 transform 类、animation 类的动画样式属性，且参数格式与 CSS 对齐
+渐变样式	渐变 (gradients) 可以在两个或多个指定的颜色之间显示平稳的过渡，用法与 CSS 渐变一致
+组件动画	提供一个新的执行动画的便捷方法，创建一个 Animation 对象实例
+通用事件
+通用属性
+通用样式
+通用方法
+UI组件支持表冠旋转
+颜色样式
+动画样式
+渐变样式
+自定义字体样式
+组件动画
+2.基础组件
+概述
+概述
+更新时间：2025-01-16 19:58:35
+
+作为组成复杂组件和应用的基础模块，基本的 UI 展示功能通常包括文本框、链接和图片等元素。这些 UI 组件是构建用户界面的重要基础，通过这些基本元素的组合与拼接，可以实现丰富多彩、充满个性化的 UI 设计。蓝河系统提供了这些基本 UI 展示功能的实现和支持，以帮助您快速构建和部署丰富多样的用户界面和互动性应用。
+
+基础组件介绍
+更新时间：2025-01-16 19:58:35
+
+组件	简述
+a	超链接
+image	渲染图片，不支持子组件、事件、方法
+text	文本，文本内容写在标签内容区
+span	格式化的文本，只能作为子组件，不支持事件，目前不支持换行
+marquee	跑马灯，用于插入一段滚动的文字，默认为单行
+progress	进度条，不支持子组件
+arc-text	弧形文本，文本内容展示在 arc-text 组件盒模型内最大且居中的圆周上，超出的内容将会被截断
+barcode	条形码，将文本内容转换为条形码展示
+qrcode	二维码，将文本内容转换为二维码展示
+canvas	画布组件，通过使用 JavaScript 中的脚本，可以在 canvas 上绘制图形，文字等
+a
+image
+text
+span
+marquee
+progress
+arc-text
+barcode
+qrcode
+canvas
+3.表单组件
+
+概述
+概述
+更新时间：2025-01-16 19:58:36
+
+用于收集和展示用户的信息，以便后续的处理。可通过搭配使用不同的表单组件，实现不同的业务需求，比如登录、注册和信息填写等
+
+表单组件介绍
+组件	简述
+input	提供可交互的界面，接收用户的输入，默认为单行
+label	为 input 组件定义标注
+picker	滚动选择器，支持四种选择器，普通选择器，日期选择器，时间选择器，弧形选择器
+slider	滑动型输入器
+switch	开关选择
+artboard	提供可交互的界面，接收用户的笔画输入
+input
+label
+picker
+slider
+switch
+artboard
+4.布局/容器组件
+
+概述
+概述
+更新时间：2025-01-16 19:58:36
+
+布局/容器组件是实现 UI 布局的核心模块之一，不仅可以提供独立的布局功能，还可以多个容器组合，实现更为复杂的布局模式和视觉效果。布局容器还能够为其它 UI 组件提供适当的间距及排列方式，使得整个页面更加美观，构建更丰富的 UI 界面。
+
+布局/容器组件介绍
+组件	简述
+div	基本容器
+list	列表视图容器，仅支持<list-item>子组件
+list-item	<list>的子组件，用来展示列表具体 item，宽度默认充满 list 组件
+stack	基本容器，子组件排列方式为层叠排列，每个直接子组件按照先后顺序依次堆叠，覆盖前一个子组件
+swiper	滑块视图容器
+scroll	滚动视图容器。竖向或水平方向滚动容器，竖向滚动需要设置定高，水平滚动需要设置定宽
+div
+list
+list-item
+stack
+swiper
+scroll
+5.导航组件
+
+概述
+概述
+更新时间：2025-01-16 19:58:36
+
+用于简化页面导航的 UI 组件，通过提供直观的导航形式、清晰的页面路径和视觉创意等，提供了便捷的导航体验
+
+导航组件介绍
+组件	简述
+drawer	抽屉容器，抽屉默认隐藏。可通过边缘滑动，支持 flex 布局
+drawer-navigation	<drawer>的子组件，用来展示具体的抽屉内容
+cellular-list	蜂窝列表组件，将指定结构的数组渲染成蜂窝状列表
+drawer
+drawer-navigation
+cellular-list
+6.动画组件
+
+概述
+概述
+更新时间：2025-01-16 19:58:35
+
+提供用于实现页面元素动画效果的 UI 组件，通常用于增强用户交互体验，吸引用户的注意力，提高页面的美观度和可视化效果。
+
+动画组件介绍
+组件	简述
+svg-container	渲染 svg 图片，可以动态修改 svg 属性
+image-animator	图片帧动画播放器
+animated-vector	animated-vector 组件，用于解析渲染安卓 xml 动画资源
+svg-container
+image-animator
+animated-vector
+7.系统风格组件
+
+概述
+概述
+更新时间：2025-01-16 19:58:36
+
+提供基于蓝河应用的特定的设计规范和标准所设计的 UI 组件，这些组件具有统一的设计风格、布局、图标元素和字体字号等，旨在为用户提供全面的业务场景下的界面设计需求。
+
+系统风格组件介绍
+组件	简述
+vw-alert	弹窗组件，此组件为应用内主动触发的信息、操作确认弹窗
+vw-button	一种基础的组件，点击后可执行对应（按钮表意）的操作。包含“文字按钮”“图标按钮”两类
+vw-empty	页面无用户生成的内容时，显示空白页控件元素
+vw-icon	提供一套常用图标
+vw-slide	用来快速调节设置值，如音量、亮度、色彩饱和度等. 用户通过点击左侧/右侧按钮的方式增加/降低数值.
+vw-title	标题显示在页面顶部，作为关键导航信息，用来告知用户当前在哪里
+vw-list	列表包含一系列连续的列表项，可以呈现文本、图标等内容。
+vw-list-item	列表选项可以作为列表的子项，当列表的每一项不同时可以用列表选项拼接实现
+vw-loading	loading 用于定性地指示一种过程状态，多用于数据加载过程，如加载应用列表，或从网络端获取内容的过程
+vw-alert
+vw-button
+vw-empty
+vw-icon
+vw-slide
+vw-title
+vw-list
+vw-list-item
+vw-loading
+三。JS API
+1.应用框架
+1.1概述
+概述
+更新时间：2025-01-16 19:58:34
+
+蓝河应用的应用框架为开发者提供了广泛的能力，以构建、管理蓝河应用的各个方面。通过这些能力，开发者可以更好地控制和定制蓝河应用的行为、用户体验以及数据操作。
+
+子模块介绍
+模块	简介
+应用上下文	提供了管理和控制应用的重要功能，可帮助开发者获得更多应用信息、整合外部资源，以及有效退出应用
+页面路由	提供应用能够有效管理和导航不同页面的能力，以确保应用的流畅导航和用户体验
+应用管理	该模块负责跟踪和管理应用的状态，包括前台运行、后台运行以及应用未运行的情况，以实现灵活的应用控制
+生命周期	提供了页面、自定义组件、应用的生命周期接口，开发者可以选择在应用运行的特定阶段执行相应的业务代码
+包管理	该模块允许检测应用是否存在，安装应用，获取应用版本信息、签名摘要信息以及应用分类，为应用操作和信息检索提供全面的支持
+页面栈管理	管理页面栈信息
+应用沙箱目录	蓝河应用框架给每个应用分配了一个专属的应用目录，蓝河应用的数据访问和操作都被限制在该目录内，此目录下存放的数据可以保护数据的安全性
+通知能力	提供多应用间数据传递和事件交互的能力，应用发布通知能力以及弹窗能力
+后台管理	提供定时触发事件或执行特定操作的功能，允许应用在预定的时间或间隔内执行后台任务
+1.2应用上下文
+应用上下文
+更新时间：2025-01-16 19:58:35
+
+接口声明
+无需声明
+
+导入模块
+import app from '@blueos.app.context'
+// 或 const app = require('@blueos.app.context')
+接口定义
+app.getInfo()
+获取当前应用信息
+
+参数：
+无
+
+返回值
+参数名	类型	说明
+packageName	String	应用包名
+icon	String	应用图标路径
+name	String	应用名称
+versionName	String	应用版本名称
+versionCode	Integer	应用版本号
+示例：
+console.log(JSON.stringify(app.getInfo()))
+// console 值打印
+{
+  // 应用包名
+  "packageName": "com.example.demo",
+  // 应用名称
+  "name": "demo",
+  // 应用版本名称
+  "versionName": "1.0.0",
+  // 应用版本号
+  "versionCode": 1,
+  // 应用图片
+  "icon": "/Common/logo.png"
+}
+app.loadLibrary(name: string)
+加载静态库，需要与厂商合作
+
+参数：
+参数名	类型	必填	说明
+name	String	是	lib 库名称
+返回值
+静态库加载结果
+
+示例：
+import app from '@blueos.app.app'
+const testApp = app.loadLibrary('test_app')
+
+testApp.on('js_task_callback', () => {
+  // callback action
+})
+app.terminate()
+退出当前应用
+
+参数:
+无
+
+返回值：
+无
+
+示例：
+app.terminate()
+1.3页面路由
+页面路由
+更新时间：2025-01-16 19:58:35
+
+接口声明
+无需声明
+
+导入模块
+import router from '@blueos.app.appmanager.router' 或 const router = require('@blueos.app.appmanager.router')
+接口定义
+router.push(OBJECT)
+跳转到应用内的某个页面。
+
+参数：
+参数	类型	必填	说明
+uri	String	是	要跳转到的 uri，可以是下面的格式：
+1. 以"/"开头的应用内页面的路径；例：/about。
+2. 以非"/"开头的应用内页面的名称；例：About。
+3. 特殊的，如果 uri 的值是"/"，则跳转到 path 为"/"的页，没有则跳转到首页
+params	Object	否	跳转时需要传递的数据；跳转到蓝河应用页面时，参数可以在目标页面中通过this.param1的方式使用，param1 为 json 中的参数名，param1 对应的值会统一转换为 String 类型。
+transition	Object	否	设置当前跳转的转场动画，优先级高于 router.setTransition
+transition 参数说明
+属性	类型	必填	说明
+forward	Object	否	路由进入页面时的动效
+back	Object	否	路由返回页面时的动效
+forward、back 参数说明
+属性	类型	必填	说明
+exit	TransitionAnimation	否	即将退出的页面动画
+enter	TransitionAnimation	否	即将出现的页面动画
+示例：
+应用内切换页面
+
+path 切换
+
+router.push({
+  uri: '/about',
+  params: {
+    testId: '1',
+  },
+})
+name 切换
+
+// open page by name
+router.push({
+  uri: 'About',
+  params: {
+    testId: '1',
+  },
+})
+打开另一个应用
+
+指定 deeplink 打开
+
+router.push({
+  uri: 'hap://app/com.vivo.bind/pages/bindmain?key=value',
+})
+router.replace(OBJECT)
+跳转到应用内的某个页面，当前页面无法返回
+
+参数：
+参数	类型	必填	说明
+uri	String	是	要跳转到的 uri，可以是下面的格式：
+以"/"开头的应用内页面的路径；例：/about。
+以非"/"开头的应用内页面的名称;例：About。
+特殊的，如果 uri 的值是"/"，则跳转到 path 为"/"的页，没有则跳转到首页
+params	Object	否	跳转时需要传递的数据，参数可以在目标页面中通过this.param1的方式使用，param1 为 json 中的参数名，param1 对应的值会统一转换为 String 类型。
+示例：
+router.replace({
+  uri: '/test',
+  params: {
+    testId: '1',
+  },
+})
+router.back()
+返回上一页面
+
+示例：
+// A页面，open page by name
+router.push({
+  uri: 'B',
+})
+// B页面，open page by name
+router.push({
+  uri: 'C',
+})
+// C页面，open page by name
+router.push({
+  uri: 'D',
+})
+// D页面，open page by name
+router.push({
+  uri: 'E',
+})
+// E页面返回至D页面
+router.back()
+// D页面返回至C页面
+router.back()
+router.clear()
+清空所有历史页面记录，仅保留当前页面（即保留栈顶页面）
+
+参数：
+无
+
+示例：
+router.clear()
+router.getState()
+获取当前页面状态
+
+返回参数：
+参数名	类型	说明
+index	Number	当前页面在页面栈中的位置
+name	String	当前页面的名称
+path	String	当前页面的路径
+示例：
+const page = router.getState()
+console.log(`page index = ${page.index}`)
+console.log(`page name = ${page.name}`)
+console.log(`page path = ${page.path}`)
+router.setTransition(OBJECT)
+设置应用默认转场动画
+
+参数：
+属性	类型	必填	说明
+forward	Object	否	路由进入页面时的动效
+back	Object	否	路由返回页面时的动效
+forward、back 参数说明：
+属性	类型	必填	说明
+exit	TransitionAnimation	否	即将退出的页面动画
+enter	TransitionAnimation	否	即将出现的页面动画
+示例：
+router.setTransition({
+  forward: {
+    enter: 'fadeIn',
+    exit: 'fadeOut',
+  },
+  back: {
+    enter: 'fadeIn',
+    exit: 'fadeOut',
+  },
+})
+TransitionAnimation
+支持别名内置动画
+
+动效别名表
+系统提供内置动画，类型为 String。
+
+别名	适用情况	描述
+slideInLeft	打开页面	左侧滑入
+slideOutRight	关闭页面	右侧滑出
+fadeIn	打开页面	淡入
+fadeOut	关闭页面	淡出
+none	打开/关闭页面	无动效，瞬间显示/瞬间隐藏
+zoomIn	打开/关闭页面	放大
+zoomOut	打开/关闭页面	缩小
+1.4应用管理
+应用管理
+更新时间：2025-01-16 19:58:34
+
+接口声明
+JS 接口声明
+{ "name": "blueos.app.appmanager.appState" }
+导入模块
+import am from '@blueos.app.appmanager.appState'
+在工程里面的 manifest 文件中配置如下内容
+申请权限
+{
+  "permissions": [{ "name": "watch.permission.AM" }]
+}
+应用状态
+蓝河应用的状态有三种，应用处于前台，后台以及应用未运行。对应的三种状态值枚举如下：
+
+状态值	说明
+foreground	应用处于前台
+background	应用处于后台
+noRunning	应用未运行
+JS 接口定义
+am.moveTaskToBack()
+将当前栈顶应用移动到后台
+
+参数
+无
+
+返回值
+如果当前任务成功移动到后台，则返回值为 true，否则返回值为 false。
+
+示例
+
+am.moveTaskToBack()
+1.5生命周期
+生命周期
+更新时间：2025-01-16 19:58:33
+
+了解页面生命周期与状态，应用生命周期
+
+页面生命周期
+onInit
+监听页面初始化。当页面完成初始化时调用，只触发一次
+
+onReady
+监听页面创建完成。当页面完成创建可以显示时触发，只触发一次
+
+参数
+无
+
+onShow
+onShow 是一个页面生命周期函数，用于监听页面显示的事件。当一个页面被打开或从后台切换到前台时(当应用处于后台时打开页面但页面没有在前台显示时 onShow 方法不会被触发)，onShow 方法会被触发。
+
+参数
+无
+
+onHide
+onHide 是一个页面生命周期函数，用于监听页面隐藏的事件。当一个页面被切换到后台或关闭时(当应用处于后台时页面被关闭 onHide 方法不会被触发)，onHide 方法会被触发。
+
+参数
+无
+
+onDestroy
+监听页面退出。当页面跳转离开（退出页面栈）时触发
+
+参数
+无
+
+onBackPress()
+监听返回动作。当用户执行返回操作时触发。只有当前页面配置了 followHand : disable，该接口才生效。
+
+参数
+无
+
+返回值
+类型	描述
+Boolean	返回 true 表示页面自己处理返回逻辑，返回 false 表示使用默认的返回逻辑，不返回值会作为 false 处理； 注意：该函数不支持声明为异步函数（即：使用async标识），因为返回值代表界面要立即响应用户操作；
+onRefresh
+监听页面重新打开。
+
+1.当页面在 manifest 中 launchMode 标识为'singleTask'时，仅会存在一个目标页面实例，用户多次打开目标页面时触发此函数。
+该回调中参数为重新打开该页面时携带的参数。
+详见页面启动模式
+
+参数
+参数名	类型	描述
+query	Object	通过 deeplink、router.push 等接口传入的 uri 中 query 解析成的对象，或者 router.push 等接口传入的 params 对象
+onKey
+监听按键响应。当按键被触发时回调
+
+参数
+参数名	类型	描述
+event	Object	被触发的按键事件
+event 参数
+参数名	类型	描述
+keyCode	Number	按下的键位，0：下键(电源键)，1：上键
+keyAction	Number	按下或弹起的动作 0：按下 1：短按弹起 2：长按弹起
+repeatCount	Number	连续按的次数，按键在长按的时候，会连续产生多个按下事件，这个时候第一个按下事件的 repeatCount 为 0，之后的按下事件 repeatCount 会递增。
+示例代码：
+onKey(event) {
+  console.log(`key pressed! ${JSON.stringify(event)}`);
+  console.info(`触发页面生命周期 onKey`)
+}
+onConfigurationChanged
+监听系统语言改变
+
+参数
+参数名	类型	描述
+event	Object	应用配置发生变化的事件
+event 参数：
+参数名	类型	描述
+type	String	应用配置发生变化的原因类型，支持的 type 值如下所示
+event 中type 现在支持的参数值如下：
+参数值	描述
+locale	应用语言、地区变化而发生改变
+示例代码：
+onConfigurationChanged(evt) {
+  if (event && event.type && event.type === 'locale') {
+    console.log('locale or language changed!')
+  }
+}
+onPalmOver
+监听手掌覆盖事件
+
+参数
+无
+
+返回值
+true 表示不将事件继续传递给 launcher，其他值或者不返回都会将事件继续传递给 launcher。
+
+示例代码：
+
+onPalmOver(evt) {
+  console.info(`大手掌事件 onPalmOver`)
+  return true;
+}
+页面的生命周期接口的调用顺序
+打开页面 A：onInit() -> onReady() -> onShow()
+在页面 A 打开页面 B：onHide()
+从页面 B 返回页面 A：onShow()
+自定义组件的生命周期
+自定义组件，指的是通过 import 标签引入的 ViewModel 组件
+
+属性	类型	参数	返回值	描述	触发时机
+onInit	Function	无	无	监听初始化	当数据驱动化完成时触发
+onReady	Function	无	无	监听模板创建完成	当模板创建完成时触发
+onDestroy	Function	无	无	监听组件销毁	当销毁时触发
+应用生命周期
+onCreate()
+监听应用创建，应用创建时调用。
+
+参数
+无
+
+onDestroy()
+监听应用销毁，应用销毁时调用。
+
+参数
+无
+1.6包管理
+包管理
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.package.packageManager" }
+导入模块
+import package from '@blueos.package.packageManager' 或 const package = require('@blueos.package.packageManager')
+接口定义
+package.hasInstalled(OBJECT)
+检测应用是否存在。支持检测原生应用是否已安装。
+
+参数：
+参数名	类型	必填	说明
+package	String	是	应用包名
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+result	Boolean	应用是否存在
+示例：
+package.hasInstalled({
+  package: 'com.vivo.app',
+  success: function (data) {
+    console.log(`handling success: ${data.result}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+package.getInfo(OBJECT)
+获取应用版本号、版本名称信息，包括原生应用和蓝河应用
+
+参数：
+参数名	类型	必填	说明
+package	String	是	应用包名
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束回调
+success 返回值：
+参数名	类型	说明
+package	String	应用包名
+name	String	应用名称
+icon	String	应用图标路径
+versionCode	Number	版本号
+versionName	String	版本名称
+fail 返回错误码：
+错误码	说明
+202	参数错误
+1000	应用不存在
+示例：
+package.getInfo({
+  package: 'com.vivo.app',
+  success: function (data) {
+    console.log(`handling success: ${data.versionCode}, ${data.versionName}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+package.getAppCategoryAsync(OBJECT)
+异步获取应用分类，权限同同步 api。
+
+参数
+参数名	类型	必填	说明
+package	String	是	应用包名
+success	Function	否	成功回调
+fail	Function	否	失败回调
+success 返回值
+参数名	类型	说明
+appCategory	Array<String>	应用所属类别，详见上文应用分类
+fail 返回错误码
+错误码	说明
+1000	应用不存在
+示例
+package.getAppCategoryAsync({
+  package: 'com.vivo.app',
+  success: function (data) {
+    console.log(`handling success: ${data.appCategory}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+1.7页面栈管理
+页面栈管理
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.app.appmanager.pageStack" }
+导入模块
+ import pagestack from '@blueos.app.appmanager.pageStack' 或 const pagestack = require('@blueos.app.appmanager.pageStack')
+接口定义
+pagestack.getAppStacks(OBJECT)
+获取应用页面栈信息
+
+参数：
+参数名	类型	必填	说明
+package	Array|String	否	应用包名。 默认不传获取所有应用的页面栈信息 或 ['com.vivo.app1','com.vivo.app2'] 或 'com.vivo.app1'
+success	Function	否	接口调用成功的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+complete	Function	否	接口调用结束的回调函数。
+success 返回值：
+参数名	类型	说明
+appStackPages	Array<Object>	返回调用方页面栈信息
+所有应用 appStackPages 数据格式示例：
+appStackPages：[
+ {
+   appInfo:{zIndex:1,package:'com.vivo.app'},
+   pages:[{pageId:1,path:'pages/index/index'}]
+ },
+ null,
+ null
+]
+根据传入应用包名的顺序返回页面栈信息
+参数名	类型	说明
+appInfo	Object	应用信息
+pages	Array<Object>	应用页面栈信息
+某个应用 appInfo 参数详细说明
+
+参数名	类型	说明
+zIndex	Number	所属应用的层级
+package	String	应用包名
+某个应用 pages 参数详细说明
+
+参数名	类型	说明
+pageId	Number	页面的 id
+path	String	页面的路径
+示例：
+pagestack.getAppStacks({
+  package: ['com.vivo.app1', 'com.vivo.app2'],
+  success: function (data) {
+    const [app1, app2] = data.appStackPages
+    //获取某个应用页面栈里面的某个页面id
+    let paths1 = [app1 && app1.pages[0].path, app1 && app1.pages[1].path]
+    let paths2 = [app2 && app2.pages[0].path, app2 && app2.pages[1].path]
+    let pageIds1 = [app1 && app1.pages[0].pageId, app1 && app1.pages[1].pageId]
+    let pageIds2 = [app2 && app2.pages[0].pageId, app2 && app2.pages[1].pageId]
+    let package1 = app1 && app1.appInfo.package
+    let package2 = app2 && app2.appInfo.package
+    //根据页面id或页面路径关闭指定页面
+    pagestack.close({
+      pageList: [
+        {
+          package: package1, //是
+          pageIds: pageIds1, //否
+          paths: paths1, //否
+        },
+        {
+          package: package2,
+          pageIds: pageIds2,
+          paths: paths2,
+        },
+      ],
+      success: function () {},
+      fail: function (data, code) {
+        console.log(`handling fail,code = ${code}`)
+      },
+      complete: function () {
+        console.log(`handling complete`)
+      },
+    })
+    console.log(`handling success, pages = ${pages}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail,code = ${code}`)
+  },
+  complete: function () {
+    console.log(`handling complete`)
+  },
+})
+pagestack.close(OBJECT)
+关闭页面
+
+参数
+参数名	类型	必填	说明
+pageList	Array<Object>	是	关闭应用的配置项
+success	Function	否	接口调用成功的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+complete	Function	否	接口调用结束的回调函数。
+pageList 参数详细
+参数名	类型	必填	说明
+package	String	是	应用包名
+pageIds	Array	否	页面 id
+paths	Array	否	页面路径
+示例：
+pagestack.close({
+  pageList: [
+    {
+      package: 'com.vivo.app',
+      pageIds: [1],
+      paths: ['/pages/index/index'],
+    },
+  ],
+  success: function () {},
+  fail: function (data, code) {
+    console.log(`handling fail,code = ${code}`)
+  },
+  complete: function () {
+    console.log(`handling complete`)
+  },
+})
+1.8应用沙箱目录
+应用沙箱目录
+更新时间：2025-01-16 19:58:33
+
+蓝河应用框架给每个应用分配了一个专属的应用目录，蓝河应用的数据访问和操作都被限制在该目录内，此目录下存放的数据可以保护数据的安全性，这个目录称为 “应用的沙箱目录”。
+
+应用沙箱目录定义
+应用沙箱目录定义详细说明
+
+沙箱目录名	定义说明
+files	应用在本设备上用于存放小而重要的数据目录（如用户登录数据），安全且持久有效，随应用卸载而删除。
+cache	应用在本设备上用于存放缓存文件的目录（如图片、音频缓存），此目录可能会因系统空间不足而被清理，用户也可通过系统管理类应用清理该目录，此目录随应用卸载而删除，适合保存不重要的缓存数据。
+mass	应用在本设备上用于存放大文件的目录（如下载的音频文件），此目录随应用卸载而删除。
+tmp	应用在本设备上用于存放临时文件的目录（如临时日志），应用退出后就会清理该目录，此目录随应用卸载而删除，适合存放使用后即可删除的文件数据。
+preferences	应用在本设备上用于存放 key-val 数据的目录，有大小限制，此目录下的数据通过 storage 的 API 写入，适合保存首选项和配置文件，随应用卸载而删除。
+访问沙箱目录
+沙箱目录是通过 URI 形式访问，每个沙箱目录都有对应的 URI 标准标识。可以使用 URI 的地方都可以访问到沙箱目录，下面表格展示了不同沙箱目录的对应的 URI 格式。
+
+沙箱目录名	URI 定义
+files	internal://files/
+cache	internal://cache/
+mass	internal://mass/
+tmp	internal://tmp/
+如需要往 files 沙箱存放一个 json 文件，则可如下操作：
+
+file.writeText({
+  uri: 'internal://files/demo.json',
+  text: '{"name": "张三"}',
+  success: function () {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+如何选择存放沙箱目录的位置
+沙箱目录的不同划分是为了对数据进行分类管理，将数据放在合理的目录下会让应用获得更大的收益。
+
+对于不同沙箱目录的使用场景如下：
+
+files：此目录用于存放小而重要的数据，目录长期有效，可以保存的文本文件，如 json。
+mass：此目录用于存放大而不太重要的数据，目录长期有效，可以保存需要需要持久化的图片、音频、视频等文件。
+cache：此目录用于存放缓存文件，适合保存不重要的缓存数据，如缓存的音频、视频等。
+tmp：此目录用于存放临时文件，应用退出后可能被清理，适合存放日志等临时文件。
+preferences：此目录只能通过 storage 能力访问，适合存放应用运行中的 key-val 数据。
+JS 如何正确的使用沙箱目录
+要在 js 中使用沙箱目录，只要遵循蓝河应用框架开发即可。
+
+存放/获取 文件时，使用 blueos.storage.file 能力，并且使用 URI 拼接，避免使用绝对路径写法。
+存放/获取 key-val 时，使用 blueos.storage.storage 能力。
+存放在沙箱目录内的图片，如果要用 image 标签访问，也需要使用 URI 访问。
+同上，音频和视频文件如果要播放同样是需要 URI 访问。
+2.通知能力
+2.1公共事件公共事件
+更新时间：2025-01-16 19:58:34
+
+公共事件提供了多应用间数据传递和事件交互的能力。
+
+接口声明
+{ "name": "blueos.app.event.eventManager" }
+导入模块
+import event from '@blueos.app.event.eventManager' 或 const event = require('@blueos.app.event.eventManager')
+接口定义
+event.publish(OBJECT)
+发布公共事件
+
+参数：
+参数名	类型	必填	说明
+eventName	String	是	事件名称, 公共事件保留名称被系统占用，请勿使用
+options	Object	否	事件参数
+options 参数：
+参数名	类型	必填	说明
+params	Object	否	事件参数
+permissions	Array<String>	否	订阅者的权限, 拥有权限的包才能收到发送的事件
+示例：
+event.publish({
+  eventName: 'myEventName',
+  options: {
+    params: { age: 10, name: 'peter' },
+    permissions: ['com.example.demo'],
+  },
+})
+event.subscribe(OBJECT)
+订阅公共事件
+
+参数：
+参数名	类型	必填	说明
+eventName	String	是	事件名称
+callback	Function	是	事件回调
+callback 返回值：
+参数名	类型	必填	说明
+params	Object	否	事件参数
+package	String	否	事件推送者包名
+返回值：
+类型	必填	说明
+Number	是	事件 id
+示例：
+const evtId = event.subscribe({
+  eventName: 'myEventName',
+  callback: function (res) {
+    if (res.package === 'com.example.demo') {
+      console.log(res.params)
+    }
+  },
+})
+console.log(evtId)
+event.unsubscribe(OBJECT)
+取消订阅公共事件
+
+参数：
+参数名	类型	必填	说明
+id	Number	是	订阅 id
+示例：
+event.unsubscribe({ id: 1 })
+系统支持的公共事件
+系统公共事件名称	订阅者所需权限	说明
+usual.event.SHUTDOWN	无	即将关机
+usual.event.BATTERY_CHANGED	无	电量改变，参数：level:0.0 - 1.0 之间
+usual.event.BATTERY_LOW	无	低电事件
+usual.event.BATTERY_OKAY	无	充满电事件
+usual.event.SCREEN_OFF	无	灭屏事件
+usual.event.SCREEN_AOD	无	AOD 事件
+usual.event.SCREEN_ON	无	亮屏事件
+usual.event.PACKAGE_ADDED	无	新安装应用，参数：package:com.xxx.xxx
+usual.event.PACKAGE_REPLACED	无	应用安装更新，参数：package:com.xxx.xxx
+usual.event.PACKAGE_REMOVED	无	应用卸载，参数：package:com.xxx.xxx
+usual.event.DISCHARGING	无	停止充电
+usual.event.CHARGING	无	开始充电
+usual.event.OTA_TRANSFER	无	ota 开始传输
+usual.event.OTA_INSTALL	无	ota 开始安装
+2.2消息通知
+消息通知
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.app.notification.notificationManager" }
+导入模块
+import notification from '@blueos.app.notification.notificationManager' 或 const notification = require('@blueos.app.notification.notificationManager')
+接口定义
+notification.publish(OBJECT)
+发布通知
+
+参数：
+参数名	类型	必填	说明
+request	Notification	是	消息通知对象
+success	Function	是	成功的回调
+fail	Function	是	失败的回调
+complete	Function	是	执行结束后的回调
+Notification
+说明如下：
+
+参数名	类型	必填	默认	说明	
+icon	String	是	-	通知小图标，应用下以src为根目录的图片的绝对路径	
+id	number	否	-	应用通知的唯一 id	
+appName	String	否	-	应用名称	
+contentType	Number	是	-	正文类型。 1：普通文本通知类型。 2：图片通知类型	
+content	Content	是	-	通知内容 与 contentType 对应	
+channel	Number	是	-	通知来源 , 1：PHONE；2：WATCH_APP	
+platform	String	否	-	消息渠道来源 (PHONE 时) iOS | Andriod	
+deliveryTime	Number	是	-	通知发送时间	
+actionButtons	Array<ActionButton>	否	-	通知按钮，最多两个按钮	
+largeIcon	String	否	-	通知大图标，应用下以src为根目录的图片的绝对路径	
+isUnremovable	Boolean	否	false	是否不可清除	
+badge	Number	否	-	数字角标(消息合并情况下)	
+appBundleName	String	否	-	应用包名 ，格式 com.xxx.xxx，该字段的值应由 native 填充	
+group	String	否	-	消息分组	
+extraInfo	{[key: String]: any}	否	-	扩展参数	
+Content
+普通文本通知类型
+
+名称	类型	必填	说明
+title	String	是	普通文本通知标题
+text	String	是	普通文本通知内容
+additionalText	String	否	可选参数，普通文本通知附加信息
+图片通知类型
+
+名称	类型	必填	说明
+title	String	是	通知标题
+text	String	是	通知内容
+additionalText	String	否	可选参数，通知附加信息
+briefText	String	是	图片文本通知简略内容
+expandedTitle	String	是	图片通知扩展标题
+picture	String	是	图片通知的图片，应用下以src为根目录的图片的绝对路径
+ActionButton
+参数名	类型	必填	说明
+label	String	是	按钮标题
+action	Action	是	点击按钮时触发的动作
+extras	{[key: String]: any}	否	扩展参数
+Action
+参数名	类型	必填	说明
+triggerMethod	String	否	定义按钮点击触发的回调函数, 需要在 app.ux 中定义
+prameters	{[key: String]: any}	否	自定义参数，供回调函数使用
+示例：
+notification.publish({
+  request: {
+    icon: '/assets/images/icon.png',
+    contentType: 1,
+    content: {
+      title: '收件通知',
+      text: '门口xx收件，收件码：XXX',
+    },
+    channel: 1,
+    deliveryTime: Date.now(),
+  },
+  success: function () {},
+  fail: function () {},
+  complete: function () {},
+})
+notification.remove(OBJECT)
+清除消息通知
+
+参数：
+参数名	类型	必填	说明
+query	Query	是	清除的查询条件，如果条件为空则全部清除
+success	Function	是	成功的回调
+fail	Function	是	失败的回调
+complete	Function	是	执行结束后的回调
+Query 参数：
+参数名	类型	必填	说明
+id	Number	否	应用通知的唯一 id
+group	String	否	通知的分组
+示例：
+notification.remove({
+  query: {
+    group: 'group1',
+  },
+  success: function () {},
+  fail: function () {},
+  complete: function () {},
+})
+2.3弹窗
+弹窗
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.window.prompt" }
+导入模块
+import prompt from '@blueos.window.prompt' 或 const prompt = require('@blueos.window.prompt')
+接口定义
+prompt.showToast(OBJECT)
+显示 Toast
+
+参数：
+参数名	类型	必填	说明
+message	String	是	要显示的文本
+duration	Number	否	0 为短时，1 为长时，默认 0
+示例：
+prompt.showToast({
+  message: 'message',
+})
+3.后台管理
+3.1定时任务
+定时任务
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.app.appmanager.schedule" }
+导入模块
+import schedule from '@blueos.app.appmanager.schedule' 或 const schedule = require('@blueos.app.appmanager.schedule')
+接口定义
+schedule.scheduleJob(OBJECT)
+设置定时任务
+
+参数：
+属性	类型	必填	说明
+type	Number	是	1 硬件时间，2 真实时间流逝，前者可以通过修改系统时间触发triggerMethod，后者要通过真实时间的流逝，即使在休眠状态，时间也会被计算
+timeout	long	是	若 type 为 1，则为首次执行时间的时间戳，即从 1970/01/01 00:00:00 GMT 到当前时间的毫秒数；若 type 为 2，则为当前时间距离首次执行时间的间隔，单位毫秒。
+triggerMethod	String	是	app.ux 中定义的方法名，由后台拉起时调用
+interval	long	否	周期性执行的间隔，毫秒为单位，不传就不重复执行
+params	Object	否	任务参数
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+返回值：
+返回值	类型	说明
+id	Integer	底层分配唯一的 ID
+fail 返回错误代码
+错误码	说明
+-27	定时任务已满
+-28	已注册
+示例：
+// xx.ux
+schedule.scheduleJob({
+  type: 1,
+  timeout: new Date('2050-10-01 09:00:00').getTime(),
+  interval: 1000,
+  triggerMethod: 'scheduleFunc',
+  params: {
+    color: 'red',
+  },
+  success: function (data) {
+    console.log(`handling success, scheduleId = ${data.id}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail,code = ${code}`)
+  },
+  complete: function () {
+    console.log(`handling complete`)
+  },
+})
+
+// app.ux
+export default {
+  scheduleFunc(params) {
+    console.log(`background processing color = ${params.color}`)
+  },
+}
+schedule.cancel(id: Integer)
+取消定时任务
+
+参数：
+返回值	类型	说明
+id	Integer	底层分配唯一的 ID
+返回值：
+返回值	类型	说明
+value	Boolean	true：成功； false：失败；
+示例：
+schedule.cancel(1)
+4.通信能力
+
+4.1概述
+概述
+更新时间：2025-01-16 19:58:34
+
+蓝河应用通信能力为应用提供了丰富的通信工具，从本地设备到远程服务器，从文件传输到实时通信，从蓝牙到网络状态监测，为应用提供了多样化的数据传输和通信渠道。这使开发者能够构建更多样化的应用，实现应用内外的数据传输和通信。
+
+子模块介绍
+模块	简述
+蓝牙	该模块允许应用与附件的蓝牙设备进行通信，实现设备间的数据传输和互动
+上传下载	该模块支持应用上传和下载各种文件数据，有助于实现文件传输和数据同步
+数据请求	该模块允许应用向远程服务器发送请求，获取数据或与服务器进行交互。这是应用与后端服务通信的核心功能
+websocket	该模块提供了实时双向通信的能力，使应用能够实时传递数据和事件
+网络状态	该模块帮助应用监测当前网络连接状态，包括是否连接、网络类型等，有助于应用根据网络条件调整行为
+4.2蓝牙
+蓝牙模块暂不可导入不要使用蓝牙相关功能
+4.3上传下载
+上传下载
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.network.request" }
+导入模块
+import request from '@blueos.network.request' 或 const request = require('@blueos.network.request')
+接口定义
+request.upload(OBJECT)
+上传文件
+
+参数：
+参数名	类型	必填	说明
+url	String	是	资源 url
+header	Object	否	请求的 header，会将其所有属性设置到请求的 header 部分。
+method	String	否	默认为 POST，可以是： POST, PUT
+files	Array	是	需要上传的文件列表，使用 multipart/form-data 方式提交
+data	Array	否	HTTP 请求中其他额外的 form data
+success	Function	否	成功返回的回调函数
+fail	Function	否	失败的回调函数
+complete	Function	否	结束的回调函数（调用成功、失败都会执行）
+files 参数 ：
+files 参数是一个 file 对象的数组，file 对象的结构如下：
+
+参数名	类型	必填	说明
+filename	String	否	multipart 提交时，header 中的文件名
+name	String	否	multipart 提交时，表单的项目名，默认 file
+uri	String	是	文件的本地地址
+type	String	否	文件的 Content-Type 格式，默认会根据 filename 或者 uri 的后缀获取
+data 参数 ：
+参数名	类型	必填	说明
+name	String	是	form 元素的名称。
+value	String	是	form 元素的值。
+success 返回值：
+参数名	类型	说明
+code	Integer	服务器状态 code
+data	String	如果服务器返回的 header 中 type 是 text/*或 application/json、application/javascript、application/xml，值是文本内容，否则是存储的临时文件的 uri 临时文件如果是图片或者视频内容，可以将图片设置到 image 或 video 控件上显示
+headers	Object	服务器 response 的所有 header
+示例：
+request.upload({
+  url: 'http://www.example.com',
+  files: [
+    {
+      uri: 'internal://xxx/xxx/test',
+      name: 'file1',
+      filename: 'test.png',
+    },
+  ],
+  data: [
+    {
+      name: 'param1',
+      value: 'value1',
+    },
+  ],
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+request.download(OBJECT)
+下载文件
+
+参数：
+参数名	类型	必填	说明
+url	String	是	资源 url
+header	String	否	请求的 header，会将其所有属性设置到请求的 header 部分。
+description	String	否	下载描述，会用于通知栏标题。默认为文件名
+filename	String	否	在下载文件时，可以提供文件名或文件URI。当输入文件URI（internal://xxx）时，可定义下载路径；而若输入文件名，则会默认保存至缓存目录（internal://cache/）。若未提供文件信息，系统将从网络请求或URL中获取文件名。
+success	Function	否	成功返回的回调函数
+fail	Function	否	失败的回调函数
+complete	Function	否	结束的回调函数（调用成功、失败都会执行）
+success 返回值：
+参数名	类型	说明
+token	String	下载的 token，根据此 token 获取下载状态
+示例：
+request.download({
+  url: 'http://www.example.com',
+  success: function (data) {
+    console.log(`handling success${data.token}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+request.abortDownload(OBJECT)
+中断下载任务
+
+参数：
+参数名	类型	必填	说明
+token	String	是	download 接口返回的 token
+success	Function	否	成功返回的回调函数
+fail	Function	否	失败的回调函数
+complete	Function	否	结束的回调函数（调用成功、失败都会执行）
+success 返回值：
+无
+
+fail 返回错误代码：
+错误码　	说明
+1000	中断失败
+1001	下载任务不存在
+示例：
+request.abortDownload({
+  token: '123',
+  success: function (data) {
+    console.log(`abortDownload success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+request.onDownloadComplete(OBJECT)
+监听下载任务
+
+参数：
+参数名	类型	必填	说明
+token	String	是	download 接口返回的 token
+success	Function	否	成功返回的回调函数
+fail	Function	否	失败的回调函数
+complete	Function	否	结束的回调函数（调用成功、失败都会执行）
+success 返回值：
+参数名	类型	说明
+uri	String	下载文件的 uri（默认情况下该文件处于应用缓存目录。如果文件类型为图片或者视频且要求用户可以在相册等应用内查看，则需要将该文件转存至公共目录，参考 media 接口中的方法实现即可）
+fail 返回错误代码：
+错误码　	说明
+1000	下载失败
+1001	下载任务不存在
+示例：
+request.onDownloadComplete({
+  token: '123',
+  success: function (data) {
+    console.log(`handling success${data.uri}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+4.4数据请求
+数据请求
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.network.fetch" }
+导入模块
+import fetch from '@blueos.network.fetch' 或 const fetch = require('@blueos.network.fetch')
+接口定义
+fetch.fetch(OBJECT)
+获取网络数据
+
+参数：
+参数名	类型	必填	说明
+url	String	是	资源 url
+data	String/Object/ArrayBuffer	否	请求的参数，可以是字符串，或者是 js 对象、arraybuffer 对象。参考 data与Content-Type关系 部分
+header	Object	否	请求的 header，会将其所有属性设置到请求的 header 部分。User-Agent 设置在版本开始支持。示例：{"Accept-Encoding": "gzip, deflate","Accept-Language": "zh-CN,en-US;q=0.8,en;q=0.6"}
+method	String	否	默认为 GET，可以是：OPTIONS，GET，HEAD，POST，PUT，DELETE，TRACE，CONNECT
+responseType	String	否	支持返回类型是 text，json，file，arraybuffer，默认会根据服务器返回 header 中的 Content-Type 确定返回类型，详见 success返回值。
+timeout	Number	否	超时时间，单位ms，默认值为7000
+success	Function	否	成功返回的回调函数
+fail	Function	否	失败的回调函数，可能会因为权限失败
+complete	Function	否	结束的回调函数（调用成功、失败都会执行）
+data 与 Content-Type 关系
+data	Content-Type	说明
+String	不设置	Content-Type 默认为 text/plain，data 值作为请求的 body
+String	任意 Type	data 值作为请求的 body
+Object	不设置	Content-Type 默认为 application/x-www-form-urlencoded，data 按照 url 规则进行 encode 拼接作为请求的 body
+Object	application/x-www-form-urlencoded	data 按照 url 规则进行 encode 拼接作为请求的 body
+Object	application/x-www-form-urlencoded 之外的任意 type	会将 data 转为字符串作为请求的 body
+ArrayBuffer	不设置	Content-Type 默认为 application/octet-stream，data 值作为请求的 body
+ArrayBuffer	任意 Type	data 值作为请求的 body
+success 返回值：
+参数名	类型	说明
+code	Integer	服务器状态 code
+data	String/Object /ArrayBuffer	参考 responseType与success中data关系 部分
+headers	Object	服务器 response 的所有 header
+responseType 与 success 中 data 关系：
+responseType	data	说明
+无	String	服务器返回的 header 中 type 是 text/*或 application/json、application/javascript、application/xml，值是文本内容，否则是存储的临时文件的 uri，临时文件如果是图片或者视频内容，可以将图片设置到 image 或 video 控件上显示
+text	String	返回普通文本
+json	Object	返回 js 对象
+file	String	返回存储的临时文件的 uri
+arraybuffer	ArrayBuffer	返回 ArrayBuffer 对象
+示例：
+fetch.fetch({
+  url: 'http://www.example.com',
+  responseType: 'text',
+  success: function (response) {
+    console.log(`the status code of the response: ${response.code}`)
+    console.log(`the data of the response: ${response.data}`)
+    console.log(`the headers of the response: ${JSON.stringify(response.headers)}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, errMsg = ${data}`)
+    console.log(`handling fail, errCode = ${code}`)
+  },
+})
+4.5websocket
+websocket
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.network.webSocket" }
+导入模块
+import websocketfactory from '@blueos.network.webSocket' 或 const websocketfactory = require('@blueos.network.webSocket')
+接口定义
+方法
+websocketfactory.create(OBJECT)
+创建 websocket 实例
+
+参数：
+参数名	类型	必填	说明
+url	String	是	请求 url， 必须是 wss 或 ws 协议
+header	Object	否	请求头，header 中不能设置 Referer
+protocols	StringArray	否	子协议组
+返回值：
+类型	描述
+WebSocket	返回一个 WebSocket 对象，请参考 WebSocket 对象
+示例：
+ws = websocketfactory.create({
+  url: 'ws://test:8088',
+  header: {
+    'content-type': 'application/json',
+  },
+  protocols: ['protocol'],
+})
+WebSocket
+WebSocket 对象提供了用于创建和管理 WebSocket 连接，以及可以通过该连接发送和接收数据的 API。
+
+方法
+WebSocket.send(OBJECT)
+向服务器发送数据
+
+参数：
+参数名	类型	必填	说明
+data	String | ArrayBuffer	是	发送的消息
+success	Function	否	成功回调
+fail	Function	否	失败回调
+示例：
+ws.send({
+  data: 'send message',
+  success: function () {
+    console.log(`send success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+WebSocket.close(OBJECT)
+关闭当前连接
+
+参数：
+参数名	类型	必填	说明
+code	Number	否	关闭链接的状态号 ，默认 1000
+reason	String	否	关闭的原因
+success	Function	否	接口调用成功的回调函数
+fail	Function	否	接口调用失败的回调函数
+示例：
+ws.close({
+  code: 1000,
+  reason: 'close as normal',
+  success: function () {
+    console.log(`close success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+属性
+WebSocket.onOpen
+用于指定连接成功后的回调函数
+
+参数：
+参数名	类型	必填	说明
+callback	Function	否	打开连接回调
+示例：
+ws.onOpen = function () {
+  console.log(`connect open`)
+}
+WebSocket.onMessage
+用于指定当从服务器接受到信息时的回调函数
+
+参数：
+参数名	类型	必填	说明
+callback	Function	否	服务器返回消息事件回调
+callback 参数：
+参数名	类型	说明
+data	String | ArrayBuffer	监听器接收到的消息，消息类型与发送类型一致
+示例：
+ws.onMessage = function (data) {
+  console.log(`message is ${data.data}`)
+}
+WebSocket.onClose
+用于指定连接关闭后的回调函数
+
+参数：
+参数名	类型	必填	说明
+callback	Function	否	关闭连接事件回调。
+callback 参数：
+参数名	类型	说明
+code	Number	服务器返回关闭的状态码。
+reason	String	服务器返回的关闭原因。
+wasClean	Boolean	是否正常关闭。
+示例：
+ws.onClose = function (data) {
+  console.log(
+    `onclose:data.code = ${data.code}, data.reason = ${data.reason}, data.wasClean = ${data.wasClean}`
+  )
+}
+WebSocket.onError
+用于指定连接失败后的回调函数
+
+参数：
+参数名	类型	必填	说明
+callback	Function	否	连接错误回调
+callback 参数：
+参数名	类型	说明
+data	String	监听器接收到的消息。
+示例：
+ws.onError = function (data) {
+  console.log(`onerror data.data = ${data.data}`)
+}
+4.6网络状态
+网络状态
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.network.networkManager" }
+导入模块
+import network from '@blueos.network.networkManager' 或 const network = require('@blueos.network.networkManager')
+接口定义
+network.getType(OBJECT)
+获取网络类型
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调，可能是因为缺乏权限
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+type	String	网络类型，可能的值为 2g，3g，4g，wifi，none，
+5g，bluetooth，others
+示例：
+network.getType({
+  success(data) {
+    console.log(`handling success: ${data.type}`)
+  },
+})
+network.subscribe(OBJECT)
+监听网络连接状态。如果多次调用，仅最后一次调用生效
+
+参数：
+参数名	类型	必填	说明
+reserved	Boolean	否	是否持久化订阅，默认为 false。机制：设置为 true，页面跳转，不会自动取消订阅，需手动取消订阅
+callback	Function	否	每次网络发生变化，都会被回调
+fail	Function	否	失败回调，可能是因为缺乏权限
+callback 返回值：
+参数名	类型	说明
+type	String	网络类型，可能的值为 2g，3g，4g，wifi，none，
+5g，bluetooth，others
+示例：
+network.subscribe({
+  callback: (data) => {
+    console.log('handling callback')
+  },
+})
+network.unsubscribe()
+取消监听网络连接状态
+
+参数：
+无
+
+示例：
+network.unsubscribe()
+network.getSimOperators(OBJECT)
+获取 Sim 卡的运营商信息，即将废弃，改用 @blueos.telephony.simManager.getSimOperators()
+
+权限要求
+电话权限
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+operators	Array	SIM 卡列表信息
+size	Number	Sim 卡数量
+fail 返回错误代码：
+错误码	说明
+201	用户拒绝，获取电话权限失败
+207	用户拒绝并勾选不再询问复选框
+1001	未插入 sim 卡
+1002	获取运营商信息失败
+SIM 卡列表项参数：
+参数名	类型	说明
+operator	String	返回 Sim 卡的运营商信息
+运营商信息说明：此处统一返回 MCC+MNC，即移动国家代码 + 移动网络代码；
+中国移动：46000，46002，46004，46007；
+中国联通：46001，46006，46009；
+中国电信：46003，46005，46011；
+其余 MCC+MNC
+slotIndex	Number	卡槽序号
+示例：
+network.getSimOperators({
+  success(data) {
+    console.log(`size: ${data.size}`)
+    for (const i in data.operators) {
+      console.log(`operator: ${data.operators[i].operator},
+        slotIndex:${data.operators[i].slotIndex},
+        isDefaultDataOperator:${data.operators[i].isDefaultDataOperator},`)
+    }
+  },
+  fail(data, code) {
+    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+  },
+})
+5.多媒体能力
+5.1概述
+概述
+更新时间：2025-01-16 19:58:34
+
+蓝河应用多媒体能力支持音频业务的开发，提供音频相关的功能，主要包括音频播放、音频流式播放、录音、音量管理等。
+
+子模块介绍
+模块	简述
+音频	提供音频播放能力
+多媒体	提供音频播放、音频流式播放、录音能力
+音频管理	提供音量设置，音量获取、监听等音频管理能力
+录音	提供录音能力
+5.2音频
+音频
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.media.audio.audioPlayer" }
+导入模块
+import audio from '@blueos.media.audio.audioPlayer' 或 const audio = require('@blueos.media.audio.audioPlayer')
+接口定义
+audio.play()
+开始播放音频
+
+参数
+无
+
+示例：
+audio.play()
+audio.pause()
+暂停播放音频
+
+参数
+无
+
+示例
+audio.pause()
+audio.stop()
+停止音频播放，可以通过 play 重新播放音频
+
+参数
+无
+
+示例：
+audio.stop()
+audio.getPlayState(OBJECT)
+获取当前播放状态数据
+
+参数
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+state	String	播放状态,分别为'play','pause','stop','idle'
+src	String	播放的音频媒体 uri
+currentTime	Number	当前音频的当前进度，单位秒,停止时返回-1
+示例：
+audio.getPlayState({
+  success: function (data) {
+    console.log(`
+      handling success: state: ${data.state},
+      src:${data.src}
+    `)
+  },
+  fail: function (data, code) {
+    console.log('handling fail, code=' + code)
+  },
+})
+属性
+名称	参数类型	是否可读	是否可写	必填	描述
+src	String	是	是	是	播放的音频媒体 uri
+currentTime	Number	是	是	否	音频的当前进度，单位秒，对值设置可以调整播放进度
+duration	Number	是	否	否	音频文件的总时长，单位秒，未知返回 NaN
+streamType	String	是	是	否	streamType 指定使用音频类型，默认为 music。
+streamType 参数
+名称	说明	取值
+MEDIA	媒体	music
+VOICE_CALL	通话	voicecall
+示例：
+let streamType = audio.streamType
+audio.streamType = 'voicecall'
+事件
+名称	描述	返回值
+Play	在调用 play 方法后的回调事件	
+Pause	在调用 pause 方法后的回调事件	
+Stop	在调用 stop 方法后的回调事件	
+Ended	播放结束时的回调事件	
+Error	播放发生错误时的回调事件	
+TimeUpdate	在 currentTime 属性更新时会触发的回调事件	
+DurationChange	在 duration 属性更新时被触发的回调事件	
+LoadedData	第一次获取到音频数据的回调事件	
+示例：
+audio.onError = function (error) {
+  console.info(`audio error called, error: ${error}`)
+}
+5.3多媒体
+多媒体
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.media.audio.mediaManager" }
+复制代码
+导入模块
+import media from '@blueos.media.audio.mediaManager' 或 const media = require('@blueos.media.audio.mediaManager')
+接口定义
+media.createAudioPlayer()
+创建音频播放的实例。
+
+参数
+参数	类型	必填	说明
+streamType	String	否	streamType
+contentType	String	否	contentType
+streamUsage	String	否	streamUsage
+返回值
+AudioPlayer
+
+示例：
+const audioplayer = media.createAudioPlayer()
+media.createAudioTrack()
+创建音频流式播放的实例
+
+参数
+参数名	类型	必填	说明
+streamType	String	否	streamType
+contentType	String	否	contentType
+streamUsage	String	否	streamUsage
+sampleRateInHz	Number	否	采样率，单位赫兹，可选值为：8000、 16000；默认值为 16000
+channelConfig	Number	否	捕获音频的声道数目，1：单声道，2：立体声；默认值为 1
+audioFormat	Number	否	样本的分辨率，单位 bit，可选值为： 8、16；默认值为 16
+返回值
+AudioTrack
+
+示例：
+const audiotrack = media.createAudioTrack()
+media.createAudioRecord(OBJECT)
+创建录音实例
+
+参数
+属性名	类型	必填	说明
+sampleRateInHz	Number	否	采样率，单位赫兹，可选值为：8000、 16000；默认值为 16000
+channelConfig	Number	否	音频的声道数目，1：单声道，2：立体声；默认值为 1
+audioFormat	Number	否	样本的分辨率，单位 bit，可选值为： 8、16；默认值为 16
+返回值
+AudioRecorder
+
+示例：
+const record = media.createAudioRecord()
+AudioPlayer
+AudioPlayer.play()
+开始播放音频
+
+参数
+无
+
+示例：
+audioplayer.src = 'xxx'
+// play 方法调用无需等待 src 加载完成
+audioplayer.play()
+AudioPlayer.pause()
+暂停播放音频
+
+参数
+无
+
+示例：
+audioplayer.pause()
+AudioPlayer.stop()
+停止音频播放，可以通过 play 重新播放音频
+
+参数
+无
+
+示例：
+audioplayer.stop()
+AudioPlayer.release()
+释放音频资源
+
+参数
+无
+
+示例：
+audioplayer.release()
+属性
+名称	参数类型	是否可读	是否可写	必填	描述
+src	String	是	是	是	播放的音频媒体 uri
+currentTime	Number	是	是	否	音频的当前进度，单位秒，对值设置可以调整播放进度
+duration	Number	是	否	否	音频文件的总时长，单位秒，未知返回 NaN
+state	String	是	否	否	播放状态，分别为'play','pause','stop','idle'
+playcount	Number	是	是	是	控制音频的循环播放，playcount == 1 或 playcount == 0：不开启循环; playcount >1：开启循环，且循环指定的次数; playcount == -1：开启循环，且循环无限次数
+示例：
+let currentTime = audioplayer.currentTime
+// 跳转时间
+audioplayer.currentTime = 100
+事件
+名称	描述	返回值
+Play	在音频 play 后的回调事件	
+Pause	在音频 pause 后的回调事件	
+Stop	在音频 stop 后的回调事件	
+Ended	播放结束时的回调事件	
+Error	播放发生错误时的回调事件	
+TimeUpdate	在 currentTime 属性更新时会触发的回调事件	
+DurationChange	在 duration 属性更新时被触发的回调事件	
+Previous	音乐面板点击上一首按钮时触发	
+Next	音乐面板点击下一首按钮时触发	
+LoadedData	第一次获取到音频数据的回调事件	
+Interrupt	音频打断事件，当前音频被其他有相同音频类型的音频抢夺时，被停止或者恢复的通知。或者当前音频被当外部设备操作打断的通知。	InterruptAction
+示例：
+audioplayer.onInterrupt = function (interruptAction) {
+  console.log(interruptAction.interruptHint)
+}
+AudioTrack
+AudioTrack.play()
+开始播放音频
+
+参数
+无
+
+示例：
+audiotrack.play()
+AudioTrack.write(OBJECT)
+写入音频数据
+
+参数
+参数	类型	必填	说明
+buffer	Uint8Array	是	写入的二进制音频数据
+success	Function	否	成功函数，通过该回调函数通知写入的情况
+fail	Function	否	
+success 返回值：
+参数值	类型	说明
+state	Number	写入状态，1 - 成功 2 - 失败 3 - 参数异常
+示例：
+http.get('/getAudio').then((res) => {
+  audiotrack.write({
+    buffer: new Uint8Array(res),
+    success: function () {
+      // wirte success
+    },
+  })
+})
+AudioTrack.pause()
+暂停播放音频
+
+参数
+无
+
+示例：
+audiotrack.pause()
+AudioTrack.stop()
+停止音频播放，可以通过 play 重新播放音频
+
+参数
+无
+
+示例：
+audiotrack.stop()
+AudioTrack.release()
+释放音频资源
+
+参数
+无
+
+示例：
+audiotrack.release()
+属性
+名称	参数类型	是否可读	是否可写	必填	描述
+state	String	是	否	否	播放状态，分别为'play','pause','stop'
+示例：
+let state = audiotrack.state
+console.log(state)
+事件
+名称	描述	返回值
+Play	在音频 play 后的回调事件	
+Stop	在音频 stop 后的回调事件	
+Pause	在音频 pause 后的回调事件	
+Ended	播放结束时的回调事件	
+Error	播放发生错误时的回调事件	
+TimeUpdate	在 currentTime 属性更新时会触发的回调事件	
+Interrupt	音频打断事件，当前音频被其他有相同音频类型的音频抢夺时，被停止或者恢复的通知。或者当前音频被当外部设备操作打断的通知。	InterruptAction
+示例：
+audiotrack.onInterrupt = function (interruptAction) {
+  console.log(interruptAction.interruptHint)
+}
+AudioRecorder
+AudioRecorder.start(OBJECT)
+开始录音，并在录音结束后生成音频文件。
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	需要输出到文件的 uri
+success	Function	是	成功的回调
+fail	Function	是	失败的回调
+complete	Function	是	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+uri	String	录音文件的存储路径
+示例：
+record.start({
+  uri: 'internal://cache/path/to/file',
+  success: function (data) {
+    console.log(`handling success: ${data.uri}`)
+  },
+  fail: function (data, code) {},
+})
+AudioRecorder.read(OBJECT)
+开始录音，录音的过程中实时返回音频内容。
+
+注意：AudioRecorder.read 也是开始录音，不要再调用 AudioRecorder.start。
+
+参数：
+参数	类型	必填	说明
+callback	Function	否	回调函数
+callback 返回值：
+参数名	类型	说明
+buffer	Uint8Array	录音内容
+示例：
+record.read({
+  callback(buffer) {
+    console.log('buffer.length: ' + buffer.length)
+  },
+})
+AudioRecorder.stop(OBJECT)
+停止录音。
+
+参数：
+无
+
+示例：
+record.stop()
+AudioRecorder.release(OBJECT)
+释放录音资源。
+
+参数：
+无
+
+示例：
+record.release()
+事件
+名称	描述
+Error	录音发生错误时的回调事件
+Start	录音开始时的回调事件
+Stop	录音停止时的回调事件
+示例：
+record.onError = function () {
+  console.log(`audio error`)
+}
+参数
+streamUsage
+指定使用音频类型 ，默认值为music。用于对音频冲突的仲裁，多个相同的streamUsage音频同时播放时，系统只会保留一个，其他的会被打断。
+
+名称	说明
+music	媒体
+contentType
+用于音频后处理，默认值为music。系统会根据不同的 contentType 对声音进行优化处理。
+
+名称	说明
+speech	语音播报
+music	音乐播放
+movie	视频播放/电视节目
+sonification	按键音/游戏中的短音提示/拟音
+streamType
+用于音量策略，默认值为music。系统可以通过不同的 streamType 来管理音频的音量，例如：播放音乐设置为 music，消息提示音设置为 ring 。
+
+名称	说明
+music	媒体
+InterruptAction
+属性	类型	说明
+interruptHint	Number	1 - 音频恢复 （如：来电恢复）
+2 - 音频暂停 （如：来电打断）
+3 - 音频停止（如：彻底停止）
+actionType	Number	事件返回类型。
+0 - 被音频抢夺，焦点触发事件
+1 - 音频被外部设备打断事件。
+5.4音频管理
+音频管理
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.media.audio.audioManager" }
+导入模块
+import audiomanager from '@blueos.media.audio.audioManager' 或 const audiomanager = require('@blueos.media.audio.audioManager')
+接口定义
+audiomanager.setVolume(OBJECT)
+设置音量
+
+参数
+参数名	类型	必填	说明
+volumeType	AudioVolumeType	是	音量流类型
+volume	Number	是	音量等级, 设置的音量，0.00-1.00 之间。
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+AudioVolumeType
+枚举，音量流的类型
+
+名称	说明	取值
+RING	铃声	ring
+MEDIA	媒体声音	music
+返回值：
+无
+
+示例：
+audiomanager.setVolume({
+  volumeType: 'music',
+  volume: 0.5,
+  success: function () {},
+  fail: function () {},
+})
+audiomanager.getVolume(OBJECT)
+获取音量
+
+参数：
+参数名	类型	必填	说明
+volumeType	AudioVolumeType	是	音量流类型
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+返回值：
+类型	必填	说明
+Number	是	音量等级, 设置的音量，0.00-1.00 之间。
+示例
+audiomanager.getVolume({
+  volumeType: 'music',
+  success: function (val) {
+    console.log(val)
+  },
+  fail: function () {},
+})
+audiomanager.getVolumeSync(Object)
+同步获取音量
+
+参数
+参数名	类型	必填	说明
+volumeType	AudioVolumeType	是	音量流类型
+返回值
+参数值	类型	说明
+value	Number	音量等级, 设置的音量，0.00-1.00 之间。
+示例
+const value = audiomanager.getVolumeSync({
+  volumeType: 'music',
+})
+audiomanager.subscribe(OBJECT)
+监听音量变化
+
+参数：
+参数名	类型	必填	说明
+type	string	是	volume：表示音量
+callback	Function	是	监听音量变化数据回调函数的执行
+fail	Function	否	失败回调
+callback 返回值：
+参数名	类型	说明
+volumeType	AudioVolumeType	音量流类型
+value	Number	音量等级, 设置的音量，0.00-1.00 之间
+示例：
+audiomanager.subscribe({
+  type: 'volume',
+  callback: function (data) {
+    console.log(`handling success, value = ${data.value} volumeType = ${data.volumeType}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+audiomanager.unsubscribe()
+取消监听音量变化
+
+参数：
+参数名	类型	必填	说明
+type	string	是	volume：表示音量
+示例：
+audiomanager.unsubscribe({
+  type: 'volume',
+})
+audiomanager.getMinVolume(OBJECT)
+获取指定流的最小音量
+
+参数：
+参数名	类型	必填	说明
+volumeType	AudioVolumeType	是	音量流类型
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+类型	说明
+Number	最小音量
+示例：
+audiomanager.getMinVolume({
+  volumeType: 'music',
+  success(volume) {
+    console.log(volume)
+  }
+})
+audiomanager.getMaxVolume(OBJECT)
+获取指定流的最大音量
+
+参数：
+参数名	类型	必填	说明
+volumeType	AudioVolumeType	是	音量流类型
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+类型	说明
+Number	最大音量
+示例：
+audiomanager.getMaxVolume({
+  volumeType: 'music',
+  success(volume) {
+    console.log(volume)
+  }
+})
+audiomanager.mute(OBJECT)
+设置指定音量流静音或取消静音
+
+参数：
+参数名	类型	必填	说明
+volumeType	AudioVolumeType	是	音量流类型
+isMute	Number	是	是否将音量流静音（1:设置静音 ；0:设置取消静音
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+返回值：
+无
+
+示例：
+audiomanager.mute({
+  volumeType: 'music',
+  isMute: 1,
+  success: function (val) {
+    console.log(val)
+  },
+  fail: function () {},
+})
+audiomanager.isMute(OBJECT)
+获取指定音量流是否被静音
+
+参数：
+参数名	类型	必填	说明
+volumeType	AudioVolumeType	是	音量流类型
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+返回值：
+类型	必填	说明
+Number	是	是否将音量流静音（1:设置静音 ；0:设置取消静音)。
+示例
+audiomanager.isMute({
+  volumeType: 'music',
+  success: function (val) {
+    console.log(val)
+  },
+  fail: function () {},
+})
+audiomanager.isMicrophoneMute(OBJECT)
+获取麦克风是否为静音状态
+
+参数
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+返回值
+类型	必填	说明
+Number	是	是否将音量流静音（1:设置静音 ；0:设置取消静音)。
+示例
+audiomanager.isMicrophoneMute({
+  success: function (val) {
+    console.log(val)
+  },
+  fail: function () {},
+})
+5.5录音
+录音
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.media.audio.audioRecorder" }
+导入模块
+import record from '@blueos.media.audio.audioRecorder' 或 const record = require('@blueos.media.audio.audioRecorder')
+接口定义
+record.start(OBJECT)
+开始录音。默认录制为 PCM 格式，16000 采样率，16bit 位宽，2 通道。
+
+权限要求
+录音
+
+开发者需要在 manifest.json 里面配置权限：
+{
+  "permissions": [{ "name": "watch.permission.RECORD" }]
+}
+参数：
+参数名	类型	必填	说明
+success	Function	是	成功的回调
+fail	Function	是	失败的回调
+complete	Function	是	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+uri	String	录音文件的存储路径，在应用的缓存目录中
+fail 返回错误代码
+错误码	说明
+400	拒绝授予权限
+401	敏感权限不能在后台运行
+402	权限错误（未声明该权限）
+示例：
+record.start({
+  success: function (data) {
+    console.log(`handling success: ${data.uri}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+  },
+})
+record.stop(OBJECT)
+停止录音。
+
+参数：
+无
+
+示例：
+record.stop()
+record.release(OBJECT)
+释放录音资源。
+
+参数：
+无
+
+示例：
+record.release()
+事件
+名称	描述
+Error	录音发生错误时的回调事件
+Start	录音开始时的回调事件
+Stop	录音停止时的回调事件
+示例：
+record.onError = function () {
+  console.log(`audio error`)
+}
+6数据存储能力
+
+6.1概述
+概述
+更新时间：2025-01-16 19:58:35
+
+蓝河应用的数据存储能力模块使应用能够更好地管理和存储数据，提供了广泛的工具和功能，从简单的键值存储到文件操作，以及跨应用数据共享，提供了多样化数据管理和共享能力。
+
+子模块介绍
+模块	简述
+数据存储	提供读取、修改、设置、删除、清空存储内容等数据存储能力
+文件存储	提供对应用沙箱目录下的文件的一些操作能力
+数据共享	提供三个维度的不同蓝河应用间数据共享能力
+属性系统	给内置应用提供的全局设置和获取属性的功能，保存内容不进行持久化存储，关机后会丢失。
+6.2数据存储
+数据存储
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.storage.storage" }
+导入模块
+import storage from '@blueos.storage.storage' 或 const storage = require('@blueos.storage.storage')
+接口定义
+storage.get(OBJECT)
+读取存储内容
+
+参数：
+参数名	类型	必填	说明
+key	String	是	索引
+default	String	否	如果 key 不存在，返回 default。如果 default 未指定，返回长度为 0 的空字符串
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+key 对应的存储内容
+
+示例：
+storage.get({
+  key: 'A1',
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+storage.getSync(OBJECT)
+同步读取存储内容
+
+参数：
+参数名	类型	必填	说明
+key	String	是	索引
+返回值：
+参数名	类型	说明
+value	String | Boolean | Number | Object | Array	key 对应的存储内容
+示例：
+const value = storage.getSync({ key: 'A1' })
+storage.set(OBJECT)
+修改存储内容
+
+参数：
+参数名	类型	必填	说明
+key	String	是	索引
+value	String | Boolean | Number | Object | Array	否	新值。如果新值是长度为 0 的空字符串，会删除以 key 为索引的数据项
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+示例：
+storage.set({
+  key: 'A1',
+  value: 'V1',
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例：
+storage.set({
+  key: 'A1',
+  value: true,
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例：
+storage.set({
+  key: 'A1',
+  value: 18,
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例：
+storage.set({
+  key: 'A1',
+  value: { name: '李四', age: 18 },
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例：
+storage.set({
+  key: 'A1',
+  value: [18, 20],
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+storage.clear(OBJECT)
+清空存储内容
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+示例：
+storage.clear({
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+storage.delete(OBJECT)
+删除存储内容
+
+参数：
+参数名	类型	必填	说明
+key	String	是	索引
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+示例：
+storage.delete({
+  key: 'A1',
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+storage.key(OBJECT)
+返回存储中某个 index 的键名
+
+参数：
+参数名	类型	必填	说明
+index	Number	是	要查询的键名对应的索引
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+index 对应的键名
+
+示例：
+storage.key({
+  index: 1,
+  success: function (data) {
+    console.log(`handling success, key = ${data}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+属性
+名称	参数类型	是否可读	是否可写	描述
+length 　	Number	是	否	存储里的数据项的数量
+示例：
+let length = storage.length
+6.3文件存储
+文件存储
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.storage.file" }
+导入模块
+import file from '@blueos.storage.file' 或 const file = require('@blueos.storage.file')
+注意：下面文件操作仅支持 URI 的写法，不支持文件绝对路径。
+
+接口定义
+file.move(OBJECT)
+将源文件移动到指定位置
+
+参数：
+参数名	类型	必填	说明
+srcUri	String	是	源文件的 uri，不能是应用资源路径和 tmp 类型的 uri
+dstUri	String	是	目标文件的 uri，不能是应用资源路径和 tmp 类型的 uri
+success	Function	否	成功回调，返回目标文件的 uri
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.move({
+  srcUri: 'internal://cache/path/to/file',
+  dstUri: 'internal://files/path/to/file',
+  success: function (uri) {
+    console.log(`move success: ${uri}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.copy(OBJECT)
+将源文件复制一份并存储到指定位置，接口中使用的 URI 描述请参考文件组织
+
+参数：
+参数名	类型	必填	说明
+srcUri	String	是	源文件的 uri
+dstUri	String	是	目标文件的 uri，不能是应用资源路径和 tmp 类型的 uri
+success	Function	否	成功回调，返回目标文件的 uri
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.copy({
+  srcUri: 'internal://cache/path/to/file',
+  dstUri: 'internal://files/path/to/file',
+  success: function (uri) {
+    console.log(`copy success: ${uri}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.list(OBJECT)
+获取指定目录下的文件列表，接口中使用的 URI 描述请参考文件组织
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	目录 uri，不能是应用资源路径和 tmp 类型的 uri。 支持应用资源路径
+success	Function	否	成功回调，返回{fileList:[{uri:'file1', lastModifiedTime:1234456, length:123456} ...]}
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+fileList	Array	文件列表，每个文件的格式为{uri:'file1', lastModifiedTime:1234456, length:123456}
+每个文件的元信息：
+参数名	类型	说明
+uri	String	文件的 uri，该 uri 可以被其他组件或 Feature 访问
+length	Number	文件大小，单位 B
+lastModifiedTime	Number	文件的保存是的时间戳，从 1970/01/01 00:00:00 GMT 到当前时间的毫秒数
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.list({
+  uri: 'internal://files/movies/',
+  success: function (data) {
+    console.log(data.fileList)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.get(OBJECT)
+获取本地文件的文件信息，接口中使用的 URI 描述请参考文件组织
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	文件的 uri，不能是应用资源路径。 支持应用资源路径
+recursive	Boolean	否	是否递归获取子目录文件列表。默认 false
+success	Function	否	成功回调，返回{uri:'file1', length:123456, lastModifiedTime:1233456}
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+uri	String	文件的 uri，该 uri 可以被其他组件或 Feature 访问
+length	Number	文件大小，单位 B
+lastModifiedTime	Number	文件的保存是的时间戳，从 1970/01/01 08:00:00 到当前时间的毫秒数
+type	String	文件类型，dir：目录；file：文件
+subFiles	Array	文件列表，recursive 为 true 且 type 为 dir 时递归返回子目录文件细信息，否则不返回
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.get({
+  uri: 'internal://files/path/to/file',
+  success: function (data) {
+    console.log(data.uri)
+    console.log(data.length)
+    console.log(data.lastModifiedTime)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.delete(OBJECT)
+删除本地存储的文件，接口中使用的 URI 描述请参考文件组织
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	需要删除的文件 uri，不能是应用资源路径和 tmp 类型的 uri
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.delete({
+  uri: 'internal://files/path/to/file',
+  success: function (data) {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.writeText(OBJECT)
+写文本到文件
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	本地文件路径，不支持资源文件路径和 tmp 分区，如果文件不存在会创建文件
+text	String	是	需要写入的字符串
+encoding	String	否	编码格式，默认 UTF-8
+append	Boolean	否	是否追加模式，默认 false
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.writeText({
+  uri: 'internal://files/work/demo.txt',
+  text: 'test',
+  success: function () {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.writeArrayBuffer(OBJECT)
+写 Buffer 到文件
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	本地文件路径，不支持资源文件路径和 tmp 分区，如果文件不存在会创建文件
+buffer	Uint8Array	是	需要写入的 Buffer
+position	Number	否	指向文件开始写入数据的位置的偏移量，默认 0
+append	Boolean	否	是否追加模式，默认 false。当为 true 时，position 参数无效
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.writeArrayBuffer({
+  uri: 'internal://files/work/demo',
+  buffer: buffer,
+  success: function () {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.readText(OBJECT)
+从文件中读取文本
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	本地文件路径
+encoding	String	否	编码格式，默认 UTF-8
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+text	String	读取的文本
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+301	文件不存在
+示例：
+file.readText({
+  uri: 'internal://files/work/demo.txt',
+  success: function (data) {
+    console.log('text: ' + data.text)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.readArrayBuffer(OBJECT)
+从文件中读取 Buffer
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	本地文件路径
+position	Number	否	读取的起始位置，默认值为文件的起始位置
+length	Number	否	读取的长度，不填写则读取到文件结尾
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+buffer	Uint8Array	读取的文件内容
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+301	文件不存在
+示例：
+file.readArrayBuffer({
+  uri: 'internal://files/work/demo',
+  position: 100,
+  length: 100,
+  success: function (data) {
+    console.log('buffer.byteLength: ' + data.buffer.byteLength)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.access(OBJECT)
+判断文件或目录是否存在
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	目录或文件 uri，不能是应用资源路径和 tmp 类型的 uri。 支持应用资源路径
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.access({
+  uri: 'internal://files/test',
+  success: function (data) {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.mkdir(OBJECT)
+创建目录
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	目录的 uri，不能是应用资源路径和 tmp 类型的 uri
+recursive	Boolean	否	是否递归创建该目录的上级目录后再创建该目录。默认 false
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.mkdir({
+  uri: 'internal://files/dir/',
+  success: function (data) {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+file.rmdir(OBJECT)
+删除目录
+
+参数：
+参数名	类型	必填	说明
+uri	String	是	目录的 uri，不能是应用资源路径和 tmp 类型的 uri
+recursive	Boolean	否	是否递归删除子文件和子目录。默认 false
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+file.rmdir({
+  uri: 'internal://files/dir/',
+  success: function (data) {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+6.4数据共享
+数据共享
+更新时间：2025-01-16 19:58:34
+
+接口声明
+提供了一个不同蓝河应用间数据交互的方式。蓝河应用可以利用它发布数据，或从其他蓝河应用获取数据
+
+数据交互有三个数据空间，分别是应用空间（application）、应用开发商空间（vendor）和全局空间（global）
+
+application：数据发布在应用空间，读取、修改、删除 时需同时指定发布方的包名和签名，并且需要发布方授权
+
+vendor：数据发布在应用开发商空间，同签名的多个应用的写操作会相互覆盖，读取时不能指定发布方的包名和签名，不需要发布方授权
+
+global：数据发布在全局空间，多个应用的写操作会相互覆盖，读取时不能指定发布方的包名和签名，不需要发布方授权
+
+注意：
+
+1、set、get 操作支持在 application、vendor 和global 空间上操作数据。 2、exchange 的数据不做持久化处理，系统重启后数据会丢失。
+
+{ "name": "blueos.storage.exchange" }
+导入模块
+import exchange from '@blueos.storage.exchange' 或 const exchange = require('@blueos.storage.exchange')
+接口定义
+exchange.get(OBJECT)
+读取蓝河应用平台数据，可获取到应用空间（application）、应用开发商空间（vendor ）或全局空间（global）的数据
+
+参数
+参数名	类型	必填	说明
+package	String	否	数据发布方的包名，scope 为 application 时必须提供，为 vendor或 global 时必须为空
+sign	String	否	数据发布方签名的 SHA-256，scope 为 application 时必须提供，为 vendor 或 global 时必须为空
+scope	String	否	数据发布的空间类型，支持 application、vendor 和 global，默认为 application
+key	String	是	数据的 key
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调（调用成功、失败都会执行）
+返回值:
+参数名	类型	说明
+value	String | Boolean | Number | Object | Array	数据的值，与 set 设置的类型一致
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+1000	没有权限
+示例
+exchange.get({
+  package: 'com.example',
+  sign: '7a12ec1d66233f20a20141035b1f7937',
+  key: 'token',
+  success: function (ret) {
+    console.log(`handling success, value = ${ret.value}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+exchange.getSync(Object)
+同步读取蓝河应用平台数据，可获取到应用空间（application）、应用开发商空间（vendor ）或全局空间（global）的数据
+
+参数
+参数名	类型	必填	说明
+package	String	否	数据发布方的包名，scope 为 application 时必须提供，为 vendor或 global 时必须为空
+sign	String	否	数据发布方签名的 SHA-256，scope 为 application 时必须提供，为 vendor 或 global 时必须为空
+scope	String	否	数据发布的空间类型，支持 application、vendor 和 global，默认为 application
+key	String	是	数据的 key
+返回值
+参数值	类型	说明
+value	String | Boolean | Number | Object | Array	数据的值，与 set 设置的类型一致
+示例
+const value = exchange.getSync({
+  package: 'com.example',
+  sign: '7a12ec1d66233f20a20141035b1f7937',
+  key: 'token',
+})
+exchange.set(OBJECT)
+发布数据到蓝河应用平台，可发布到应用空间（application）、应用开发商空间 或全局空间（global）
+
+参数
+参数名	类型	必填	说明
+key	String	是	数据的 key
+value	String | Boolean | Number | Object | Array	是	数据的值
+scope	String	否	数据发布的空间类型，支持 application、vendor 和 global，默认为 application
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调（调用成功、失败都会执行）
+package	String	否	配置需要写入数据到某蓝河应用的应用空间时某蓝河应用的包名，仅在scope参数不设置或设置为application时生效，在scope为vendor或global时必须设为空值
+sign	String	否	配置需要写入数据到某蓝河应用的应用空间时某蓝河应用的签名的 SHA-256，仅在scope参数不设置或设置为application时生效，在scope为vendor或global 时必须设为空值
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+示例
+exchange.set({
+  key: 'token',
+  value: '12347979',
+  success: function () {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例
+exchange.set({
+  key: 'token',
+  value: false,
+  success: function () {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例
+exchange.set({
+  key: 'token',
+  value: 10,
+  success: function () {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例
+exchange.set({
+  key: 'token',
+  value: { name: '张三', age: 18 },
+  success: function () {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+示例
+exchange.set({
+  key: 'token',
+  value: [2, 3, 4],
+  success: function () {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+7.基础硬件能力
+7.1概述
+概述
+更新时间：2025-01-16 19:58:34
+
+蓝河应用的基础硬件能力模块旨在为应用提供访问和控制设备的基础硬件功能。该模块使应用能够与设备硬件进行互动，为开发者提供了强大的工具，以满足应用特定功能要求。
+
+子模块介绍
+模块	简述
+地理位置	该模块允许应用获取设备的地理位置信息，包括经度、纬度和定位精度，以支持位置相关的应用功能
+振动	该模块提供了控制设备振动的功能，使应用能够在需要时触发振动反馈。
+屏幕管理	提供获取熄屏时间能力
+传感器	该模块提供了访问设备内置传感器（如加速度计、陀螺仪等）的功能，以支持应用的传感器驱动功能
+电量信息	该模块提供了获取设备电池状态和电量信息的能力
+屏幕亮度	该模块允许应用调整和获取设备屏幕的亮度，以满足用户需求和环境条件。
+设备信息	该模块提供了获取设备硬件信息的功能，包括设备型号、操作系统版本等，以帮助应用适配和识别设备特性
+7.2地理位置
+地理位置
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.hardware.location.location" }
+导入模块
+import geolocation from '@blueos.hardware.location.location' 或 const geolocation = require('@blueos.hardware.location.location')
+接口定义
+geolocation.getLocation(OBJECT)
+获取地理位置
+
+权限要求
+精确设备定位
+
+开发者需要在 manifest.json 里面配置权限：
+{
+  "permissions": [{ "name": "watch.permission.LOCATION" }]
+}
+参数：
+参数名	类型	必填	说明
+timeout	Number	否	设置超时时间，单位是 ms，默认值为 30000。在权限被系统拒绝或者定位设置不当的情况下，有可能永远不能返回结果，因而需要设置超时。超时后会使用 fail 回调
+coordType	String	否	坐标系类型，可选值可通过 getSupportedCoordTypes 获取，默认为 wgs84
+success	Function	是	成功回调
+fail	Function	否	失败回调，原因可能是用户拒绝
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数名	类型	说明
+longitude	Number	经度
+latitude	Number	纬度
+accuracy	Number	精确度
+time	Number	时间
+fail 返回错误代码
+错误码	说明
+400	拒绝授予权限
+402	权限错误（未声明该权限）
+示例：
+geolocation.getLocation({
+  success: function (data) {
+    console.log(`handling success: longitude = ${data.longitude}, latitude = ${data.latitude}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+  },
+})
+geolocation.subscribe(OBJECT)
+监听地理位置。如果多次调用，仅最后一次调用生效
+
+权限要求
+精确设备定位
+
+参数：
+参数名	类型	必填	说明
+reserved	Boolean	否	是否持久化订阅，默认为 false。机制：设置为 true，页面跳转，不会自动取消订阅，需手动取消订阅
+coordType	String	否	坐标系类型，可选值可通过 getSupportedCoordTypes 获取，默认为 wgs84
+callback	Function	是	每次位置信息发生变化，都会被回调
+fail	Function	否	失败回调，原因可能是用户拒绝
+callback 返回值：
+参数名	类型	说明
+longitude	Number	经度
+latitude	Number	纬度
+accuracy	Number	精确度
+time	Number	时间
+fail 返回错误代码
+错误码	说明
+400	拒绝授予权限
+402	权限错误（未声明该权限）
+示例：
+geolocation.subscribe({
+  callback: function (data) {
+    console.log(`handling success: longitude = ${data.longitude}, latitude = ${data.latitude}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+  },
+})
+geolocation.unsubscribe()
+取消监听地理位置
+
+参数：
+无
+
+示例：
+geolocation.unsubscribe()
+geolocation.getSupportedCoordTypes()
+获取支持的坐标系类型
+
+参数：
+无
+
+返回值：
+字符串数组。当前支持的坐标系类型，如['wgs84']
+
+示例：
+const types = geolocation.getSupportedCoordTypes()
+7.3振动
+振动
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.hardware.vibrator.vibrator" }
+导入模块
+import vibrator from '@blueos.hardware.vibrator.vibrator' 或 const vibrator = require('@blueos.hardware.vibrator.vibrator')
+vibrator.vibrate(OBJECT)
+触发振动
+
+参数：
+参数	类型	必填	说明
+mode	String	否	振动模式，long 表示长振动，short 表示短振动。默认为 long
+示例：
+vibrator.vibrate({
+  mode: 'long',
+})
+vibrator.start(OBJECT)
+开始振动
+
+参数：
+属性	类型	必填	说明
+priority	Number	是	振动优先级 0-8，数字越小优先级越高
+duration	Number	是	振动持续时间(单位 ms)
+interval	Number	是	振动间隔时间(单位 ms)
+count	Number	是	振动次数
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+返回值	类型	说明
+id	Number	底层分配唯一的 ID 并返回给调用者
+示例：
+vibrator.start({
+  priority: 1,
+  duration: 1000,
+  interval: 1000,
+  count: 10,
+  success: function (data) {
+    console.log(`handling success, id = ${data.id}`)
+  },
+  fail: function () {
+    console.log(`handling fail`)
+  },
+  complete: function () {
+    console.log(`handling complete`)
+  },
+})
+vibrator.stop(Number)
+停止振动
+
+参数：
+类型	必填	说明
+Number	是	底层分配唯一的 ID
+返回值：
+类型	说明
+Boolean	true:成功; false:失败;
+示例：
+vibrator.stop(1)
+vibrator.getSystemDefaultMode()
+获取系统默认振动模式
+
+参数：
+无
+
+返回值：
+类型	说明
+Number	0:关闭振动; 1:标准振动; 2:加强振动
+示例：
+vibrator.getSystemDefaultMode()
+7.4屏幕管理
+屏幕管理
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.hardware.display.screen" }
+导入模块
+import screen from '@blueos.hardware.display.screen' 或 const screen = require('@blueos.hardware.display.screen')
+接口定义
+screen.getScreenOffTime()
+获取熄屏时间
+
+参数：
+无
+
+返回值：
+类型	说明
+Number	1-999 秒
+示例：
+screen.getScreenOffTime()
+screen.getAodStatus()
+获取 AOD 状态
+
+AOD：Always on Display，即不点亮整块屏幕的情况下，控制屏幕局部亮起，将一些重要的信息一直显示在屏幕上。
+
+参数：
+无
+
+返回值：
+类型	说明
+Number	0: AOD 关闭; 1: AOD 打开
+示例：
+screen.getAodStatus()
+7.5传感器
+传感器
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.hardware.sensor.sensor" }
+导入模块
+import sensor from '@blueos.hardware.sensor.sensor' 或 const sensor = require('@blueos.hardware.sensor.sensor')
+接口定义
+sensor.subscribeAccelerometer(OBJECT)
+订阅加速度传感器数据，如果多次调用，仅最后一次调用生效
+
+说明：
+
+加速度是重力加速度和设备自身运动加速度的矢量叠加
+当设备静止或做匀速直线运动时，返回的加速度值表示重力加速度。
+参数：
+参数名	类型	必填	说明
+interval	String	否	监听加速度数据回调函数的执行频率，默认normal
+callback	Function	是	加速度感应数据变化后会回调此函数。
+fail	Function	否	失败回调
+callback 返回值：
+参数名	类型	说明
+x	Number	x 轴加速度
+y	Number	y 轴加速度
+z	Number	z 轴加速度
+interval 的合法值：
+
+值	说明
+game	适用于更新游戏的回调频率，在 20ms/次 左右
+ui	适用于更新 UI 的回调频率，在 60ms/次 左右
+normal	普通的回调频率，在 200ms/次 左右
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持重力感应传感器
+示例：
+sensor.subscribeAccelerometer({
+  callback: function (ret) {
+    console.log(`handling callback, x = ${ret.x}, y = ${ret.y}, z = ${ret.z}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+sensor.unsubscribeAccelerometer()
+取消监听重力感应数据
+
+参数：
+无
+
+示例：
+sensor.unsubscribeAccelerometer()
+sensor.subscribeCompass(OBJECT)
+监听罗盘数据。如果多次调用，仅最后一次调用生效
+
+参数：
+参数名	类型	必填	说明
+callback	Function	是	罗盘数据变化后会回调此函数。
+fail	Function	否	失败回调
+callback 返回值：
+参数名	类型	说明
+direction	Number	表示设备的 y 轴和地球磁场北极之间的角度，当面朝北，角度为 0；朝南角度为 π；朝东角度 π/2；朝西角度-π/2
+accuracy	Number	精度
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持罗盘传感器
+值	说明
+3	高精度
+2	中等精度
+1	低精度
+-1	不可信，传感器失去连接
+0	不可信，原因未知
+示例：
+sensor.subscribeCompass({
+  callback: function (ret) {
+    console.log(`handling callback, direction = ${ret.direction}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+sensor.unsubscribeCompass()
+取消监听罗盘数据
+
+参数：
+无
+
+示例：
+sensor.unsubscribeCompass()
+sensor.subscribeStepCounter(OBJECT)
+监听计步传感器数据。如果多次调用，仅最后一次调用生效。
+
+开发者需要在 manifest.json 里面配置权限：
+{
+  "permissions": [{ "name": "watch.permission.STEP_COUNTER" }]
+}
+参数：
+参数名	类型	必填	说明
+callback	Function	是	计步传感器数据变化后会回调此函数。
+fail	Function	否	失败回调
+callback 返回值：
+参数名	类型	说明
+steps	Number	计步传感器当前累计记录的步数。每次手表重启，这个值就会从 0 开始重新计算。
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持计步传感器
+示例：
+sensor.subscribeStepCounter({
+  callback: function (ret) {
+    console.log(`handling callback, steps = ${ret.steps}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+sensor.unsubscribeStepCounter()
+取消监听计步传感器数据。
+
+参数：
+无
+
+示例：
+sensor.unsubscribeStepCounter()
+sensor.subscribeOnBodyState(OBJECT)
+监听设备佩戴状态传感器数据。如果多次调用，仅最后一次调用生效。
+
+参数：
+参数名	类型	必填	说明
+callback	Function	是	穿戴状态改变后的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+callback 返回值：
+参数名	类型	说明
+value	boolean	是否已佩戴。
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持佩戴状态传感器
+sensor.subscribeOnBodyState({
+  callback: function (ret) {
+    console.log('get on-body state value:' + ret.value)
+  },
+  fail: function (data, code) {
+    console.log('Subscription failed. Code: ' + code + '; Data: ' + data)
+  },
+})
+sensor.unsubscribeOnBodyState()
+取消监听设备佩戴状态。
+
+参数：
+无
+
+示例：
+sensor.unsubscribeOnBodyState()
+sensor.getOnBodyState(OBJECT)
+获取设备佩戴状态。
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	接口调用成功的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+complete	Function	否	接口调用结束的回调函数。
+callback 返回值：
+参数名	类型	说明
+value	boolean	是否已佩戴。
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持佩戴状态传感器
+sensor.getOnBodyState({
+  success: function (ret) {
+    console.log('on body state: ' + ret.value)
+  },
+  fail: function (data, code) {
+    console.log('Subscription failed. Code: ' + code + '; Data: ' + data)
+  },
+})
+sensor.subscribeGyroscope(OBJECT)
+监听陀螺仪传感器数据。如果多次调用，仅最后一次调用生效。
+
+参数：
+参数名	类型	必填	说明
+callback	Function	是	陀螺仪传感器数据改变后的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+callback 返回值：
+参数名	类型	说明
+x	Number	x 轴坐标
+y	Number	y 轴坐标
+z	Number	z 轴坐标
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持陀螺仪传感器
+示例：
+sensor.subscribeGyroscope({
+  callback: function (ret) {
+    console.log(`handling callback, x = ${ret.x}, y = ${ret.y}, z = ${ret.z}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+sensor.unsubscribeGyroscope()
+取消监听陀螺仪数据。
+
+参数：
+无
+
+示例：
+sensor.unsubscribeGyroscope()
+sensor.subscribeBarometer(OBJECT)
+监听气压传感器数据。如果多次调用，仅最后一次调用生效。
+
+参数：
+参数名	类型	必填	说明
+callback	Function	是	气压传感器数据改变后的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+callback 返回值：
+参数名	类型	说明
+pressure	Number	气压值，单位：帕斯卡。
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持气压传感器
+sensor.subscribeBarometer({
+  callback: function (ret) {
+    console.log('get data value:' + ret.pressure)
+  },
+  fail: function (data, code) {
+    console.log('Subscription failed. Code: ' + code + '; Data: ' + data)
+  },
+})
+sensor.unsubscribeBarometer()
+取消监听气压传感器。
+
+参数：
+无
+
+示例：
+sensor.unsubscribeBarometer()
+sensor.subscribeWristLift(OBJECT)
+监听抬腕。如果多次调用，仅最后一次调用生效。
+
+参数：
+参数名	类型	必填	说明
+callback	Function	是	抬腕后的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+callback 返回值：
+无
+
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持
+sensor.subscribeWristLift({
+  callback: function () {
+    console.log('wrist lift')
+  },
+  fail: function (data, code) {
+    console.log('Subscription failed. Code: ' + code + '; Data: ' + data)
+  },
+})
+sensor.unsubscribeWristLift()
+取消监听监听抬腕。
+
+参数：
+无
+
+示例：
+sensor.unsubscribeWristLift()
+sensor.subscribeContinuousWristTurn(OBJECT)
+监听连续转腕。如果多次调用，仅最后一次调用生效。
+
+参数：
+参数名	类型	必填	说明
+callback	Function	是	连续转腕变后的回调函数。
+fail	Function	否	接口调用失败的回调函数。
+callback 返回值：
+无
+
+fail 返回错误代码
+错误码	说明
+1000	当前设备不支持
+sensor.subscribeContinuousWristTurn({
+  callback: function () {
+    console.log('continuous wrist turn')
+  },
+  fail: function (data, code) {
+    console.log('Subscription failed. Code: ' + code + '; Data: ' + data)
+  },
+})
+sensor.unsubscribeContinuousWristTurn()
+取消监听连续转腕。
+
+参数：
+无
+
+示例：
+sensor.unsubscribeContinuousWristTurn()
+7.6电量信息
+电量信息
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.hardware.battery.battery" }
+导入模块
+import battery from '@blueos.hardware.battery.battery' 或 const battery = require('@blueos.hardware.battery.battery')
+接口定义
+battery.getStatus(OBJECT)
+获取当前设备的电量信息。
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+charging	Boolean	是否正在充电
+level	Number	当前电量，0.0 - 1.0 之间
+示例：
+battery.getStatus({
+  success: function (data) {
+    console.log(`handling success: ${data.level}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+battery.getStatusSync()
+同步获取当前设备的电量信息。
+
+参数
+无
+
+返回值
+参数值	类型	说明
+batteryStatus	Object	当前电量信息
+batteryStatus 参数描述
+参数值	类型	说明
+charging	Boolean	是否正在充电
+level	Number	当前电量，0.0 - 1.0 之间
+示例
+const batteryStatus = battery.getStatusSync()
+7.7屏幕亮度
+屏幕亮度
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.hardware.display.brightness" }
+导入模块
+import brightness from '@blueos.hardware.display.brightness' 或 const brightness = require('@blueos.hardware.display.brightness')
+接口定义
+brightness.getValue(OBJECT)
+获得当前屏幕亮度值
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+value	Integer	屏幕亮度，取值范围 0-255
+示例：
+brightness.getValue({
+  success: function (data) {
+    console.log(`handling success, value = ${data.value}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+brightness.getValueSync()
+同步获得当前屏幕亮度值
+
+参数
+无
+
+返回值
+参数值	类型	说明
+value	Number	屏幕亮度，取值范围 0-255
+示例
+const value = brightness.getValueSync()
+brightness.setValue(OBJECT)
+设置当前屏幕亮度值
+
+参数：
+参数名	类型	必填	说明
+value	Integer	是	屏幕亮度，取值范围 0-255
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+示例：
+brightness.setValue({
+  value: 100,
+  success: function () {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+brightness.getMode(OBJECT)
+获得当前屏幕亮度模式
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+mode	Integer	0 为手动调节屏幕亮度,1 为自动调节屏幕亮度
+示例：
+brightness.getMode({
+  success: function (data) {
+    console.log(`handling success, mode = ${data.mode}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+brightness.setMode(OBJECT)
+设置当前屏幕亮度模式
+
+参数：
+参数名	类型	必填	说明
+mode	Integer	是	0 为手动调节屏幕亮度,1 为自动调节屏幕亮度
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+示例：
+brightness.setMode({
+  mode: 1,
+  success: function () {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+brightness.setKeepScreenOn(OBJECT)
+设置是否保持常亮状态
+
+参数：
+参数名	类型	必填	说明
+keepScreenOn	Boolean	是	是否保持屏幕常亮
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+示例：
+brightness.setKeepScreenOn({
+  keepScreenOn: true,
+  success: function () {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+brightness.wakeScreenOn(OBJECT)
+点亮或熄灭屏幕
+
+参数：
+参数名	类型	必填	说明
+screenOn	Boolean	是	是否点亮
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+示例：
+brightness.wakeScreenOn({
+  screenOn: true,
+  success: function () {
+    console.log('handling success')
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+brightness.subscribe(OBJECT)
+监听当前屏幕亮度数据。如果多次调用，仅最后一次调用生效
+
+参数：
+参数名	类型	必填	说明
+callback	Function	是	监听前屏幕亮度数据回调函数的执行
+fail	Function	否	失败回调
+callback 返回值：
+参数名	类型	说明
+value	Number	屏幕亮度，取值范围 0-255
+示例：
+brightness.subscribe({
+  callback: function (data) {
+    console.log(`handling success, data = ${data.value}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+brightness.unsubscribe()
+取消监听屏幕亮度数据
+
+参数：
+无
+
+示例：
+brightness.unsubscribe()
+7.8设备信息
+设备信息
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.hardware.deviceInfo" }
+导入模块
+import device from '@blueos.hardware.deviceInfo' 或 const device = require('@blueos.hardware.deviceInfo')
+开发者需要在 manifest.json 里面配置权限：
+{
+  "permissions": [{ "name": "watch.permission.DEVICE_INFO" }]
+}
+接口定义
+device.getInfo(OBJECT)
+获取设备信息
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+brand	String	设备品牌
+manufacturer	String	设备生产商
+model	String	设备型号
+product	String	设备代号
+osType	String	操作系统名称
+osVersionName	String	操作系统版本名称
+osVersionCode	Integer	操作系统版本号
+platformVersionName	String	运行平台版本名称
+platformVersionCode	Integer	运行平台版本号
+language	String	系统语言
+deviceName	String	设备名称
+hardwareVersion	String	硬件版本
+softwareVersion	String	软件版本
+region	String	系统地区
+screenWidth	Integer	屏幕宽
+screenHeight	Integer	屏幕高
+windowWidth	Integer	可使用窗口宽度
+windowHeight	Integer	可使用窗口高度
+statusBarHeight	Integer	状态栏高度
+screenDensity	Float	设备的屏幕密度
+vendorOsName	String	系统的名称，如 BlueOS
+vendorOsVersion	String	蓝河应用的版本号
+cutout	Array	针对异形屏(比如刘海屏、水滴屏和开孔屏)返回异形区域的位置大小。Array 中每个 item 表示一个异形区域的描述。item 参数：
+left:cutout 左边界距离屏幕左边距离
+top:cutout 上边界距离屏幕上边距离
+right:cutout 右边界距离屏幕右边距离
+bottom:cutout 下边界距离屏幕下边距离
+cutout 的坐标描述以竖屏为基准。即在横屏和竖屏下获取的 cutout 参数描述都是一样的。
+deviceType	String	当前蓝河应用引擎的设备类型，手表版为'watch'
+screenRefreshRate	Float	获取屏幕显示刷新率(获取帧率可能不为 60, 90, 144 等标准帧率)
+示例：
+device.getInfo({
+  success: function (ret) {
+    console.log(`handling success， brand = ${ret.brand}`)
+  },
+})
+device.getInfoSync()
+同步获取设备信息
+
+参数
+无
+
+返回值
+参数值	类型	说明
+deviceInfo	Object	当前设备信息,deviceInfo 参数信息如上 device.getInfo success 返回值
+示例
+const deviceInfo = device.getInfoSync()
+device.getRegionSync()
+同步获取设备地区信息
+
+参数
+无
+
+返回值
+类型	说明
+string	CN 中国
+ID 印度尼西亚
+TH 泰国
+MY 马来西亚
+SG 新加坡
+PH 菲律宾
+ZA 南非
+CO 哥伦比亚
+TR 土耳其
+RU 俄罗斯
+示例
+const region = device.getRegionSync()
+console.log("region is", region)
+device.getRegion()
+异步获取设备地区信息
+
+参数：
+属性	必填	类型	说明
+success	否	Function	成功回调
+fail	否	Function	失败回调
+success 返回值:
+类型	说明
+string	CN 中国
+ID 印度尼西亚
+TH 泰国
+MY 马来西亚
+SG 新加坡
+PH 菲律宾
+ZA 南非
+CO 哥伦比亚
+TR 土耳其
+RU 俄罗斯
+示例：
+device.getRegion({
+  success: function (region) {
+    console.log("region is", region)
+  },
+})
+device.getPeerDeviceInfo(OBJECT)
+获取连接手机的信息
+
+参数：
+属性	必填	类型	说明
+success	否	Function	成功回调
+fail	否	Function	失败回调
+success 返回值:
+属性	类型	说明
+brand	String	设备品牌
+osType	String	操作系统名称
+fail 返回值:
+示例：
+device.getPeerDeviceInfo({
+  success: function (ret) {
+    console.log(`handling success， brand = ${ret.brand}`)
+  },
+})
+device.getId(OBJECT)
+批量获取设备标识
+
+权限要求
+获取手表状态
+
+参数：
+参数名	类型	必填	说明
+type	Array	是	支持 device、mac、user、advertising 四种类型，可提供一至多个
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+按照传入的 type 返回对应的 id，未在 type 中出现的 id 类型不会返回
+
+参数名	类型	说明
+device	String	设备唯一标识。
+mac	String	设备的 mac 地址。
+user	String	用户唯一标识。
+advertising	String	广告唯一标识
+fail 返回错误代码
+错误码	说明
+400	拒绝授予权限
+402	权限错误（未声明该权限）
+示例：
+device.getId({
+  type: ['device', 'mac'],
+  success: function (data) {
+    console.log(`handling success: ${data.device}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+  },
+})
+device.getDeviceId(OBJECT)
+获取设备唯一标识
+
+权限要求
+获取手表状态
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+deviceId	String	设备唯一标识。
+fail 返回错误代码
+错误码	说明
+400	拒绝授予权限
+402	权限错误（未声明该权限）
+device.getDeviceId({
+  success: function (data) {
+    console.log(`handling success: ${data.deviceId}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+device.getSerial(OBJECT)
+获取设备序列号
+
+权限要求
+获取手表状态
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+serial	String	设备序列号
+device.getSerial({
+  success: function (data) {
+    console.log(`handling success: ${data.serial}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+device.getTotalStorage(OBJECT)
+获取存储空间的总大小
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+totalStorage	Number	存储空间的总大小，单位是 Byte。
+device.getTotalStorage({
+  success: function (data) {
+    console.log(`handling success: ${data.totalStorage}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+device.getAvailableStorage(OBJECT)
+获取存储空间的可用大小
+
+参数：
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+availableStorage	Number	存储空间的可用大小，单位是 Byte。
+device.getAvailableStorage({
+  success: function (data) {
+    console.log(`handling success: ${data.availableStorage}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+device.getDeviceICCID(OBJECT)
+获取卡识别码
+
+参数
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+iccid	String	卡识别码
+device.getDeviceICCID({
+  success: function (data) {
+    console.log(`handling success: ${data.iccid}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+device.getCpuInfo(OBJECT)
+返回 CPU 信息
+
+参数
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+cpuInfo	String	CPU 信息。
+device.getCpuInfo({
+  success: function (data) {
+    console.log(`handling success: ${data.cpuInfo}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+device.isSupported(name: string)
+断硬件设备能力是否支持
+
+参数
+类型	必填	说明
+String	是	支持的硬件能力枚举，见下文【硬件设备能力枚举】
+返回值
+类型	说明
+Boolean	是否支持，true 支持，false 不支持
+示例
+const isSupported = device.isSupported('sys.modem.support')
+device.getFeatureList(OBJECT)
+获取全部硬件功能列表
+
+参数
+参数名	类型	必填	说明
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+类型	说明
+Array<string>	获取全部硬件功能列表，见下文【硬件设备能力枚举】
+示例
+device.getFeatureList({
+  success: function (data) {
+    console.log(`handling success: ${data}`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}, errorMsg=${data}`)
+  },
+})
+类型	说明
+Array<string>	硬件设备支持的功能列表
+硬件设备能力枚举
+枚举值	说明
+sys.modem.support	modem 功能
+sys.sensor.ecg.support	ecg 功能
+8.基础软件能力
+8.1概述
+概述
+更新时间：2025-01-16 19:58:35
+
+蓝河应用的基础软件能力为应用提供了基础的软件功能支持，包括系统设置、输入法、解压缩、解包和序列化等，可以帮助开发者更加高效、快速地进行软件开发和计算机操作
+
+子模块介绍
+模块	简述
+系统设置	提供获取系统设置能力
+输入法	为输入法应用提供向 input 组件写入数据能力
+解压缩	提供解压本地文件能力
+解包	提供解包能力
+序列化	提供序列化数据，反序列化数据能力
+8.2系统设置系统设置
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.service.settings" }
+导入模块
+import settings from '@blueos.service.settings'
+在工程里面的 manifest 文件中配置如下内容
+申请权限
+{
+  "permissions": [{ "name": "watch.permission.SETTINGS" }]
+}
+接口定义
+settings.getValue(OBJECT)
+获取设置
+
+参数：
+参数名	类型	必填	说明
+key	String	是	相应设置的字段名
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+success 返回值：
+参数值	类型	说明
+key	String	相应设置的字段名
+value	String/Object/Array 等 JS 原生对象	相应设置的值
+示例：
+settings.getValue({
+  key: 'brightness',
+  success: function (data) {
+    console.log(data.key + ': ' + data.value)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+settings.getValueSync(String)
+同步获取设置
+
+参数
+参数名	类型	必填	说明
+key	String	是	相应设置的字段名
+返回值
+参数值	类型	说明
+value	String/Object/Array 等 JS 原生对象	相应设置的值
+示例
+const value = settings.getValueSync('brightness')
+设置相关的字段
+brightness 屏幕亮度
+字段名	类型	功能	说明
+brightness	Number	系统屏幕亮度值设置	取值范围 0-255
+{
+  brightness: 60
+}
+wearHand 佩戴手
+字段名	类型	功能	说明
+wearHand	String	佩戴手设置	L: 左手， R: 右手
+{
+  wearHand: 'R'
+}
+raiseWristSwitch 抬腕监听开关
+注意: 此处的监听仅代表用户感知的监听设置，和真实的监听无关
+
+字段名	类型	功能	说明
+raiseWristSwitch	Boolean	抬腕监听开关设置	true: 开启抬腕监听， false: 关闭抬腕监听
+{
+  raiseWristSwitch: true
+}
+raiseWristSensitivity 抬腕监听灵敏度
+注：灵敏度改变会影响 sensor 接口监听的灵敏度
+
+字段名	类型	功能	说明
+raiseWristSensitivity	String	抬腕监听灵敏度设置	H: 高灵敏度， M: 标准灵敏度
+{
+  raiseWristSensitivity: `H`
+}
+silentMode 静音模式
+字段名	类型	功能	说明
+silentMode	Boolean	静音模式设置	true: 开启静音模式， false: 关闭静音模式
+{
+  silentMode: false
+}
+flipScreen 屏幕翻转
+字段名	类型	功能	说明
+flipScreen	Boolean	屏幕翻转设置	true: 翻转到正向， false: 翻转到反向
+{
+  flipScreen: false
+}
+8.3输入法
+输入法
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.service.inputMethod" }
+导入模块
+import inputmethod from '@blueos.service.inputMethod' 或 const inputmethod = require('@blueos.service.inputMethod')
+接口定义
+inputmethod.setInput()
+输入法应用向页面的 <input> 组件写入数据，仅输入法应用才会用到此功能
+
+参数：
+属性	类型	说明
+value	String	输入法录入的数据
+返回值：
+无
+
+示例：
+inputmethod.setInput({
+  value: 'hello vivo watch',
+})
+如何调起输入法
+1. 选择输入法类型
+input 组件 type 属性可以控制拉起输入法类型
+
+text: 手写输入法
+speak: 语音输入法
+<template>
+  <input type="text" value="inputValue" onchange="textChange" />
+</template>
+<script>
+  export default {
+    data: {
+      inputValue: '',
+    },
+    textChange({ value }) {
+      this.inputValue = value
+    },
+  }
+</script>
+2.禁止 input 输入法自动拉起
+若调用者仅需要展示文本，而不希望自动拉起输入法，可以在 input 组件上设置属性 readonly="readonly"
+
+<template>
+  <input type="text" value="inputValue" readonly="readonly" />
+</template>
+<script>
+  export default {
+    data: {
+      inputValue: 'hello',
+    },
+  }
+</script>
+3.任意组件拉起输入法
+增加类型为 text 或者 speak 的 input 组件，并将其隐藏 show="false", input组件位置可以是任意的。
+input 组件的 change 事件回调用于调用者接收输入法返回的数据。
+在其他需要调用输入法的组件的 click 事件中调用 input 组件的 focus 方法
+若有多个组件需要启动输入法，只需要新增一个 input 组件，在对应的组件的 click 方法中标识是哪个组件拉起输入法。
+<template>
+  <div>
+    <text onclick="btnClick">{{inputValue}}</text>
+    <input show="false" id="ipt" type="text" onchange="textChange" />
+  </div>
+</template>
+<script>
+  export default {
+    data: {
+      inputValue: '',
+    },
+    textChange({ value }) {
+      this.inputValue = value
+    },
+    btnClick() {
+      this.$element('ipt').focus()
+    },
+  }
+</script>
+8.4解压缩
+解压缩
+更新时间：2025-01-16 19:58:34
+
+接口声明
+{ "name": "blueos.util.fastlz" }
+导入模块
+import fastlz from '@blueos.util.fastlz' 或 const fastlz = require('@blueos.util.fastlz')
+接口定义
+注：“蓝河应用平台参数” 表示开发蓝河应用应用必填参数
+
+fastlz.decompress(OBJECT)
+解压文件
+
+参数：
+参数名	类型	必填	说明
+srcUri	String	是	源文件的 uri，不能是 tmp 类型的 uri
+dstUri	String	是	目标目录的 uri 必须是完整的文件名
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+fastlz.decompress({
+  srcUri: 'internal://cache/test.flz',
+  dstUri: 'internal://files/untar/test.tar',
+  success: function () {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+8.5解包
+解包
+更新时间：2025-01-16 19:58:35
+
+接口声明
+{ "name": "blueos.util.tar" }
+导入模块
+import tar from '@blueos.util.tar' 或 const fastlz = require('@blueos.util.tar')
+接口定义
+注：“蓝河应用平台参数” 表示开发蓝河应用必填参数
+tar.untar(OBJECT)
+解包
+
+参数：
+参数名	类型	必填	说明
+srcUri	String	是	源文件的 uri，不能是 tmp 类型的 uri
+dstUri	String	是	目标目录的 uri，不能是应用资源路径和 tmp 类型的 uri
+success	Function	否	成功回调
+fail	Function	否	失败回调
+complete	Function	否	执行结束后的回调
+备注：
+srcUri 和 dstUri 路径采用的是 file_feature 协议，由于是私有接口，是可以跨包读取的。internal:// 原本的路径解析为: /sdcard/internal/rpk 包名，但在解压缩去掉了包名的限制，实际得到的路径是： /sdcard/internal/
+
+fail 返回错误代码：
+错误码	说明
+202	参数错误
+300	I/O 错误
+示例：
+tar.untar({
+  srcUri: 'internal://cache/test.tar',
+  dstUri: 'interval://files/untar/',
+  success: function () {
+    console.log(`handling success`)
+  },
+  fail: function (data, code) {
+    console.log(`handling fail, code = ${code}`)
+  },
+})
+9.安全能力
+9.1概述
+概述
+更新时间：2025-01-16 19:58:35
+
+蓝河应用安全模块旨在确保应用程序的数据和用户信息得到有效的保护，以防止未经授权的访问和数据泄漏。
+
+子模块介绍
+模块	简述
+权限管理	提供全面的权限控制和管理功能，以确保应用的安全性和隐私保护
+密码算法	为应用提供了安全数据加密和解密的功能，以确保用户的敏感信息得到保护
+9.2权限管理
+权限管理
+更新时间：2025-01-16 19:58:35
+
+权限列表说明:
+权限名	需要导入的模块	需要权限申请的具体接口	说明	权限错误码
+watch.permission.LOCATION	import geolocation from '@blueos.hardware.geolocation'	geolocation.getLocation(OBJECT)
+geolocation.subscribe(OBJECT)
+geolocation.unsubscribe()	位置信息	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+watch.permission.STEP_COUNTER	import sensor from '@blueos.hardware.sensor'	sensor.subscribeStepCounter(OBJECT)	计步传感器	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+watch.permission.DEVICE_INFO	import device from '@blueos.hardware.device'	device.getId(OBJECT)
+device.getDeviceId(OBJECT)
+device.getSerial(OBJECT)	设备信息	400: 拒绝授予权限 , 402: 权限错误（未声明该权限）
+watch.permission.RECORD	import record from '@blueos.multimedia.record'	record.start(OBJECT)
+record.stop(OBJECT)
+record.release(OBJECT)	录音	400: 拒绝授予权限, 401: 敏感权限不能在后台运行, 402: 权限错误（未声明该权限）
+watch.permission.BLUETOOTH	import bluetooth from '@blueos.communication.bluetooth.bluetooth'
+import bluetooth from '@vivo.bluetooth'	bluetooth.getBindState()
+bluetooth.startBind(OBJECT)
+bluetooth.confirmBind(OBJECT)
+bluetooth.cancelBind(OBJECT)
+bluetooth.startDevicesDiscovery(OBJECT)
+bluetooth.onDevicefound = function(data)
+bluetooth.stopDevicesDiscovery(OBJECT)
+bluetooth.getConnectedDevices(OBJECT)
+bluetooth.getPairedDevices(OBJECT)
+bluetooth.createConnection(OBJECT)
+bluetooth.closeConnection (OBJECT)
+bluetooth.pair(OBJECT)
+bluetooth.unpair(OBJECT)
+bluetooth.subscribeBind(OBJECT)
+bluetooth.clearBindData(OBJECT)
+bluetooth.replyPhone(OBJECT)
+bluetooth.onadapterstatechange = function(data)	允许使用设备蓝牙	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+watch.permission.READ_HEALTH_DATA	import health from '@blueos.health.health'
+import health from '@vivo.health'	health.getRecentSamples(Object)
+health.subscribeSample(Object)
+health.unsubscribeSample(Object)
+health.getTodayStatistic(Object)
+health.subscribeTodayStatistic(Object)
+health.unsubscribeTodayStatistic(Object)	读取健康数据	400 : 拒绝授予权限, 402: 权限错误（未声明该权限）
+9.3密码算法
+10.通用
+
+10.1概述
+概述
+更新时间：2025-01-16 19:58:33
+
+在本章节中，我们将为您介绍蓝河系统 JS API 的调用规则和通用的错误码。通过阅读本章节，您将了解 JS API 的三种调用形式——同步、异步和订阅，并且掌握一些常见的错误码。
+10.2调用规则
+调用规则
+更新时间：2025-01-16 19:58:33
+
+同步
+同步方法调用后必须等到方法结果返回后才能继续后续的行为，返回值可以是任意类型。
+
+示例
+import context from '@blueos.app.context'
+
+export default {
+  getInfo() {
+    const info = context.getInfo()
+    console.log(JSON.stringify(info))
+  },
+}
+异步
+异步方法调用整个过程不会阻碍调用者的工作。业务执行完成后会调用开发者提供的回调函数。
+
+异步接口支持的回调函数
+回调函数	参数名	类型	返回值	说明
+success	data	any	可选，返回值可以是任意类型，详见接口使用文档。	在执行成功时触发。
+fail	data,code	any,number	错误信息内容，一般是字符串，也可能是其他类型，详见接口使用文档。	在执行失败时触发。 code 是错误码
+complete	-	-	-	在执行完成时触发。
+说明
+success、fail和complete四个回调函数是否支持参考具体接口描述。
+success、fail两个回调函数的触发是互斥的，即会且只会在一个回调函数中触发，触发任意一个都会再次调用complete回调。
+示例
+import deviceInfo from '@blueos.hardware.deviceInfo'
+
+export default {
+  getInfo() {
+    deviceInfo.getInfo({
+      success: function (data) {
+        console.log('Device information obtained successfully. Device brand:' + data.brand)
+      },
+      fail: function (data, code) {
+        console.log(
+          'Failed to obtain device information. Error code:' + code + '; Error information: ' + data
+        )
+      },
+    })
+  },
+}
+订阅
+订阅接口不会立即返回结果，开发者要在参数中设置相应的回调函数；该回调函数会在完成时或者事件变化时进行回调；可以执行多次。
+
+订阅接口支持以下回调函数
+回调函数	参数名	类型	返回值	说明
+callback	data	any	返回值可以是任意类型，详见接口使用文档。	接口调用成功或事件变更时触发，可能会触发多次。
+fail	data,code	any,number	错误信息内容，一般是字符串，也可能是其他类型，详见接口使用文档。	在执行失败时触发。一旦触发该回调函数，callback 不会再次被调用，接口调用结束。code 是错误码
+以监听罗盘数据为例
+import sensor from '@blueos.hardware.sensor.sensor'
+
+export default {
+  subscribeCompass() {
+    sensor.subscribeCompass({
+      callback: function (ret) {
+        console.log(`handling callback, direction = ${ret.direction}`)
+      },
+      fail: function (data, code) {
+        console.log(`handling fail, code = ${code}`)
+      },
+    })
+  },
+}
+10.3通用错误码
+通用错误码
+更新时间：2025-01-16 19:58:33
+
+提供公共的错误码
+其中，错误码 200 为系统通用错误码，所有系统未知异常发生时抛出。比如系统申请内存空间失败等。
+code	含义
+200	通用错误。
+202	参数错误。
+300	I/O 错误。
+11.运动健康能力
+运动健康
+更新时间：2025-01-16 19:58:33
+
+概述
+蓝河应用等运动健康模块旨在支持用户的运动和健康数据管理。该模块提供了两个主要部分：采样数据和统计数据，为用户提供了全面的健康数据管理和实时监控功能，对于健康和运动类应用、健康监测工具和健康管理应用非常有用。
+
+接口声明
+{ "name": "blueos.health.health" }
+导入模块
+import health from '@blueos.health.health' 或 const health = require('@blueos.health.health')
+开发者需要在 manifest.json 里面配置权限：
+
+{
+  "permissions": [{ "name": "watch.permission.READ_HEALTH_DATA" }]
+}
+接口定义
+health.getRecentSamples
+获取最近一次采样数据
+
+参数
+参数名	类型	必填	说明
+dataTypes	DataType[]	是	数据类型
+success	(recentSamples: RecentSample[]) => void	是	回调函数，返回值是一个 RecentSample 数组
+complete	() => void	否	完成的回调函数
+fail	(data: string, code: number) => void	否	失败回调函数
+RecentSample
+属性名	值类型	说明
+dataType	DataType	数据类型
+data	Sample	采样数据
+示例：
+
+{
+  "dataType": 0,
+  "data": {
+    "timeStamp": 1732706966443,
+    "value": 80
+  }
+}
+示例
+health.getRecentSamples({
+  dataTypes: [health.DATA_TYPES.HEART_RATE, health.DATA_TYPES.STEP_COUNT],
+  success: (res) => {
+    console.log(`current heart rate(${res[0].dataType}) is`, res[0].data.value, 'bpm')
+  },
+})
+health.subscribeSample
+监听采样数据变化
+
+参数
+参数名	类型	必填	说明
+dataType	DataType	是	数据类型
+callback	(sample: Sample) => void	是	回调函数，返回值是一个Sample
+fail	(data: string, code: number) => void	否	失败回调函数
+示例
+health.subscribeSample({
+  dataType: health.DATA_TYPES.HEART_RATE,
+  callback: (res) => {
+    console.log(`current heart rate(${res.value}) is`)
+  },
+})
+health.unsubscribeSample
+取消监听采样数据变化
+
+参数
+参数名	类型	必填	说明
+dataType	DataType	是	数据类型
+示例
+health.unsubscribeSample({
+  dataType: health.DATA_TYPES.HEART_RATE,
+})
+health.getTodayStatistic
+查询当日统计数据
+
+参数名	类型	必填	说明
+dataType	DataType	是	数据类型
+statisticType	StatisticType	否	统计的维度，不同的 dataType 支持的维度不一样
+success	(statistic: Statistic) => void	是	回调函数，返回值是一个Statistic, 统计类型由 dataType 决定
+complete	() => void	否	完成的回调函数
+fail	(data: string, code: number) => void	否	失败回调函数
+示例
+health.getTodayStatistic({
+  dataType: health.DATA_TYPES.HEART_RATE,
+  statisticType: health.STATISTIC_TYPES.SUM,
+  success(data) {
+    console.log(data)
+  },
+  fail(data, code) {
+    console.log(data, code)
+  },
+})
+health.getStatistic
+查询当日统计数据
+
+参数名	类型	必填	说明
+dataType	DataType	是	数据类型
+statisticType	StatisticType	否	统计的维度，不同的 dataType 支持的维度不一样
+startTime	timeStamp	否	开始时间，在这个时间之后发生的活动，包含在这个时间段之前已经发生，但是还没有结束的活动
+endTime	timeStamp	否	结束时间，在这个时间之前发生的活动，包含正在发生但还没有完全结束的活动
+success	(statistic: Statistic) => void	否	回调函数，返回值是一个Statistic , 统计类型由 dataType 决定
+complete	() => void	否	完成的回调函数
+fail	(data: string, code: number) => void	否	失败回调函数
+示例
+health.getStatistic({
+  dataType: health.DATA_TYPES.HEART_RATE,
+  statisticType: health.STATISTIC_TYPES.SUM,
+  startTime: '2023-09-10',
+  endTime: '2023-10-1',
+  success(data) {
+    console.log(data)
+  },
+  fail(data, code) {
+    console.log(data, code)
+  },
+})
+health.subscribeTodayStatistic
+监听当日统计数据
+
+参数名	类型	必填	说明
+dataType	DataType	是	每个值都是一个 DataType 的枚举类型
+statisticType	StatisticType	否	统计的维度，不同厂商，不同的 dataType 支持的维度不一样
+callback	(statistic: Statistic) => void	是	回调函数，返回值是一个 Statistic , 统计类型由 dataType 决定
+fail	(data: string, code: number) => void	否	失败回调函数
+示例
+health.subscribeTodayStatistic({
+  dataType: health.DATA_TYPES.HEART_RATE,
+  statisticType: health.STATISTIC_TYPES.SUM,
+  callback(data) {
+    console.log(data)
+  },
+  fail(data, code) {
+    console.log(data, code)
+  },
+})
+health.unsubscribeTodayStatistic
+取消监听当日统计数据
+
+参数名	类型	必填	说明
+dataType	DataType	是	数据类型
+示例
+health.unsubscribeTodayStatistic({
+  dataType: health.DATA_TYPES.HEART_RATE,
+})
+DataType
+健康数据类型
+
+const heartRate = health.DATA_TYPES.HEART_RATE
+类型	类型值	返回值类型	返回单位	说明
+HEART_RATE	0	Int	bpm	心率
+HEART_RATE_STEP	1	Int	bpm	步行心率
+HEART_RATE_RESTING	2	Int	bpm	静息心率
+STANDING	3	Int	hour	站立，以时长衡量。1 小时内站立超过 1 分钟即算作站立 1 小时
+INTENSITY_SPORT	4	Int	minutes	中高强度运动的持续时长
+STEP_COUNT	5	Int	步	步数
+SPO2	6	Int	%	血氧
+DISTANCE	7	Int	米	距离，由骑行、跑步、步行产生
+CALORIES	8	Int	千卡	总卡路里
+STRESS	9	Int		压力值
+WALKING_SPEED	10	Int	步/min	步频
+SLEEP_UNIT	11	SleepUnit		睡眠时段
+SLEEP_STAGES	12	SleepStage[]		一个完整睡眠包含的睡眠分期
+SLEEP_STATUS	13	Int	0:清醒 1:睡眠	睡眠状态
+ENERGY	14	Int	%	活力值
+WALKING_STATUS	15	Int	0:非步行 1:步行	步行状态
+SPEED	16	Float	米/s	配速
+SleepUnit
+睡眠时段返回值
+
+属性	单位	说明
+enterSleep	timeStamp	入睡时间戳
+exitSleep	timeStamp	出睡时间戳
+示例：
+
+{
+  "enterSleep": 1732705884223,
+  "exitSleep": 1732706966443
+}
+SleepStage
+属性	单位	说明
+enterTimeStamp	timeStamp	进入该睡眠分期的时间戳
+sleepType	Int	进入的睡眠分期类型 1:深睡 2:浅睡 3:快速眼动 4:清醒
+示例：
+
+{
+  "enterTimeStamp": 1732705884223,
+  "sleepType": 1
+}
+Sample
+采样查询接口返回的数据结构
+
+属性	值类型	说明
+timeStamp	timeStamp	采样时间
+value	Int |Float |SleepUnit |SleepStage[]	数据类型由查询时的 DataType 决定
+示例：
+
+{
+  "timeStamp": 1732705884223,
+  "value": 80
+}
+StatisticType
+统计数据类型
+
+const sum = health.STATISTIC_TYPES.SUM
+不同DataType支持的统计类型如下：
+
+类型	类型值	说明
+AVERAGE	0	平均值
+SUM	1	总和
+MAX	2	最大值
+MIN	3	最小值
+各数据类型，支持的情况如下：
+
+数据类型	最大小值	总和	平均值
+HEART_RATE	✔️		
+SPO2	✔️		
+STRESS	✔️		
+Statistic
+统计数据，获取采样数据的统计值。统计数据的数据结构如下：
+
+属性	值类型	说明
+value	Int | Float |SleepUnit | SleepStage[]	数据类型由查询时的 DataType 决定
+statisticType	-	统计类型。如果数据返回的不是统计类型，则此值是 null
+startTime	timeStamp	统计开始时间
+endTime	timeStamp	统计结束时间
+示例：
+
+{
+  "value": 80,
+  "statisticType": 0,
+  "startTime": 1732705884223,
+  "endTime": 1732706966443
+}
+！！！请给出完整的蓝河项目结构和完整的index.ux页面代码！！！

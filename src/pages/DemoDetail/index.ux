@@ -1,0 +1,27 @@
+<template>
+  <div class="wrapper">
+    <text class="title">{{ text }}</text>
+  </div>
+</template>
+
+<script>
+export default {
+  data: {
+    text: '你好，世界'
+  }
+}
+</script>
+
+<style lang="scss">
+@import './../../assets/styles/style.scss';
+
+.wrapper {
+  @include flex-box-mixins(column, center, center);
+  margin: 0 10 * $size-factor;
+  .title {
+    font-size: 8 * $size-factor;
+    text-align: center;
+    color: $black;
+  }
+}
+</style>

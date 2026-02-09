@@ -1,0 +1,83 @@
+<template>
+  <div class="wrapper">
+    <text class="title">跳转到：{{ progress }}%</text>
+
+    <div class="picker-container">
+      <!-- 模拟 Picker 样式 -->
+      <text class="picker-item prev">49</text>
+      <text class="picker-item current">50</text>
+      <text class="picker-dot">.</text>
+      <text class="picker-item current">00</text>
+      <text class="picker-item next">51</text>
+    </div>
+
+    <input type="button" class="jump-btn" value="跳转" onclick="doJump" />
+  </div>
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+
+  export default {
+    data: {
+      progress: '6.50',
+    },
+    doJump() {
+      router.back()
+    },
+  }
+</script>
+
+<style lang="scss">
+
+  .wrapper {
+    flex-direction: column;
+    background-color: #000000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 32px;
+    color: #ffffff;
+    margin-bottom: 30px;
+  }
+
+  .picker-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    margin-bottom: 30px;
+  }
+
+  .picker-item {
+    font-size: 50px;
+    color: #9393aa;
+    width: 80px;
+    text-align: center;
+  }
+
+  .picker-item.current {
+    font-size: 70px;
+    color: #ffffff;
+    font-weight: bold;
+    border-bottom: 2px solid #3399ff;
+  }
+
+  .picker-dot {
+    font-size: 50px;
+    color: #ffffff;
+    margin: 0 10px;
+  }
+
+  .jump-btn {
+    width: 300px;
+    height: 80px;
+    border-radius: 40px;
+    background-color: #3399ff;
+    color: #ffffff;
+    font-size: 36px;
+  }
+</style>

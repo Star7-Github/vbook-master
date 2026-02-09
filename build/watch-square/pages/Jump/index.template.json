@@ -1,0 +1,138 @@
+{
+  "type": "div",
+  "class": "wrapper",
+  "style": {
+    "alignItems": "center",
+    "backgroundColor": "#000000",
+    "flexDirection": "column",
+    "justifyContent": "center",
+    "paddingBottom": "20px",
+    "paddingLeft": "20px",
+    "paddingRight": "20px",
+    "paddingTop": "20px"
+  },
+  "styleObjectId": 1193965867,
+  "children": [
+    {
+      "type": "text",
+      "attr": {
+        "$value": "function () { return '' + '跳转到：' + this.progress + '%'; }"
+      },
+      "bind": 1,
+      "class": "title",
+      "style": {
+        "color": "#ffffff",
+        "fontSize": "32px",
+        "marginBottom": "30px"
+      }
+    },
+    {
+      "type": "div",
+      "class": "picker-container",
+      "style": {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "height": "200px",
+        "justifyContent": "center",
+        "marginBottom": "30px"
+      },
+      "children": [
+        {
+          "type": "text",
+          "attr": {
+            "value": "49"
+          },
+          "class": "picker-item prev",
+          "style": {
+            "color": "#9393aa",
+            "fontSize": "50px",
+            "textAlign": "center",
+            "width": "80px"
+          }
+        },
+        {
+          "type": "text",
+          "attr": {
+            "value": "50"
+          },
+          "class": "picker-item current",
+          "style": {
+            "borderBottomColor": "#3399ff",
+            "borderBottomStyle": "solid",
+            "borderBottomWidth": "2px",
+            "color": "#ffffff",
+            "fontSize": "70px",
+            "fontWeight": "bold",
+            "textAlign": "center",
+            "width": "80px"
+          }
+        },
+        {
+          "type": "text",
+          "attr": {
+            "value": "."
+          },
+          "class": "picker-dot",
+          "style": {
+            "color": "#ffffff",
+            "fontSize": "50px",
+            "marginBottom": "0px",
+            "marginLeft": "10px",
+            "marginRight": "10px",
+            "marginTop": "0px"
+          }
+        },
+        {
+          "type": "text",
+          "attr": {
+            "value": "00"
+          },
+          "class": "picker-item current",
+          "style": {
+            "borderBottomColor": "#3399ff",
+            "borderBottomStyle": "solid",
+            "borderBottomWidth": "2px",
+            "color": "#ffffff",
+            "fontSize": "70px",
+            "fontWeight": "bold",
+            "textAlign": "center",
+            "width": "80px"
+          }
+        },
+        {
+          "type": "text",
+          "attr": {
+            "value": "51"
+          },
+          "class": "picker-item next",
+          "style": {
+            "color": "#9393aa",
+            "fontSize": "50px",
+            "textAlign": "center",
+            "width": "80px"
+          }
+        }
+      ]
+    },
+    {
+      "type": "input",
+      "attr": {
+        "type": "button",
+        "value": "跳转"
+      },
+      "bind": 1,
+      "class": "jump-btn",
+      "events": {
+        "click": "doJump"
+      },
+      "style": {
+        "backgroundColor": "#3399ff",
+        "borderRadius": "40px",
+        "color": "#ffffff",
+        "fontSize": "36px",
+        "height": "80px",
+        "width": "300px"
+      }
+    }
+  ]
+}

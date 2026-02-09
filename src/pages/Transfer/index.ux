@@ -1,0 +1,533 @@
+<template>
+  <list title="true" scrollbar="true">
+    <list-item type="li" @click="goBack">
+      <div class="vwTitleWrapper">
+        <div class="vwTitle">
+          <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+          <text>传书到表</text>
+        </div>
+      </div>
+    </list-item>
+    <list-item if="{{isLoading}}" type="li">
+      <div class="wrapper loading">
+        <vw-loading></vw-loading>
+        <div class="wrapper">
+          <text>正在加载...</text>
+        </div>
+      </div>
+    </list-item>
+    <list-item if="{{!isLoading && bookList.length === 0}}" type="li">
+      <div class="wrapper empty">
+        <vw-icon icon="delete"></vw-icon>
+        <div class="wrapper">
+          <text>暂无在线书籍</text>
+        </div>
+      </div>
+    </list-item>
+    <list-item if="{{!isLoading && isDownloading}}" type="li">
+      <div class="vwSubTitle">
+        <text>下载列表</text>
+      </div>
+    </list-item>
+    <list-item
+      if="{{!isLoading && isDownloading}}"
+      type="li"
+      class="bookItemWrapper">
+      <div class="book-item">
+        <div class="book-info">
+          <marquee class="book-title">{{ curBookName }}</marquee>
+          <text class="book-author">{{ curBookAuthor }}</text>
+        </div>
+        <stack class="downloading">
+          <div class="progressWrapper">
+            <div
+              class="progress"
+              style="width: {{downloadProgress}}px;height:{{downloadProgress<60?downloadProgress:60}}px;"></div>
+          </div>
+          <div class="progressTxt">
+            <text>{{ downloadProgress }}%</text>
+          </div>
+        </stack>
+      </div>
+    </list-item>
+    <list-item if="{{!isLoading && bookList.length > 0}}" type="li">
+      <div class="vwSubTitle">
+        <text>在线书籍</text>
+      </div>
+    </list-item>
+    <list-item type="li" class="bookItemWrapper" for="{{bookList}}" tid="id">
+      <div class="book-item">
+        <div class="book-info">
+          <marquee class="book-title">{{ $item.name }}</marquee>
+          <text class="book-author">{{ $item.author }}</text>
+        </div>
+        <div class="download-btn" onclick="startDownload($item)">
+          <text class="btn-icon">下载</text>
+        </div>
+      </div>
+    </list-item>
+    <list-item>
+      <div style="height: 140px"></div>
+    </list-item>
+  </list>
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+  import network from '@blueos.network.fetch'
+  import sysFetch from '@system.fetch'
+  import file from '@blueos.storage.file'
+  import prompt from '@blueos.window.prompt'
+
+  export default {
+    data: {
+      bookList: [],
+      isLoading: true,
+      isDownloading: false,
+      downloadProgress: 0,
+      curBookName: '',
+      curBookAuthor: '',
+      monitorId: '',
+    },
+    onDestroy() {
+      if (this.timerId) clearTimeout(this.timerId)
+      if (this.intervalId) clearInterval(this.intervalId)
+      if (this.pollTimer) clearInterval(this.pollTimer)
+    },
+    onInit() {
+      this.timerId = null
+      this.intervalId = null
+      this.pollTimer = null
+      this.fetchBookList()
+    },
+    startDownload(book) {
+      if (this.isDownloading) {
+        prompt.showToast({ message: '请等待当前下载完成' })
+        return
+      }
+
+      const count = parseInt(book.chapterCount) || 0
+      if (count === 0) {
+        prompt.showToast({ message: '章节数为0' })
+        return
+      }
+
+      this.isDownloading = true
+      this.curBookName = book.name
+      this.curBookAuthor = book.author
+      this.downloadProgress = 0
+      this.monitorId = book.id
+
+      // Start Background Task
+      if (this.$app && this.$app.$def && this.$app.$def.start) {
+        this.$app.$def.start(book)
+        this.startPolling()
+      } else {
+        prompt.showToast({ message: '应用异常' })
+        this.isDownloading = false
+      }
+    },
+    startPolling() {
+      if (this.pollTimer) clearInterval(this.pollTimer)
+      this.pollTimer = setInterval(() => {
+        if (!this.monitorId) return
+
+        const task = this.$app.$def.getTask(this.monitorId)
+        if (task) {
+          this.downloadProgress = task.progress || 0
+          if (task.status !== 'running') {
+            if (task.status === 'done') {
+              this.downloadProgress = 100
+              prompt.showToast({ message: '下载完成' })
+            } else {
+              prompt.showToast({ message: '下载出错' })
+            }
+
+            // Reset after delay
+            setTimeout(() => {
+              this.isDownloading = false
+              this.monitorId = ''
+              clearInterval(this.pollTimer)
+            }, 1500)
+          }
+        }
+      }, 500)
+    },
+    goBack() {
+      router.back()
+    },
+    getFetch() {
+      // 优先尝试 system.fetch
+      if (sysFetch && typeof sysFetch.fetch === 'function') {
+        return (options) => sysFetch.fetch(options)
+      }
+
+      // 尝试 blueos network
+      if (typeof network === 'function') return network
+      if (network && typeof network.fetch === 'function') {
+        return (options) => network.fetch(options)
+      }
+
+      return null
+    },
+    async fetchBookList() {
+      this.isLoading = true
+
+      // ====== MOCK MODE======
+      const USE_MOCK = false
+      if (USE_MOCK) {
+        console.log('模拟列表')
+        // 模拟几本书
+        this.bookList = [
+          {
+            id: 'book1',
+            name: '三体三体三体三体三体三体三体三体',
+            author: '本地导入',
+            size: 1200000,
+            chapterCount: 42,
+            isDownloaded: false,
+            localExists: false,
+          },
+          {
+            id: 'book2',
+            name: '流浪地球',
+            author: '本地导入',
+            size: 800000,
+            chapterCount: 15,
+            isDownloaded: true,
+            localExists: true,
+          },
+          {
+            id: 'book3',
+            name: '时间之海',
+            author: '本地导入',
+            size: 500000,
+            chapterCount: 2, // 测试章节数为0的情况
+            isDownloaded: false,
+            localExists: false,
+          },
+          {
+            id: 'book4',
+            name: '时间之海2',
+            author: '本地导入',
+            size: 500000,
+            chapterCount: 3, // 测试章节数为0的情况
+            isDownloaded: false,
+            localExists: false,
+          },
+          {
+            id: 'book5',
+            name: '时间之海',
+            author: '本地导入',
+            size: 500000,
+            chapterCount: 0, // 测试章节数为0的情况
+            isDownloaded: false,
+            localExists: false,
+          },
+        ]
+        this.isLoading = false
+
+        // 模拟下载
+        const MOCK_DOWNLOADING = true
+        if (MOCK_DOWNLOADING) {
+          this.isDownloading = true
+          this.curBookName = '三体三体三体三体三体三体三体三体'
+          this.curBookAuthor = '本地导入'
+          this.downloadProgress = 0
+
+          // 模拟进度自动增长
+          if (this.intervalId) clearInterval(this.intervalId)
+          this.intervalId = setInterval(() => {
+            this.downloadProgress += 4
+            if (this.downloadProgress >= 100) {
+              this.downloadProgress = 100
+              clearInterval(this.intervalId) // 注释掉则停在100%
+            }
+          }, 1000)
+        }
+
+        return
+      }
+      // ====== END MOCK MODE ======
+
+      console.log('正在请求书单')
+
+      // 1. Get Local Books to check status
+      const localBooks = await this.getLocalBooks()
+      const localMap = {}
+      localBooks.forEach((b) => (localMap[b.id] = b))
+
+      const fetchFn = this.getFetch()
+
+      if (!fetchFn) {
+        prompt.showToast({ message: 'API不支持' })
+        this.isLoading = false
+        return
+      }
+
+      fetchFn({
+        url: 'http://127.0.0.1:23101/api/novel/list',
+        method: 'GET',
+        responseType: 'json',
+        success: (response) => {
+          let list = []
+          if (Array.isArray(response.data)) {
+            list = response.data
+          } else if (response.data && Array.isArray(response.data.data)) {
+            list = response.data.data
+          }
+
+          this.bookList = list.map((item) => {
+            const local = localMap[item.id]
+            return {
+              id: item.id,
+              name: item.name,
+              author: '本地导入',
+              size: item.size,
+              chapterCount: item.chapterCount,
+              isDownloaded: !!local && local.isOffline,
+              localExists: !!local,
+            }
+          })
+          this.isLoading = false
+        },
+        fail: (data, code) => {
+          console.log(`书单请求失败: ${code}, ${data}`)
+          prompt.showToast({ message: '网络请求失败' })
+          this.isLoading = false
+          this.bookList = []
+        },
+      })
+    },
+    getLocalBooks() {
+      return new Promise((resolve) => {
+        file.list({
+          uri: 'internal://files/',
+          success: (data) => {
+            const files = data.fileList || []
+            const bookFiles = files.filter(
+              (f) => f.uri.indexOf('book_') >= 0 && f.uri.endsWith('.json')
+            )
+            Promise.all(bookFiles.map((f) => this.readText(f.uri))).then(
+              (res) => {
+                resolve(
+                  res
+                    .map((txt) => {
+                      try {
+                        return JSON.parse(txt)
+                      } catch (e) {
+                        return null
+                      }
+                    })
+                    .filter((r) => r)
+                )
+              }
+            )
+          },
+          fail: () => resolve([]),
+        })
+      })
+    },
+    readText(uri) {
+      return new Promise((r) =>
+        file.readText({ uri, success: (d) => r(d.text), fail: () => r(null) })
+      )
+    },
+    ensureDir(path) {
+      return new Promise((resolve) => {
+        file.mkdir({
+          uri: path,
+          recursive: true, // 尝试递归创建
+          success: () => resolve({ success: true }),
+          fail: (data, code) => {
+            console.log(`mkdir ${path} failed: ${code} ${data}`)
+            // 如果目录已存在，某些系统可能返回 fail. 尝试检测是否存在
+            file.access({
+              uri: path,
+              success: () => resolve({ success: true }),
+              fail: (accData, accCode) => {
+                resolve({
+                  success: false,
+                  msg: `MKDIR:${code},ACCESS:${accCode}`,
+                })
+              },
+            })
+          },
+        })
+      })
+    },
+
+    checkFileExists(uri) {
+      return new Promise((resolve) => {
+        file.access({
+          uri: uri,
+          success: () => resolve(true),
+          fail: () => resolve(false),
+        })
+      })
+    },
+    downloadChapterOne(bookId, index) {
+      return new Promise((resolve) => {
+        const fetchFn = this.getFetch()
+        if (!fetchFn) {
+          resolve(null)
+          return
+        }
+
+        fetchFn({
+          url: `http://127.0.0.1:23101/api/novel/chapter?id=${bookId}&index=${index}`,
+          method: 'GET',
+          responseType: 'text',
+          success: (res) => {
+            if (res.code === 200) resolve(res.data)
+            else resolve(null)
+          },
+          fail: () => resolve(null),
+        })
+      })
+    },
+    saveChapterFile(dir, index, content) {
+      return new Promise((resolve) => {
+        file.writeText({
+          uri: `${dir}/${index}.txt`,
+          text: content,
+          success: () => resolve(true),
+          fail: (d, c) => {
+            console.log(`Save ch ${index} fail: ${c}`)
+            resolve(false)
+          },
+        })
+      })
+    },
+  }
+</script>
+
+<style lang="less">
+  .wrapper {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .vwTitleWrapper {
+    height: 80px;
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    .vwTitle {
+      align-items: center;
+      justify-content: center;
+      text {
+        color: #ffffff;
+        font-size: 40px;
+        font-weight: bold;
+        margin-right: 48px;
+      }
+    }
+  }
+  .vwSubTitle {
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-left: 40px;
+    padding-bottom: 10px;
+    padding-top: 20px;
+    width: 100%;
+    text {
+      color: #888888;
+      font-size: 30px;
+      height: 40px;
+      line-height: 40px;
+      lines: 1;
+      max-width: 340px;
+      padding-right: 10px;
+      text-align: left;
+    }
+  }
+  .loading {
+    width: 100%;
+    padding-top: 150px;
+    @media screen and (device: watch-round) {
+      padding-top: 120px;
+    }
+    text {
+      color: #ffffff;
+    }
+  }
+  .empty {
+    width: 100%;
+    padding-top: 140px;
+    @media screen and (device: watch-round) {
+      padding-top: 100px;
+    }
+    text {
+      color: #ffffff;
+    }
+  }
+  .bookItemWrapper {
+    padding: 0px 10px;
+    .book-item {
+      width: 100%;
+      justify-content: space-between;
+      background-color: #262626;
+      margin-bottom: 10px;
+      border-radius: 50px;
+      padding: 20px;
+      align-items: center;
+      .book-info {
+        flex-direction: column;
+        margin-left: 10px;
+        .book-title {
+          width: 270px;
+          double-ended-shadow-color: #262626;
+          color: #ffffff;
+          font-weight: bold;
+          font-size: 30px;
+        }
+        .book-author {
+          color: grey;
+          font-size: 24px;
+          line-height: 24px;
+          margin-top: 10px;
+        }
+      }
+      .download-btn {
+        .wrapper();
+        background-color: #295aff;
+        width: 100px;
+        height: 60px;
+        border-radius: 30px;
+        text {
+          color: #ffffff;
+        }
+        :active {
+          opacity: 0.3;
+        }
+      }
+      .downloading {
+        width: 100px;
+        height: 60px;
+        background-color: #888888;
+        border-radius: 30px;
+        .progressWrapper {
+          height: 60px;
+          flex-direction: column;
+          justify-content: center;
+          .progress {
+            background-color: #295aff;
+            max-height: 60px;
+            border-radius: 30px;
+          }
+        }
+        .progressTxt {
+          .wrapper();
+          width: 100px;
+          height: 60px;
+          text {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+</style>

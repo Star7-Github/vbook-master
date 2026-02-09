@@ -1,0 +1,418 @@
+<template>
+  <list title="true" scrollbar="true">
+    <list-item type="li" @click="goBack">
+      <div class="vwTitleWrapper">
+        <div class="vwTitle">
+          <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+          <text>我的书架</text>
+        </div>
+      </div>
+    </list-item>
+    <list-item>
+      <div style="height: 20px"></div>
+    </list-item>
+    <list-item if="{{bookList.length === 0}}" type="li">
+      <div class="wrapper empty">
+        <vw-icon icon="delete"></vw-icon>
+        <div class="wrapper">
+          <text>暂无书籍</text>
+        </div>
+      </div>
+    </list-item>
+    <list-item
+      type="book"
+      class="bookItemWrapper"
+      for="{{bookList}}"
+      onclick="openBookDetail($item)">
+      <div class="book-item">
+        <div class="book-cover">
+          <text class="book-cover-text">
+            {{ $item.name.substring(0, 1) }}
+          </text>
+        </div>
+        <div class="book-info">
+          <marquee class="book-title">{{ $item.name }}</marquee>
+          <text class="book-progress">
+            已读{{ ' ' + $item.progress }}% ({{
+              Number($item.currentChapter) || 0
+            }}/{{ Number($item.chapterCount) || 1 }}章)
+          </text>
+        </div>
+      </div>
+    </list-item>
+    <list-item>
+      <div style="height: 80px"></div>
+    </list-item>
+  </list>
+  <!-- <div class="page">
+    <div class="wrapper">
+      <div
+        class="global-progress"
+        if="{{downloadTask}}"
+        onclick="handleTaskClick">
+        <text class="progress-detail">{{ downloadTask.name }} 下载:&nbsp;</text>
+        <text class="progress-text">{{ downloadTask.progress }}%</text>
+      </div>
+      </div>
+    </div>
+  </div> -->
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+  import file from '@blueos.storage.file'
+  import prompt from '@blueos.window.prompt'
+
+  export default {
+    data: {
+      bookList: [],
+      downloadTask: null,
+      showDeleteAlert: false,
+      deleteAlertContent: '',
+      deletingBook: null,
+      deleteAlertButtons: [
+        {
+          eventType: 'confirm',
+          type: 'primary',
+          value: '确定',
+        },
+        {
+          eventType: 'cancel',
+          type: 'plain',
+          value: '忽略',
+        },
+      ],
+      refreshTimer: null, // 刷新定时器 ID
+      isDeleting: false, // 删除中状态
+    },
+    onInit() {
+      console.log('书架页 初始化')
+      console.log('onInit - isDeleting:', this.isDeleting)
+      this.pollTimer = null
+    },
+    onShow() {
+      // Reset loading state
+      this.isDeleting = false
+      console.log('Bookshelf onShow, reset isDeleting to false')
+      this.refreshBooks()
+      this.startPolling()
+    },
+    onHide() {
+      if (this.pollTimer) clearInterval(this.pollTimer)
+    },
+    onDestroy() {
+      if (this.pollTimer) clearInterval(this.pollTimer)
+      if (this.refreshTimer) clearTimeout(this.refreshTimer)
+    },
+    startPolling() {
+      if (!this.$app || !this.$app.$def || !this.$app.$def.getRunningTask)
+        return
+
+      if (this.pollTimer) clearInterval(this.pollTimer)
+
+      // Immediate check
+      this.checkTask()
+
+      this.pollTimer = setInterval(() => {
+        this.checkTask()
+      }, 1000)
+    },
+    checkTask() {
+      const task = this.$app.$def.getRunningTask()
+      if (task) {
+        this.downloadTask = {
+          name: task.name,
+          progress: task.progress || 0,
+        }
+      } else {
+        this.downloadTask = null
+        // Note: If task finishes, it disappears from getRunningTask (status='done').
+        // We might want to show "Complete" briefly but global floating usually shows ACTIVE tasks.
+      }
+    },
+    handleTaskClick() {
+      // Maybe navigate to transfer page?
+      router.push({ uri: 'pages/Transfer' })
+    },
+    handleLongPress(item) {
+      console.log('Long press triggered', item.name)
+
+      if (item.isLocal) {
+        prompt.showToast({ message: '内置书籍无法删除' })
+        return
+      }
+
+      this.deletingBook = item
+      this.deleteAlertContent = `确认删除《${item.name}》？`
+      this.showDeleteAlert = true
+      console.log('showDeleteAlert set to true, deletingBook:', item.name)
+    },
+    onDeleteConfirm() {
+      console.log('Delete confirmed')
+      this.showDeleteAlert = false
+      if (this.deletingBook) {
+        this.deleteBook(this.deletingBook)
+        this.deletingBook = null
+      }
+    },
+    onDeleteCancel() {
+      console.log('Delete cancelled')
+      this.showDeleteAlert = false
+      this.deletingBook = null
+    },
+    deleteBook(item) {
+      // Show loading
+      this.isDeleting = true
+      console.log('Starting delete, isDeleting=true')
+
+      // 1. Clear download task if exists
+      if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
+        this.$app.$def.clearTask(item.id)
+      }
+
+      // 2. Delete meta file
+      if (item._uri) {
+        file.delete({
+          uri: item._uri,
+          success: () => console.log('Deleted meta'),
+          fail: (data, code) => console.log('Delete meta failed', code),
+        })
+      }
+
+      // 3. Delete book data folder (use rmdir for directories)
+      if (item.id) {
+        const dir = `internal://files/book_data_${item.id}`
+        file.rmdir({
+          uri: dir,
+          recursive: true,
+          success: () => console.log('Deleted content folder'),
+          fail: (data, code) => console.log('Delete folder failed', code),
+        })
+      }
+
+      prompt.showToast({ message: '已删除' })
+
+      // Clear existing timer and set new one
+      if (this.refreshTimer) {
+        clearTimeout(this.refreshTimer)
+      }
+      this.refreshTimer = setTimeout(() => {
+        this.refreshBooks()
+        this.isDeleting = false
+        this.refreshTimer = null
+        console.log('Delete complete, isDeleting=false')
+      }, 500)
+    },
+    refreshBooks() {
+      const uri = 'internal://files/'
+      file.list({
+        uri: uri,
+        success: (data) => {
+          console.log('文件列表:', JSON.stringify(data))
+          const files = data.fileList || []
+
+          // Filter for book json files
+          // format: book_{hash}.json
+          const bookFiles = files.filter(
+            (f) => f.uri.endsWith('.json') && f.uri.indexOf('book_') >= 0
+          )
+
+          // We need to read each json to get details?
+          // To avoid too many reads, maybe just use filename as ID?
+          // The JSON contains: {id, name, chapterCount, currentChapter}
+
+          // For simplicity, let's just show them. If we want details, we could read async.
+          // Given the list shouldn't be huge, we can try to read texts.
+
+          Promise.all(
+            bookFiles.map((f) => {
+              return new Promise((resolve) => {
+                file.readText({
+                  uri: f.uri,
+                  success: (res) => {
+                    try {
+                      const meta = JSON.parse(res.text)
+                      meta._uri = f.uri // Store URI for deletion
+                      resolve(meta)
+                    } catch (e) {
+                      resolve(null)
+                    }
+                  },
+                  fail: () => resolve(null),
+                })
+              })
+            })
+          ).then((books) => {
+            const validBooks = books
+              .filter((b) => b !== null)
+              .map((b) => {
+                const cur = Number(b.currentChapter) || 0
+                const total = Number(b.chapterCount) || 1
+                let p = Math.floor(((cur + 1) * 100) / total)
+                if (p > 100) p = 100
+                b.progress = p
+                return b
+              })
+
+            this.bookList = validBooks
+          })
+        },
+        fail: (data, code) => {
+          console.log(`获取文件列表失败: ${code}, ${data}`)
+        },
+      })
+    },
+    goBack() {
+      router.back()
+    },
+    openBookDetail(item) {
+      router.push({
+        uri: 'pages/BookDetail',
+        params: {
+          bookId: item.id || '',
+          bookName: item.name,
+          chapterCount: item.chapterCount || 0,
+          currentChapter: item.currentChapter || 0,
+          rawUri: item._uri || '',
+          isLocal: item.isLocal || false,
+          content: item.content || '', // For legacy local books
+        },
+      })
+    },
+  }
+</script>
+
+<style lang="less">
+  .wrapper {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .vwTitleWrapper {
+    height: 80px;
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    .vwTitle {
+      align-items: center;
+      justify-content: center;
+      text {
+        color: #ffffff;
+        font-size: 40px;
+        font-weight: bold;
+        margin-right: 48px;
+      }
+    }
+  }
+  .empty {
+    width: 100%;
+    padding-top: 140px;
+    @media screen and (device: watch-round) {
+      padding-top: 100px;
+    }
+    text {
+      color: #ffffff;
+    }
+  }
+  .bookItemWrapper {
+    padding: 0 10px;
+    @media screen and (device: watch-round) {
+      padding: 0 30px;
+    }
+    .book-item {
+      width: 100%;
+      background-color: #262626;
+      margin-bottom: 10px;
+      border-radius: 30px;
+      padding: 15px;
+      flex-direction: row;
+      align-items: center;
+      @media screen and (device: watch-round) {
+        border-radius: 100px;
+      }
+      .book-cover {
+        width: 80px;
+        height: 90px;
+        border-radius: 15px;
+        background-color: #334455;
+        margin-right: 20px;
+        justify-content: center;
+        align-items: center;
+        @media screen and (device: watch-round) {
+          margin-right: 15px;
+          border-radius: 100px;
+        }
+        .book-cover-text {
+          font-size: 40px;
+          color: #ffffff;
+          font-weight: bold;
+        }
+      }
+      .book-info {
+        flex-direction: column;
+        justify-content: center;
+        .book-title {
+          width: 300px;
+          double-ended-shadow-color: #262626;
+          color: white;
+          font-size: 30px;
+          @media screen and (device: watch-round) {
+            width: 260px;
+          }
+        }
+        .book-progress {
+          color: grey;
+          font-size: 24px;
+          line-height: 24px;
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+  .empty-state {
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    .empty-text {
+      color: grey;
+      font-size: 30px;
+    }
+  }
+
+  /* @media (device: watch-round) {
+    .global-progress {
+      width: 70px;
+      height: 70px;
+      border-radius: 35px;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 0;
+      justify-content: center;
+    }
+    .progress-detail {
+      display: none;
+    }
+  }
+  .global-progress {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    padding: 10px 20px;
+    border-radius: 30px;
+    border-width: 1px;
+    border-color: #0faeff;
+    flex-direction: row;
+    align-items: center;
+  }
+  .progress-detail {
+    color: #0faeff;
+    font-size: 24px;
+  }
+  .progress-text {
+    color: #0faeff;
+    font-size: 24px;
+  } */
+</style>

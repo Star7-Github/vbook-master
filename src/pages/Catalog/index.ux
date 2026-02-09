@@ -1,0 +1,277 @@
+<template>
+  <div class="wrapper">
+    <div class="header" onclick="handleBack">
+      <text class="back-btn">&lt;</text>
+      <text class="header-title">{{ titleText }}</text>
+    </div>
+
+    <div if="{{isLoading}}" class="loading">
+      <text class="loading-text">加载中...</text>
+    </div>
+
+    <!-- 模式1：分段列表 -->
+    <list class="range-list" if="{{!isLoading && showRanges}}">
+      <list-item
+        type="range"
+        class="range-item"
+        for="{{ranges}}"
+        onclick="selectRange($idx)">
+        <text class="range-text">{{ $item.label }}</text>
+      </list-item>
+    </list>
+
+    <!-- 模式2：章节列表 -->
+    <list class="chapter-list" if="{{!isLoading && !showRanges}}">
+      <list-item
+        type="chapter"
+        class="chapter-item"
+        for="{{chapters}}"
+        onclick="selectChapter($item.index)">
+        <text
+          class="chapter-text {{ $item.index === currentIndex ? 'active' : '' }}">
+          {{ $item.title }}
+        </text>
+        <text if="{{$item.cached}}" class="cached-tag">已缓存</text>
+      </list-item>
+    </list>
+  </div>
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+  import file from '@blueos.storage.file'
+  import prompt from '@blueos.window.prompt'
+
+  export default {
+    data: {
+      bookId: '',
+      bookName: '',
+      currentIndex: -1,
+
+      totalCount: 0,
+      pageSize: 50,
+
+      isLoading: true,
+      showRanges: true,
+      ranges: [],
+      chapters: [],
+      allChaptersMeta: [], // Store chapter titles
+    },
+    computed: {
+      titleText() {
+        if (this.showRanges) {
+          return '目录-选择分页'
+        }
+        return '目录'
+      },
+    },
+    onInit() {
+      this.currentIndex = parseInt(this.currentIndex) || 0
+      this.loadMeta()
+    },
+    async loadMeta() {
+      const metaUri = `internal://files/book_${this.bookId}.json`
+      try {
+        const metaRes = await this.readText(metaUri)
+        if (metaRes) {
+          const meta = JSON.parse(metaRes)
+          this.totalCount = parseInt(meta.chapterCount) || 0
+          if (Array.isArray(meta.chapters)) {
+            this.allChaptersMeta = meta.chapters
+          }
+        }
+      } catch (e) {
+        console.log('Read meta failed')
+      }
+
+      if (this.totalCount === 0) {
+        this.isLoading = false
+        prompt.showToast({ message: '暂无目录数据' })
+        return
+      }
+
+      // 超过一页则显示分段
+      if (this.totalCount > this.pageSize) {
+        this.showRanges = true
+        this.generateRanges()
+      } else {
+        this.showRanges = false
+        this.loadChapters(0, this.totalCount)
+      }
+      this.isLoading = false
+    },
+    generateRanges() {
+      const list = []
+      const pageCount = Math.ceil(this.totalCount / this.pageSize)
+      for (let i = 0; i < pageCount; i++) {
+        const start = i * this.pageSize + 1
+        const end = Math.min((i + 1) * this.pageSize, this.totalCount)
+        list.push({
+          label: `${start} - ${end} 章`,
+          startIndex: i * this.pageSize,
+          count: end - i * this.pageSize,
+        })
+      }
+      this.ranges = list
+    },
+    loadChapters(start, count) {
+      const list = []
+      for (let i = 0; i < count; i++) {
+        const realIndex = start + i
+        let title = `第 ${realIndex + 1} 章`
+        if (this.allChaptersMeta && this.allChaptersMeta[realIndex]) {
+          title = this.allChaptersMeta[realIndex].title || title
+        }
+
+        list.push({
+          title: title,
+          index: realIndex,
+          cached: false,
+        })
+      }
+      this.chapters = list
+      this.checkCachedStatus(list)
+    },
+    async checkCachedStatus(currentList) {
+      const dirPath = `internal://files/book_data_${this.bookId}`
+      const results = await Promise.all(
+        currentList.map((item) =>
+          this.checkFileExists(`${dirPath}/${item.index}.txt`)
+        )
+      )
+
+      // Update list with statuses
+      const newList = currentList.map((item, i) => ({
+        ...item,
+        cached: results[i],
+      }))
+      this.chapters = newList
+    },
+    checkFileExists(uri) {
+      return new Promise((r) =>
+        file.access({ uri, success: () => r(true), fail: () => r(false) })
+      )
+    },
+    selectRange(index) {
+      const range = this.ranges[index]
+      this.loadChapters(range.startIndex, range.count)
+      this.showRanges = false
+    },
+    handleBack() {
+      if (!this.showRanges && this.totalCount > this.pageSize) {
+        // Return to range list
+        this.showRanges = true
+        this.chapters = []
+      } else {
+        router.back()
+      }
+    },
+    readText(uri) {
+      return new Promise((resolve) => {
+        file.readText({
+          uri,
+          success: (data) => resolve(data.text),
+          fail: () => resolve(null),
+        })
+      })
+    },
+    selectChapter(index) {
+      router.replace({
+        uri: '/pages/Reader',
+        params: {
+          bookId: this.bookId,
+          bookName: this.bookName,
+          chapterIndex: index,
+          chapterCount: this.totalCount,
+        },
+      })
+    },
+  }
+</script>
+
+<style lang="scss">
+
+  .wrapper {
+    flex-direction: column;
+    flex-direction: column;
+    background-color: #000000;
+  }
+
+  .header {
+    height: 96px;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 30px;
+    background-color: #1a1a1a;
+  }
+
+  .back-btn {
+    font-size: 40px;
+    color: #ffffff;
+    margin-right: 20px;
+  }
+
+  .header-title {
+    font-size: 36px;
+    color: #ffffff;
+    flex: 1;
+  }
+
+  .loading {
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
+  .loading-text {
+    color: #fff;
+  }
+
+  .chapter-list {
+    flex: 1;
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .chapter-item {
+    height: 100px;
+    border-bottom-color: #333;
+    border-bottom-width: 1px;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 20px;
+  }
+
+  .chapter-text {
+    color: #ccc;
+    font-size: 30px;
+    lines: 1;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+
+  .range-list {
+    flex: 1;
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .range-item {
+    height: 100px;
+    border-bottom-color: #333;
+    border-bottom-width: 1px;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+  }
+
+  .range-text {
+    color: #fff;
+    font-size: 32px;
+  }
+  .cached-tag {
+    font-size: 20px;
+    color: #888;
+    margin-left: 10px;
+  }
+</style>

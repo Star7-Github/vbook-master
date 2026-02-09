@@ -1,0 +1,46 @@
+{
+  "type": "div",
+  "class": "wrapper",
+  "style": {
+    "alignItems": "center",
+    "flexDirection": "column",
+    "justifyContent": "center"
+  },
+  "styleObjectId": 1302357824,
+  "children": [
+    {
+      "type": "text",
+      "attr": {
+        "$value": "title"
+      },
+      "bind": 1,
+      "class": "title",
+      "style": {
+        "color": "#000000",
+        "fontSize": "35px",
+        "textAlign": "center"
+      }
+    },
+    {
+      "type": "input",
+      "attr": {
+        "type": "button",
+        "value": "跳转到详情页"
+      },
+      "bind": 1,
+      "class": "btn",
+      "events": {
+        "click": "onDetailBtnClick"
+      },
+      "style": {
+        "backgroundColor": "#09ba07",
+        "borderRadius": "35px",
+        "color": "#ffffff",
+        "fontSize": "25px",
+        "height": "60px",
+        "marginTop": "35px",
+        "width": "275px"
+      }
+    }
+  ]
+}

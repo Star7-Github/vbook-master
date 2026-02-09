@@ -1,0 +1,286 @@
+<template>
+  <div class="wrapper">
+    <!-- 头部信息区 -->
+    <div class="info-area">
+      <!-- 封面图 (使用文字首字母模拟) -->
+      <div class="book-cover">
+        <text class="cover-text">{{ bookName.substring(0, 1) }}</text>
+      </div>
+
+      <!-- 书名与进度 -->
+      <text class="title">{{ bookName }}</text>
+      <text class="progress-text" if="{{!isLocal}}">
+        已读 {{ progressPercent }}% ({{ currentChapter }}/{{ chapterCount }}章)
+      </text>
+      <text class="progress-text" if="{{isLocal}}">本地书籍</text>
+    </div>
+
+    <!-- 操作按钮区 -->
+    <div class="action-area">
+      <!-- 阅读按钮 -->
+      <div class="action-btn-wrapper" onclick="startReading">
+        <div class="circle-btn read-btn">
+          <text class="btn-icon">📖</text>
+        </div>
+        <text class="btn-text">开始阅读</text>
+      </div>
+
+      <!-- 删除按钮 -->
+      <div class="action-btn-wrapper" onclick="handleDelete">
+        <div class="circle-btn delete-btn">
+          <text class="btn-icon">🗑️</text>
+        </div>
+        <text class="btn-text">删除书籍</text>
+      </div>
+    </div>
+
+    <div
+      if="{{isDeleting}}"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.5);
+      ">
+      <text style="color: #ffffff; font-size: 30px">删除中...</text>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <vw-alert
+      if="{{showDeleteAlert}}"
+      title="删除书籍"
+      content="确定要删除这本书吗？删除后无法恢复。"
+      buttons="{{alertButtons}}"
+      onclick="onAlertClick"></vw-alert>
+  </div>
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+  import prompt from '@blueos.window.prompt'
+  import file from '@blueos.storage.file'
+
+  export default {
+    data: {
+      // 传入参数
+      bookId: '',
+      bookName: '',
+      chapterCount: 0,
+      currentChapter: 0,
+      rawUri: '',
+      isLocal: false,
+      content: '',
+
+      // 内部状态
+      isDeleting: false,
+      showDeleteAlert: false,
+      alertButtons: [
+        {
+          eventType: 'confirm',
+          type: 'danger',
+          value: '删除',
+        },
+        {
+          eventType: 'cancel',
+          type: 'plain',
+          value: '取消',
+        },
+      ],
+    },
+    onInit() {
+      console.log('书籍详情页 初始化', this.bookName)
+      // 强制转换 isLocal 为布尔值，防止路由传递字符串 "false" 导致判断错误
+      if (typeof this.isLocal === 'string') {
+        this.isLocal = this.isLocal === 'true'
+      }
+    },
+    computed: {
+      progressPercent() {
+        // Use Number() to convert
+        const current = Number(this.currentChapter) || 0
+        const total = Number(this.chapterCount) || 1
+        if (total <= 0) return 0
+
+        let p = Math.floor(((current + 1) * 100) / total)
+        if (p > 100) p = 100
+        return p
+      },
+    },
+    startReading() {
+      if (this.isLocal) {
+        // 内置书籍
+        router.push({
+          uri: 'pages/Reader',
+          params: {
+            title: this.bookName,
+            content: this.content,
+            // 标记为local，Reader需要处理content参数
+            bookId: 'local_' + this.bookName,
+          },
+        })
+      } else {
+        // 下载书籍
+        router.push({
+          uri: 'pages/Reader',
+          params: {
+            bookId: this.bookId,
+            bookName: this.bookName,
+            chapterIndex: this.currentChapter,
+            chapterCount: this.chapterCount,
+          },
+        })
+      }
+    },
+    handleDelete() {
+      if (this.isLocal) {
+        prompt.showToast({ message: '内置书籍无法删除' })
+        return
+      }
+
+      this.showDeleteAlert = true
+    },
+    onAlertClick(e) {
+      this.showDeleteAlert = false
+      if (e.detail && e.detail.eventType === 'confirm') {
+        this.confirmDelete()
+      }
+    },
+    stopPropagation(e) {
+      if (e.stopPropagation) e.stopPropagation()
+    },
+    confirmDelete() {
+      this.isDeleting = true
+      // Execute delete logic
+      this.doDeleteFiles()
+    },
+    doDeleteFiles() {
+      // 1. 删除元数据文件
+      if (this.rawUri) {
+        file.delete({
+          uri: this.rawUri,
+          success: () => console.log('Deleted meta'),
+          fail: (data, code) => console.log('Delete meta failed', code),
+        })
+      }
+
+      // 2. 删除书籍内容目录
+      if (this.bookId) {
+        const dir = `internal://files/book_data_${this.bookId}`
+        file.rmdir({
+          uri: dir,
+          recursive: true,
+          success: () => console.log('Deleted content folder'),
+          fail: (data, code) => console.log('Delete folder failed', code),
+        })
+      }
+
+      // 3. 清理可能的下载任务
+      if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
+        this.$app.$def.clearTask(this.bookId)
+      }
+
+      // 延迟一下让用户看到状态，然后返回
+      setTimeout(() => {
+        this.isDeleting = false
+        prompt.showToast({ message: '删除成功' })
+        router.back()
+      }, 800)
+    },
+  }
+</script>
+
+<style lang="scss">
+  .wrapper {
+    flex-direction: column;
+    background-color: #000000;
+    padding: 40px;
+    align-items: center;
+  }
+
+  /* 适配圆形手表 */
+  @media (device: watch-round) {
+    .wrapper {
+      padding: 60px 40px;
+    }
+  }
+
+  .info-area {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 50px;
+    margin-top: 20px;
+  }
+
+  .book-cover {
+    width: 120px;
+    height: 140px;
+    background-color: #334455;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #556677;
+  }
+
+  .cover-text {
+    font-size: 60px;
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  .title {
+    font-size: 36px;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 15px;
+    lines: 2;
+    text-overflow: ellipsis;
+  }
+
+  .progress-text {
+    font-size: 26px;
+    color: #9393aa;
+  }
+
+  .action-area {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .action-btn-wrapper {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 30px;
+    width: 300px;
+    background-color: #1a1a1a;
+    padding: 15px 30px;
+    border-radius: 40px;
+    justify-content: center;
+  }
+
+  .action-btn-wrapper:active {
+    background-color: #333333;
+  }
+
+  .circle-btn {
+    width: 50px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+  }
+
+  .btn-icon {
+    font-size: 36px;
+  }
+
+  .btn-text {
+    font-size: 32px;
+    color: #ffffff;
+  }
+</style>

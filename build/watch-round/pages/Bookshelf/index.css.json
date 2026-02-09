@@ -1,0 +1,90 @@
+{
+  "331959032": {
+    ".wrapper": {
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    ".vwTitleWrapper": {
+      "height": "80px",
+      "width": "100%",
+      "flexDirection": "column",
+      "justifyContent": "flex-end",
+      "alignItems": "center"
+    },
+    ".vwTitleWrapper .vwTitle": {
+      "alignItems": "center",
+      "justifyContent": "center"
+    },
+    ".vwTitleWrapper .vwTitle text": {
+      "color": "#ffffff",
+      "fontSize": "40px",
+      "fontWeight": "bold",
+      "marginRight": "48px"
+    },
+    ".empty": {
+      "width": "100%",
+      "paddingTop": "100px"
+    },
+    ".empty text": {
+      "color": "#ffffff"
+    },
+    ".bookItemWrapper": {
+      "paddingTop": "0px",
+      "paddingRight": "30px",
+      "paddingBottom": "0px",
+      "paddingLeft": "30px"
+    },
+    ".bookItemWrapper .book-item": {
+      "width": "100%",
+      "backgroundColor": "#262626",
+      "marginBottom": "10px",
+      "borderRadius": "100px",
+      "paddingTop": "15px",
+      "paddingRight": "15px",
+      "paddingBottom": "15px",
+      "paddingLeft": "15px",
+      "flexDirection": "row",
+      "alignItems": "center"
+    },
+    ".bookItemWrapper .book-item .book-cover": {
+      "width": "80px",
+      "height": "90px",
+      "borderRadius": "100px",
+      "backgroundColor": "#334455",
+      "marginRight": "15px",
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    ".bookItemWrapper .book-item .book-cover .book-cover-text": {
+      "fontSize": "40px",
+      "color": "#ffffff",
+      "fontWeight": "bold"
+    },
+    ".bookItemWrapper .book-item .book-info": {
+      "flexDirection": "column",
+      "justifyContent": "center"
+    },
+    ".bookItemWrapper .book-item .book-info .book-title": {
+      "width": "260px",
+      "doubleEndedShadowColor": "#262626",
+      "color": "#FFFFFF",
+      "fontSize": "30px"
+    },
+    ".bookItemWrapper .book-item .book-info .book-progress": {
+      "color": "#808080",
+      "fontSize": "24px",
+      "lineHeight": "24px",
+      "marginTop": "10px"
+    },
+    ".empty-state": {
+      "flex": 1,
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    ".empty-state .empty-text": {
+      "color": "#808080",
+      "fontSize": "30px"
+    }
+  }
+}
