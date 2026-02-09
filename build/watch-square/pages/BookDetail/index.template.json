@@ -251,20 +251,6 @@
           }
         }
       ]
-    },
-    {
-      "type": "vw-alert",
-      "$shown": "showDeleteAlert",
-      "attr": {
-        "$buttons": "alertButtons",
-        "content": "确定要删除这本书吗？删除后无法恢复。",
-        "title": "删除书籍"
-      },
-      "bind": 2,
-      "events": {
-        "click": "onAlertClick"
-      },
-      "shown": false
     }
   ]
 }

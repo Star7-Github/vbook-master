@@ -146,8 +146,9 @@
             {
               "type": "text",
               "attr": {
-                "value": "下载列表"
-              }
+                "$value": "phaseText"
+              },
+              "bind": 1
             }
           ]
         }
@@ -289,16 +290,34 @@
             },
             {
               "type": "div",
-              "bind": 1,
+              "$shown": "function () { return !this.$item.isDownloaded; }",
+              "bind": 2,
               "class": "download-btn",
               "events": {
                 "$click": "function (evt) { return this.startDownload(this.$item, evt); }"
               },
+              "shown": false,
               "children": [
                 {
                   "type": "text",
                   "attr": {
                     "value": "下载"
+                  },
+                  "class": "btn-icon"
+                }
+              ]
+            },
+            {
+              "type": "div",
+              "$shown": "$item.isDownloaded",
+              "bind": 2,
+              "class": "downloaded-tag",
+              "shown": false,
+              "children": [
+                {
+                  "type": "text",
+                  "attr": {
+                    "value": "已下载"
                   },
                   "class": "btn-icon"
                 }

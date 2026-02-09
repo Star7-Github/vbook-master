@@ -2,7 +2,7 @@
   "package": "com.yyh.vbook",
   "name": "简阅",
   "versionName": "1.0.4",
-  "versionCode": 3,
+  "versionCode": 4,
   "appCategory": [
     "other"
   ],
@@ -21,7 +21,13 @@
       "name": "system.fetch"
     },
     {
+      "name": "system.request"
+    },
+    {
       "name": "system.storage"
+    },
+    {
+      "name": "system.brightness"
     }
   ],
   "deviceTypeList": [
@@ -30,6 +36,11 @@
   ],
   "config": {
     "designWidth": 466,
+    "background": {
+      "features": [
+        "blueos.communication.network.request"
+      ]
+    },
     "debug": true
   },
   "router": {

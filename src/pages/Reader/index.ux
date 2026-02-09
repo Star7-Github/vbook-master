@@ -198,9 +198,11 @@
       this.title = this.bookName || '书名'
       this.currentChapter = Number(this.chapterIndex) || 0
       this.totalChapters = Number(this.chapterCount) || 0
+      this.chapterTitles = [] // 章节标题列表
 
       this.updateTime()
       this.loadReaderSettings()
+      this.loadChapterTitles() // 加载章节标题
 
       // 加载章节
       if (this.content) {
@@ -270,11 +272,37 @@
         },
       })
     },
+    loadChapterTitles() {
+      const metaUri = `internal://files/book_${this.bookId}.json`
+      file.readText({
+        uri: metaUri,
+        success: (res) => {
+          try {
+            const meta = JSON.parse(res.text)
+            if (Array.isArray(meta.chapters)) {
+              this.chapterTitles = meta.chapters
+              // 立即更新当前章节标题
+              this.updateTitle(this.currentChapter)
+            }
+          } catch (e) {}
+        },
+        fail: () => {},
+      })
+    },
+    updateTitle(index) {
+      if (this.chapterTitles && this.chapterTitles[index] && this.chapterTitles[index].title) {
+        this.title = this.chapterTitles[index].title
+      } else {
+        this.title = this.bookName || '书名'
+      }
+    },
     loadChapter(index) {
       console.log(`Loading chapter ${index}, setting isLoading=true`)
       this.isLoading = true
-      // Clear content to show loading
       this.paragraphs = []
+
+      // 更新顶部标题为章节名
+      this.updateTitle(index)
 
       const dirPath = `internal://files/book_data_${this.bookId}`
       const localPath = `${dirPath}/${index}.txt`
@@ -295,7 +323,7 @@
     },
     loadFromNetwork(index) {
       sysFetch.fetch({
-        url: `http://127.0.0.1:23101/api/novel/chapter?id=${this.bookId}&index=${index}`,
+        url: `http://192.168.0.105:23101/api/novel/chapter?id=${this.bookId}&index=${index}`,
         method: 'GET',
         responseType: 'text',
         success: (response) => {
@@ -405,20 +433,41 @@
       this.loadChapter(this.currentChapter)
     },
     saveProgress() {
-      // Update local json
-      const bookMeta = {
-        id: this.bookId,
-        name: this.bookName,
-        chapterCount: this.totalChapters,
-        currentChapter: this.currentChapter,
-      }
-
+      // 先读取现有 meta，只更新 currentChapter，保留 chapters/isOffline 等字段
       const fileName = `book_${this.bookId}.json`
       const simplePath = `internal://files/${fileName}`
 
-      file.writeText({
+      file.readText({
         uri: simplePath,
-        text: JSON.stringify(bookMeta),
+        success: (res) => {
+          let meta = {}
+          try {
+            meta = JSON.parse(res.text)
+          } catch (e) {}
+
+          // 只更新阅读进度，保留原有字段
+          meta.currentChapter = this.currentChapter
+          meta.name = this.bookName
+          meta.chapterCount = this.totalChapters
+
+          file.writeText({
+            uri: simplePath,
+            text: JSON.stringify(meta),
+          })
+        },
+        fail: () => {
+          // 读取失败则用基础信息创建
+          const bookMeta = {
+            id: this.bookId,
+            name: this.bookName,
+            chapterCount: this.totalChapters,
+            currentChapter: this.currentChapter,
+          }
+          file.writeText({
+            uri: simplePath,
+            text: JSON.stringify(bookMeta),
+          })
+        },
       })
     },
     handleTap() {},

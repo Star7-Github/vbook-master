@@ -18,7 +18,8 @@ const $app_script$1561212216 = {
       downloadProgress: 0,
       curBookName: "",
       curBookAuthor: "",
-      monitorId: ""
+      monitorId: "",
+      phaseText: "下载列表"
     };
   },
   onDestroy() {
@@ -30,7 +31,22 @@ const $app_script$1561212216 = {
     this.timerId = null;
     this.intervalId = null;
     this.pollTimer = null;
+    this.fakeProgress = 0;
     this.fetchBookList();
+  },
+  onShow() {
+    this.fetchBookList();
+    if (this.$app && this.$app.$def && this.$app.$def.getRunningTask) {
+      const runningTask = this.$app.$def.getRunningTask();
+      if (runningTask) {
+        this.isDownloading = true;
+        this.curBookName = runningTask.name || "";
+        this.curBookAuthor = "本地导入";
+        this.monitorId = runningTask.id;
+        this.downloadProgress = runningTask.progress || 0;
+        this.startPolling();
+      }
+    }
   },
   startDownload(book) {
     if (this.isDownloading) {
@@ -63,14 +79,24 @@ const $app_script$1561212216 = {
   },
   startPolling() {
     if (this.pollTimer) clearInterval(this.pollTimer);
+    this.fakeProgress = 0;
+    this.lastPhase = "";
     this.pollTimer = setInterval(() => {
       if (!this.monitorId) return;
       const task = this.$app.$def.getTask(this.monitorId);
       if (task) {
         this.downloadProgress = task.progress || 0;
+        if (task.phase === "download") {
+          this.phaseText = `下载中 ${this.downloadProgress}%`;
+        } else if (task.phase === "batch") {
+          this.phaseText = `备用下载 ${this.downloadProgress}%`;
+        } else {
+          this.phaseText = "下载中...";
+        }
         if (task.status !== "running") {
           if (task.status === "done") {
             this.downloadProgress = 100;
+            this.phaseText = "下载完成";
             prompt.showToast({
               message: "下载完成"
             });
@@ -82,7 +108,10 @@ const $app_script$1561212216 = {
           setTimeout(() => {
             this.isDownloading = false;
             this.monitorId = "";
+            this.phaseText = "下载列表";
+            this.fakeProgress = 0;
             clearInterval(this.pollTimer);
+            this.fetchBookList();
           }, 1500);
         }
       }
@@ -116,7 +145,7 @@ const $app_script$1561212216 = {
       return;
     }
     fetchFn({
-      url: "http://127.0.0.1:23101/api/novel/list",
+      url: "http://192.168.0.105:23101/api/novel/list",
       method: "GET",
       responseType: "json",
       success: (response) => {
@@ -222,11 +251,11 @@ const $app_script$1561212216 = {
         return;
       }
       fetchFn({
-        url: `http://127.0.0.1:23101/api/novel/chapter?id=${bookId}&index=${index}`,
+        url: `http://192.168.0.105:23101/api/novel/chapter?id=${bookId}&index=${index}`,
         method: "GET",
         responseType: "text",
         success: (res) => {
-          if (res.code === 200) resolve(res.data);
+          if (res.code === 200 || res.code === 206) resolve(res.data);
           else resolve(null);
         },
         fail: () => resolve(null)

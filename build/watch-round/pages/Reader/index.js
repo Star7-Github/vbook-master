@@ -133,7 +133,7 @@ const $app_script$1182111904 = {
   },
   loadFromNetwork(index) {
     sysFetch.fetch({
-      url: `http://127.0.0.1:23101/api/novel/chapter?id=${this.bookId}&index=${index}`,
+      url: `http://192.168.0.105:23101/api/novel/chapter?id=${this.bookId}&index=${index}`,
       method: "GET",
       responseType: "text",
       success: (response) => {

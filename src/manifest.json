@@ -2,7 +2,7 @@
   "package": "com.yyh.vbook",
   "name": "简阅",
   "versionName": "1.0.4",
-  "versionCode": 3,
+  "versionCode": 4,
   "appCategory": [
     "other"
   ],
@@ -24,7 +24,13 @@
       "name": "system.fetch"
     },
     {
+      "name": "blueos.network.request"
+    },
+    {
       "name": "blueos.storage.storage"
+    },
+    {
+      "name": "blueos.hardware.display.brightness"
     }
   ],
   "deviceTypeList": [
@@ -32,7 +38,12 @@
     "watch-square"
   ],
   "config": {
-    "designWidth": 466
+    "designWidth": 466,
+    "background": {
+      "features": [
+        "blueos.communication.network.request"
+      ]
+    }
   },
   "router": {
     "entry": "pages/Home",

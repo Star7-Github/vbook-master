@@ -105,6 +105,19 @@
     ".bookItemWrapper .book-item .download-btn ": {
       "opacity:active": 0.3
     },
+    ".bookItemWrapper .book-item .downloaded-tag": {
+      "flexDirection": "column",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "backgroundColor": "#333333",
+      "width": "100px",
+      "height": "60px",
+      "borderRadius": "30px"
+    },
+    ".bookItemWrapper .book-item .downloaded-tag text": {
+      "color": "#888888",
+      "fontSize": "24px"
+    },
     ".bookItemWrapper .book-item .downloading": {
       "width": "100px",
       "height": "60px",

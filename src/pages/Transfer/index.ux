@@ -26,7 +26,7 @@
     </list-item>
     <list-item if="{{!isLoading && isDownloading}}" type="li">
       <div class="vwSubTitle">
-        <text>下载列表</text>
+        <text>{{ phaseText }}</text>
       </div>
     </list-item>
     <list-item
@@ -61,8 +61,14 @@
           <marquee class="book-title">{{ $item.name }}</marquee>
           <text class="book-author">{{ $item.author }}</text>
         </div>
-        <div class="download-btn" onclick="startDownload($item)">
+        <div
+          if="{{!$item.isDownloaded}}"
+          class="download-btn"
+          onclick="startDownload($item)">
           <text class="btn-icon">下载</text>
+        </div>
+        <div if="{{$item.isDownloaded}}" class="downloaded-tag">
+          <text class="btn-icon">已下载</text>
         </div>
       </div>
     </list-item>
@@ -88,6 +94,7 @@
       curBookName: '',
       curBookAuthor: '',
       monitorId: '',
+      phaseText: '下载列表',
     },
     onDestroy() {
       if (this.timerId) clearTimeout(this.timerId)
@@ -98,7 +105,25 @@
       this.timerId = null
       this.intervalId = null
       this.pollTimer = null
+      this.fakeProgress = 0
       this.fetchBookList()
+    },
+    onShow() {
+      // 每次进入页面都刷新书单，更新"已下载"状态
+      this.fetchBookList()
+
+      // 检查是否有正在进行的下载任务，恢复进度条显示
+      if (this.$app && this.$app.$def && this.$app.$def.getRunningTask) {
+        const runningTask = this.$app.$def.getRunningTask()
+        if (runningTask) {
+          this.isDownloading = true
+          this.curBookName = runningTask.name || ''
+          this.curBookAuthor = '本地导入'
+          this.monitorId = runningTask.id
+          this.downloadProgress = runningTask.progress || 0
+          this.startPolling()
+        }
+      }
     },
     startDownload(book) {
       if (this.isDownloading) {
@@ -129,25 +154,39 @@
     },
     startPolling() {
       if (this.pollTimer) clearInterval(this.pollTimer)
+      this.fakeProgress = 0
+      this.lastPhase = ''
+
       this.pollTimer = setInterval(() => {
         if (!this.monitorId) return
 
         const task = this.$app.$def.getTask(this.monitorId)
         if (task) {
           this.downloadProgress = task.progress || 0
+          if (task.phase === 'download') {
+            this.phaseText = `下载中 ${this.downloadProgress}%`
+          } else if (task.phase === 'batch') {
+            this.phaseText = `备用下载 ${this.downloadProgress}%`
+          } else {
+            this.phaseText = '下载中...'
+          }
+
           if (task.status !== 'running') {
             if (task.status === 'done') {
               this.downloadProgress = 100
+              this.phaseText = '下载完成'
               prompt.showToast({ message: '下载完成' })
             } else {
               prompt.showToast({ message: '下载出错' })
             }
 
-            // Reset after delay
             setTimeout(() => {
               this.isDownloading = false
               this.monitorId = ''
+              this.phaseText = '下载列表'
+              this.fakeProgress = 0
               clearInterval(this.pollTimer)
+              this.fetchBookList()
             }, 1500)
           }
         }
@@ -266,7 +305,7 @@
       }
 
       fetchFn({
-        url: 'http://127.0.0.1:23101/api/novel/list',
+        url: 'http://192.168.0.105:23101/api/novel/list',
         method: 'GET',
         responseType: 'json',
         success: (response) => {
@@ -375,11 +414,11 @@
         }
 
         fetchFn({
-          url: `http://127.0.0.1:23101/api/novel/chapter?id=${bookId}&index=${index}`,
+          url: `http://192.168.0.105:23101/api/novel/chapter?id=${bookId}&index=${index}`,
           method: 'GET',
           responseType: 'text',
           success: (res) => {
-            if (res.code === 200) resolve(res.data)
+            if (res.code === 200 || res.code === 206) resolve(res.data)
             else resolve(null)
           },
           fail: () => resolve(null),
@@ -502,6 +541,17 @@
         }
         :active {
           opacity: 0.3;
+        }
+      }
+      .downloaded-tag {
+        .wrapper();
+        background-color: #333333;
+        width: 100px;
+        height: 60px;
+        border-radius: 30px;
+        text {
+          color: #888888;
+          font-size: 24px;
         }
       }
       .downloading {

@@ -21,7 +21,13 @@
       "name": "system.fetch"
     },
     {
+      "name": "system.request"
+    },
+    {
       "name": "system.storage"
+    },
+    {
+      "name": "system.brightness"
     }
   ],
   "deviceTypeList": [
@@ -30,6 +36,11 @@
   ],
   "config": {
     "designWidth": 466,
+    "background": {
+      "features": [
+        "blueos.communication.network.request"
+      ]
+    },
     "debug": true
   },
   "router": {
