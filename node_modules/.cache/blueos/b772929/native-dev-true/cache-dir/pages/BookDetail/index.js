@@ -19,17 +19,7 @@ const $app_script$1227805737 = {
       isLocal: false,
       content: "",
       // 内部状态
-      isDeleting: false,
-      showDeleteAlert: false,
-      alertButtons: [{
-        eventType: "confirm",
-        type: "danger",
-        value: "删除"
-      }, {
-        eventType: "cancel",
-        type: "plain",
-        value: "取消"
-      }]
+      isDeleting: false
     };
   },
   onInit() {
@@ -78,40 +68,32 @@ const $app_script$1227805737 = {
       });
       return;
     }
-    this.showDeleteAlert = true;
-  },
-  onAlertClick(e) {
-    this.showDeleteAlert = false;
-    if (e.detail && e.detail.eventType === "confirm") {
-      this.confirmDelete();
-    }
-  },
-  stopPropagation(e) {
-    if (e.stopPropagation) e.stopPropagation();
-  },
-  confirmDelete() {
+    if (this.isDeleting) return;
     this.isDeleting = true;
+    prompt.showToast({
+      message: "删除中..."
+    });
     this.doDeleteFiles();
   },
   doDeleteFiles() {
-    if (this.rawUri) {
-      file.delete({
-        uri: this.rawUri,
-        success: () => console.log("Deleted meta"),
-        fail: (data, code) => console.log("Delete meta failed", code)
-      });
+    console.log(`[BookDetail] Deleting book: ${this.bookId}`);
+    if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
+      this.$app.$def.clearTask(this.bookId);
     }
+    const metaUri = this.rawUri || `internal://files/book_${this.bookId}.json`;
+    file.delete({
+      uri: metaUri,
+      success: () => console.log("[BookDetail] Meta deleted"),
+      fail: (data, code) => console.log(`[BookDetail] Meta delete fail: ${code}`)
+    });
     if (this.bookId) {
       const dir = `internal://files/book_data_${this.bookId}`;
       file.rmdir({
         uri: dir,
         recursive: true,
-        success: () => console.log("Deleted content folder"),
-        fail: (data, code) => console.log("Delete folder failed", code)
+        success: () => console.log("[BookDetail] Content folder deleted"),
+        fail: (data, code) => console.log(`[BookDetail] Content folder delete fail: ${code}`)
       });
-    }
-    if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
-      this.$app.$def.clearTask(this.bookId);
     }
     setTimeout(() => {
       this.isDeleting = false;
@@ -119,7 +101,7 @@ const $app_script$1227805737 = {
         message: "删除成功"
       });
       router.back();
-    }, 800);
+    }, 2e3);
   }
 };
 $app_define$("@app-component/index", [], function($app_require$2, $app_exports$, $app_module$) {

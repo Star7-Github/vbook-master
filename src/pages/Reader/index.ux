@@ -290,7 +290,11 @@
       })
     },
     updateTitle(index) {
-      if (this.chapterTitles && this.chapterTitles[index] && this.chapterTitles[index].title) {
+      if (
+        this.chapterTitles &&
+        this.chapterTitles[index] &&
+        this.chapterTitles[index].title
+      ) {
         this.title = this.chapterTitles[index].title
       } else {
         this.title = this.bookName || '书名'
@@ -323,7 +327,7 @@
     },
     loadFromNetwork(index) {
       sysFetch.fetch({
-        url: `http://192.168.0.105:23101/api/novel/chapter?id=${this.bookId}&index=${index}`,
+        url: `http://127.0.0.1:23101/api/novel/chapter?id=${this.bookId}&index=${index}`,
         method: 'GET',
         responseType: 'text',
         success: (response) => {

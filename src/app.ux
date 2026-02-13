@@ -7,7 +7,7 @@
   import brightness from '@blueos.hardware.display.brightness'
 
   const downloadTasks = {}
-  const SERVER = 'http://192.168.0.105:23101'
+  const SERVER = 'http://127.0.0.1:23101'
   const BATCH_SIZE = 5
 
   // ====== 工具函数 ======
@@ -124,7 +124,9 @@
               chapters = data.data.chapters
             }
 
-            console.log(`[App] fetchCatalog: got ${chapters ? chapters.length : 0} chapters`)
+            console.log(
+              `[App] fetchCatalog: got ${chapters ? chapters.length : 0} chapters`
+            )
             resolve(chapters)
           } else {
             console.log(`[App] fetchCatalog: unexpected code ${res.code}`)
@@ -318,7 +320,9 @@
         uri: `internal://files/${metaFileName}`,
         text: JSON.stringify(bookMeta),
         success: () => {
-          console.log(`[App] Meta saved with ${chaptersMeta.length} chapter titles`)
+          console.log(
+            `[App] Meta saved with ${chaptersMeta.length} chapter titles`
+          )
           r(true)
         },
         fail: (data, code) => {
@@ -378,8 +382,7 @@
     setScreenOn(true)
 
     // 3. 主路径：request.download 每次5章 + 本地拆分
-    const useSystemDownload =
-      request && typeof request.download === 'function'
+    const useSystemDownload = request && typeof request.download === 'function'
 
     let totalFail = 0
     let consecutiveBatchFail = 0

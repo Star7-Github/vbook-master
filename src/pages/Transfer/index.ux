@@ -305,7 +305,7 @@
       }
 
       fetchFn({
-        url: 'http://192.168.0.105:23101/api/novel/list',
+        url: 'http://127.0.0.1:23101/api/novel/list',
         method: 'GET',
         responseType: 'json',
         success: (response) => {
@@ -414,7 +414,7 @@
         }
 
         fetchFn({
-          url: `http://192.168.0.105:23101/api/novel/chapter?id=${bookId}&index=${index}`,
+          url: `http://127.0.0.1:23101/api/novel/chapter?id=${bookId}&index=${index}`,
           method: 'GET',
           responseType: 'text',
           success: (res) => {

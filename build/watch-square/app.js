@@ -11,7 +11,7 @@ const file = $app_require$("@app-module/system.file");
 const prompt = $app_require$("@app-module/system.prompt");
 const brightness = $app_require$("@app-module/system.brightness");
 const downloadTasks = {};
-const SERVER = "http://192.168.0.105:23101";
+const SERVER = "http://127.0.0.1:23101";
 const BATCH_SIZE = 5;
 function getFetch() {
   if (sysFetch && typeof sysFetch.fetch === "function") {
