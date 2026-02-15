@@ -72,27 +72,11 @@
     data: {
       bookList: [],
       downloadTask: null,
-      showDeleteAlert: false,
-      deleteAlertContent: '',
-      deletingBook: null,
-      deleteAlertButtons: [
-        {
-          eventType: 'confirm',
-          type: 'primary',
-          value: '确定',
-        },
-        {
-          eventType: 'cancel',
-          type: 'plain',
-          value: '忽略',
-        },
-      ],
       refreshTimer: null, // 刷新定时器 ID
       isDeleting: false, // 删除中状态
     },
     onInit() {
       console.log('书架页 初始化')
-      console.log('onInit - isDeleting:', this.isDeleting)
       this.pollTimer = null
     },
     onShow() {
@@ -139,129 +123,13 @@
       // Maybe navigate to transfer page?
       router.push({ uri: 'pages/Transfer' })
     },
-    // handleLongPress(item) {
-    //   console.log('Long press triggered', item.name)
-
-    //   if (item.isLocal) {
-    //     prompt.showToast({ message: '内置书籍无法删除' })
-    //     return
-    //   }
-
-    //   this.deletingBook = item
-    //   this.deleteAlertContent = `确认删除《${item.name}》？`
-    //   this.showDeleteAlert = true
-    //   console.log('showDeleteAlert set to true, deletingBook:', item.name)
-    // },
-    // onDeleteConfirm() {
-    //   console.log('Delete confirmed')
-    //   this.showDeleteAlert = false
-    //   if (this.deletingBook) {
-    //     this.deleteBook(this.deletingBook)
-    //     this.deletingBook = null
-    //   }
-    // },
-    // onDeleteCancel() {
-    //   console.log('Delete cancelled')
-    //   this.showDeleteAlert = false
-    //   this.deletingBook = null
-    // },
     deleteBook(item) {
-      // // Show loading
-      // this.isDeleting = true
-      // console.log('Starting delete, isDeleting=true')
-
-      // // 1. Clear download task if exists
-      // if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
-      //   this.$app.$def.clearTask(item.id)
-      // }
-
-      // // 2. Delete meta file
-      // if (item._uri) {
-      //   file.delete({
-      //     uri: item._uri,
-      //     success: () => console.log('Deleted meta'),
-      //     fail: (data, code) => console.log('Delete meta failed', code),
-      //   })
-      // }
-
-      // // 3. Delete book data folder (use rmdir for directories)
-      // if (item.id) {
-      //   const dir = `internal://files/book_data_${item.id}`
-      //   file.rmdir({
-      //     uri: dir,
-      //     recursive: true,
-      //     success: () => console.log('Deleted content folder'),
-      //     fail: (data, code) => console.log('Delete folder failed', code),
-      //   })
-      // }
-
-      // prompt.showToast({ message: '已删除' })
-
-      // // Clear existing timer and set new one
-      // if (this.refreshTimer) {
-      //   clearTimeout(this.refreshTimer)
-      // }
-      // this.refreshTimer = setTimeout(() => {
-      //   this.refreshBooks()
-      //   this.isDeleting = false
-      //   this.refreshTimer = null
-      //   console.log('Delete complete, isDeleting=false')
-      // }, 500)
-
       router.push({
         uri: 'pages/Bookshelf/delAlert',
         params: {
           bookItem: item,
         },
       })
-
-      // // 防止重复删除
-      // if (this.isDeleting) return
-      // this.isDeleting = true
-
-      // // 内置书籍不能删
-      // if (item.isLocal) {
-      //   this.isDeleting = false
-      //   prompt.showToast({ message: '内置书籍无法删除' })
-      //   return
-      // }
-
-      // prompt.showToast({ message: '删除中...' })
-
-      // console.log(`[Bookshelf] Deleting book: ${item.id}`)
-
-      // // 1. 清理下载任务
-      // if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
-      //   this.$app.$def.clearTask(item.id)
-      // }
-
-      // // 2. 删除元数据文件
-      // const metaUri = item._uri || `internal://files/book_${item.id}.json`
-      // file.delete({
-      //   uri: metaUri,
-      //   success: () => console.log('[Bookshelf] Meta deleted'),
-      //   fail: (data, code) =>
-      //     console.log(`[Bookshelf] Meta delete fail: ${code}`),
-      // })
-
-      // // 3. 删除内容目录
-      // if (item.id) {
-      //   const dir = `internal://files/book_data_${item.id}`
-      //   file.rmdir({
-      //     uri: dir,
-      //     recursive: true,
-      //     success: () => console.log('[Bookshelf] Content folder deleted'),
-      //     fail: (data, code) =>
-      //       console.log(`[Bookshelf] Content folder delete fail: ${code}`),
-      //   })
-      // }
-
-      // // 4. 延迟刷新（给大目录足够时间）
-      // setTimeout(() => {
-      //   this.refreshBooks()
-      //   this.isDeleting = false
-      //   prompt.showToast({ message: '删除成功' })
-      // }, 2000)
     },
     refreshBooks() {
       const uri = 'internal://files/'

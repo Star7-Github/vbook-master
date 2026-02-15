@@ -1,6 +1,9 @@
 <template>
   <stack>
-    <list scrollbar="true" style="background-color: {{readerStyle.bgColor}}">
+    <list
+      id="contentList"
+      scrollbar="true"
+      style="background-color: {{readerStyle.bgColor}}">
       <list-item type="li">
         <div
           if="$device.deviceType == 'watch-square'"
