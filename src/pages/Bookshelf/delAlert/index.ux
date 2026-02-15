@@ -1,0 +1,120 @@
+<template>
+  <div>
+    <div if="{{isDeleting}}" class="wrapper loading">
+      <vw-loading></vw-loading>
+      <div class="wrapper">
+        <text>删除中...</text>
+      </div>
+    </div>
+    <div else class="wrapper">
+      <vw-alert
+        title="{{title}}"
+        content="{{content}}?"
+        des="{{des}}"
+        buttons="{{buttonArray}}"
+        onconfirm="onConfirm"
+        oncancel="onCancel"></vw-alert>
+    </div>
+  </div>
+</template>
+<script>
+  import router from '@system.router'
+  import prompt from '@blueos.window.prompt'
+  import file from '@blueos.storage.file'
+  export default {
+    data: {
+      isDeleting: false,
+      bookItem: '',
+      title: '删除书籍',
+      content: '确定删除此书籍吗',
+      des: '',
+      buttonArray: [
+        {
+          eventType: 'cancel',
+          type: 'plain',
+          value: '取消',
+        },
+        {
+          eventType: 'confirm',
+          type: 'warning',
+          value: '确定',
+        },
+      ],
+    },
+    onInit() {
+      this.bookItem = JSON.parse(this.bookItem)
+      console.log(`bookItem: ${JSON.stringify(this.bookItem)}`)
+
+      if (!this.bookItem) {
+        prompt.showToast({ message: '无效的书籍信息' })
+        setTimeout(() => router.back(), 1000)
+        return
+      }
+
+      // 设置书名
+      this.des = this.bookItem.name || '未知书籍'
+    },
+
+    onConfirm() {
+      const item = this.bookItem
+
+      // 检查是否为本地书
+      if (item.isLocal) {
+        prompt.showToast({ message: '内置书籍无法删除' })
+        return
+      }
+
+      this.isDeleting = true
+
+      console.log(`[ConfirmDelete] Deleting book: ${item.id}`)
+
+      // 1. 清理下载任务（如果有）
+      if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
+        this.$app.$def.clearTask(item.id)
+      }
+
+      // 2. 删除元数据文件
+      const metaUri = item._uri || `internal://files/book_${item.id}.json`
+      file.delete({
+        uri: metaUri,
+        success: () => console.log('[ConfirmDelete] Meta deleted'),
+        fail: (data, code) => console.warn(`Meta delete failed: ${code}`),
+      })
+
+      // 3. 删除内容目录
+      if (item.id) {
+        const dir = `internal://files/book_data_${item.id}`
+        file.rmdir({
+          uri: dir,
+          recursive: true,
+          success: () => console.log('Content folder deleted'),
+          fail: (data, code) => console.warn(`Folder delete failed: ${code}`),
+        })
+      }
+
+      // 4. 延迟返回
+      setTimeout(() => {
+        prompt.showToast({ message: '删除成功' })
+        this.isDeleting = false
+        router.back()
+      }, 2000)
+    },
+    onCancel() {
+      router.back()
+    },
+  }
+</script>
+
+<style lang="less">
+  .wrapper {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .loading {
+    width: 100%;
+    text {
+      color: #ffffff;
+    }
+  }
+</style>

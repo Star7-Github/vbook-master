@@ -1,8 +1,8 @@
 {
   "package": "com.yyh.vbook",
   "name": "简阅",
-  "versionName": "1.0.4",
-  "versionCode": 4,
+  "versionName": "1.0.7",
+  "versionCode": 9,
   "appCategory": [
     "other"
   ],
@@ -35,7 +35,8 @@
   ],
   "deviceTypeList": [
     "watch",
-    "watch-square"
+    "watch-square",
+    "watch-round"
   ],
   "config": {
     "designWidth": 466,
@@ -70,6 +71,9 @@
         "component": "index"
       },
       "pages/Catalog": {
+        "component": "index"
+      },
+      "pages/Bookshelf/delAlert": {
         "component": "index"
       }
     }

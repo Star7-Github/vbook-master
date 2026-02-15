@@ -573,7 +573,7 @@
     .info-row {
       width: 100%;
       justify-content: space-between;
-      padding: 0 50px;
+      padding: 0 70px;
       .info-time,
       .info-chapter {
         font-size: 26px;

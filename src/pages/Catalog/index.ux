@@ -1,16 +1,38 @@
 <template>
   <div class="wrapper">
-    <div class="header" onclick="handleBack">
-      <text class="back-btn">&lt;</text>
-      <text class="header-title">{{ titleText }}</text>
-    </div>
-
-    <div if="{{isLoading}}" class="loading">
-      <text class="loading-text">加载中...</text>
-    </div>
+    <list title="true" scrollbar="true" if="{{isLoading}}">
+      <list-item type="li" @click="goBack">
+        <div class="vwTitleWrapper">
+          <div class="vwTitle">
+            <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+            <marquee>目录-选择分页</marquee>
+          </div>
+        </div>
+      </list-item>
+      <list-item type="li">
+        <div class="wrapper loading">
+          <vw-loading></vw-loading>
+          <div class="wrapper">
+            <text>正在加载...</text>
+          </div>
+        </div>
+      </list-item>
+    </list>
 
     <!-- 模式1：分段列表 -->
-    <list class="range-list" if="{{!isLoading && showRanges}}">
+    <list
+      title="true"
+      scrollbar="true"
+      class="range-list"
+      if="{{!isLoading && showRanges}}">
+      <list-item type="li" @click="handleBack">
+        <div class="vwTitleWrapper">
+          <div class="vwTitle">
+            <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+            <marquee>目录-选择分页</marquee>
+          </div>
+        </div>
+      </list-item>
       <list-item
         type="range"
         class="range-item"
@@ -21,7 +43,19 @@
     </list>
 
     <!-- 模式2：章节列表 -->
-    <list class="chapter-list" if="{{!isLoading && !showRanges}}">
+    <list
+      title="true"
+      scrollbar="true"
+      class="chapter-list"
+      if="{{!isLoading && !showRanges}}">
+      <list-item type="li" @click="handleBack">
+        <div class="vwTitleWrapper">
+          <div class="vwTitle">
+            <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+            <marquee>{{ titleText }}</marquee>
+          </div>
+        </div>
+      </list-item>
       <list-item
         type="chapter"
         class="chapter-item"
@@ -31,7 +65,8 @@
           class="chapter-text {{ $item.index === currentIndex ? 'active' : '' }}">
           {{ $item.title }}
         </text>
-        <text if="{{$item.cached}}" class="cached-tag">已缓存</text>
+        <!-- <text if="{{$item.cached}}" class="cached-tag">已缓存</text> -->
+        <text class="cached-tag">已缓存</text>
       </list-item>
     </list>
   </div>
@@ -67,6 +102,36 @@
     },
     onInit() {
       this.currentIndex = parseInt(this.currentIndex) || 0
+
+      // ====== MOCK MODE ======
+      const USE_MOCK = true // 设置为 true 启用模拟数据
+
+      if (USE_MOCK) {
+        this.bookId = 'mock-book-id'
+        this.bookName = '【调试用】UI测试书'
+        this.totalCount = 320 // 总章节数
+        this.allChaptersMeta = Array.from(
+          { length: this.totalCount },
+          (_, index) => ({
+            title: `第 ${index + 1} 章 标题`,
+            index: index,
+          })
+        )
+
+        // 模拟分段列表
+        if (this.totalCount > this.pageSize) {
+          this.showRanges = true
+          this.generateRanges()
+        } else {
+          this.showRanges = false
+          this.loadChapters(0, this.totalCount)
+        }
+
+        this.isLoading = false
+        return // 跳过真实加载逻辑
+      }
+      // ====== END MOCK MODE ======
+
       this.loadMeta()
     },
     async loadMeta() {
@@ -189,71 +254,64 @@
   }
 </script>
 
-<style lang="scss">
-
+<style lang="less">
   .wrapper {
     flex-direction: column;
-    flex-direction: column;
-    background-color: #000000;
-  }
-
-  .header {
-    height: 96px;
-    width: 100%;
-    flex-direction: row;
+    justify-content: center;
     align-items: center;
-    padding: 0 30px;
-    background-color: #1a1a1a;
   }
-
-  .back-btn {
-    font-size: 40px;
-    color: #ffffff;
-    margin-right: 20px;
-  }
-
-  .header-title {
-    font-size: 36px;
-    color: #ffffff;
-    flex: 1;
+  .vwTitleWrapper {
+    height: 80px;
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    .vwTitle {
+      align-items: center;
+      justify-content: center;
+      marquee {
+        color: #ffffff;
+        text-align: center;
+        font-size: 38px;
+        font-weight: bold;
+        margin-right: 48px;
+        max-width: 190px;
+      }
+    }
   }
 
   .loading {
+    width: 100%;
+    padding-top: 150px;
+    @media screen and (device: watch-round) {
+      padding-top: 120px;
+    }
+    text {
+      color: #ffffff;
+    }
+  }
+  /* .loading {
     justify-content: center;
     align-items: center;
     height: 200px;
   }
   .loading-text {
     color: #fff;
-  }
-
-  .chapter-list {
-    flex: 1;
-    flex-direction: column;
-    padding: 10px;
-  }
+  } */
 
   .chapter-item {
     height: 100px;
     border-bottom-color: #333;
     border-bottom-width: 1px;
-    justify-content: flex-start;
-    align-items: center;
     padding: 0 20px;
   }
 
   .chapter-text {
-    color: #ccc;
+    color: #fff;
     font-size: 30px;
     lines: 1;
     text-overflow: ellipsis;
     flex: 1;
-  }
-
-  .range-list {
-    flex: 1;
-    flex-direction: column;
-    padding: 10px;
   }
 
   .range-item {

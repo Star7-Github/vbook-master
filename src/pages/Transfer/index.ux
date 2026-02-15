@@ -267,7 +267,7 @@
         this.isLoading = false
 
         // 模拟下载
-        const MOCK_DOWNLOADING = true
+        const MOCK_DOWNLOADING = false
         if (MOCK_DOWNLOADING) {
           this.isDownloading = true
           this.curBookName = '三体三体三体三体三体三体三体三体'

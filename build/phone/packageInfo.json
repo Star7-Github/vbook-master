@@ -1,9 +1,0 @@
-{
-  "originType": "native",
-  "toolkit": "1.0.1-ux.29",
-  "buildTime": "2024/06/03 15:54",
-  "node": "v18.15.0",
-  "platform": "darwin",
-  "arch": "x64",
-  "commit": "021a6f06"
-}
