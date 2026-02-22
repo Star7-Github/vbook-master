@@ -104,7 +104,7 @@
       this.currentIndex = parseInt(this.currentIndex) || 0
 
       // ====== MOCK MODE ======
-      const USE_MOCK = true // 设置为 true 启用模拟数据
+      const USE_MOCK = false // 设置为 true 启用模拟数据
 
       if (USE_MOCK) {
         this.bookId = 'mock-book-id'

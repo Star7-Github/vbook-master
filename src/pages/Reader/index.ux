@@ -150,6 +150,7 @@
       loadedCount: 0, // 已加载段落数
       hasMore: false, // 是否还有更多内容
       currentTime: '12:00',
+      timeUpdater: null,
 
       currentChapter: 0, // 内部使用的index
       totalChapters: 0,
@@ -204,6 +205,7 @@
       this.chapterTitles = [] // 章节标题列表
 
       this.updateTime()
+      this.startUpdateTime()
       this.loadReaderSettings()
       this.loadChapterTitles() // 加载章节标题
 
@@ -223,6 +225,7 @@
     onShow() {
       console.log('Reader onShow, isLoading:', this.isLoading)
       this.loadReaderSettings()
+      this.startUpdateTime()
 
       // Safety check: if stuck in loading for too long (e.g. no callback), force clear
       if (this.isLoading) {
@@ -232,6 +235,27 @@
             console.log('Force clearing isLoading state')
           }
         }, 2000)
+      }
+    },
+    onHide() {
+      this.stopUpdateTime()
+    },
+    onDestroy() {
+      this.stopUpdateTime()
+    },
+    startUpdateTime() {
+      // 防止重复启动
+      if (this.timeUpdater) return
+
+      this.timeUpdater = setInterval(() => {
+        this.updateTime()
+      }, 1000)
+      // 可以考虑30秒刷新一次降低功耗
+    },
+    stopUpdateTime() {
+      if (this.timeUpdater) {
+        clearInterval(this.timeUpdater)
+        this.timeUpdater = null
       }
     },
     updateTime() {
