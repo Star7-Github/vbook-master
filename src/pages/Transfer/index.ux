@@ -211,84 +211,6 @@
     },
     async fetchBookList() {
       this.isLoading = true
-
-      // ====== MOCK MODE======
-      const USE_MOCK = false
-      if (USE_MOCK) {
-        console.log('模拟列表')
-        // 模拟几本书
-        this.bookList = [
-          {
-            id: 'book1',
-            name: '三体三体三体三体三体三体三体三体',
-            author: '本地导入',
-            size: 1200000,
-            chapterCount: 42,
-            isDownloaded: false,
-            localExists: false,
-          },
-          {
-            id: 'book2',
-            name: '流浪地球',
-            author: '本地导入',
-            size: 800000,
-            chapterCount: 15,
-            isDownloaded: true,
-            localExists: true,
-          },
-          {
-            id: 'book3',
-            name: '时间之海',
-            author: '本地导入',
-            size: 500000,
-            chapterCount: 2, // 测试章节数为0的情况
-            isDownloaded: false,
-            localExists: false,
-          },
-          {
-            id: 'book4',
-            name: '时间之海2',
-            author: '本地导入',
-            size: 500000,
-            chapterCount: 3, // 测试章节数为0的情况
-            isDownloaded: false,
-            localExists: false,
-          },
-          {
-            id: 'book5',
-            name: '时间之海',
-            author: '本地导入',
-            size: 500000,
-            chapterCount: 0, // 测试章节数为0的情况
-            isDownloaded: false,
-            localExists: false,
-          },
-        ]
-        this.isLoading = false
-
-        // 模拟下载
-        const MOCK_DOWNLOADING = false
-        if (MOCK_DOWNLOADING) {
-          this.isDownloading = true
-          this.curBookName = '三体三体三体三体三体三体三体三体'
-          this.curBookAuthor = '本地导入'
-          this.downloadProgress = 0
-
-          // 模拟进度自动增长
-          if (this.intervalId) clearInterval(this.intervalId)
-          this.intervalId = setInterval(() => {
-            this.downloadProgress += 4
-            if (this.downloadProgress >= 100) {
-              this.downloadProgress = 100
-              clearInterval(this.intervalId) // 注释掉则停在100%
-            }
-          }, 1000)
-        }
-
-        return
-      }
-      // ====== END MOCK MODE ======
-
       console.log('正在请求书单')
 
       // 1. Get Local Books to check status
@@ -306,6 +228,7 @@
 
       fetchFn({
         url: 'http://127.0.0.1:23101/api/novel/list',
+        // url: 'http://192.168.0.106:23101/api/novel/list', // 模拟器用
         method: 'GET',
         responseType: 'json',
         success: (response) => {

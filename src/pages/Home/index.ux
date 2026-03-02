@@ -90,7 +90,7 @@
         icon: '/assets/images/network.png',
       },
       itemSetting: {
-        name: '设置关于',
+        name: '设置',
         path: '/pages/Settings',
         color: '#3399ff',
         icon: '/assets/images/more.png',

@@ -24,12 +24,20 @@
       title="true"
       scrollbar="true"
       class="range-list"
-      if="{{!isLoading && showRanges}}">
-      <list-item type="li" @click="handleBack">
-        <div class="vwTitleWrapper">
-          <div class="vwTitle">
-            <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
-            <marquee>目录-选择分页</marquee>
+      if="{{!isLoading && showRanges}}"
+      style="columns: 2">
+      <list-item type="li">
+        <div style="flex-direction: column">
+          <div class="vwTitleWrapper" @click="handleBack">
+            <div class="vwTitle">
+              <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+              <marquee>选择分页</marquee>
+            </div>
+          </div>
+          <div class="inputView" @click="input">
+            <div class="input">
+              <text>输入章节跳转</text>
+            </div>
           </div>
         </div>
       </list-item>
@@ -61,12 +69,14 @@
         class="chapter-item"
         for="{{chapters}}"
         onclick="selectChapter($item.index)">
-        <text
-          class="chapter-text {{ $item.index === currentIndex ? 'active' : '' }}">
-          {{ $item.title }}
-        </text>
-        <!-- <text if="{{$item.cached}}" class="cached-tag">已缓存</text> -->
-        <text class="cached-tag">已缓存</text>
+        <div class="textWrapper">
+          <marquee
+            class="chapter-text {{ $item.index === currentIndex ? 'active' : '' }}">
+            {{ $item.title }}
+          </marquee>
+          <!-- <text if="{{$item.cached}}" class="cached-tag">已缓存</text> -->
+          <text class="cached-tag">已缓存</text>
+        </div>
       </list-item>
     </list>
   </div>
@@ -113,7 +123,7 @@
         this.allChaptersMeta = Array.from(
           { length: this.totalCount },
           (_, index) => ({
-            title: `第 ${index + 1} 章 标题`,
+            title: `第 ${index + 1} 章 标题标题标题标题`,
             index: index,
           })
         )
@@ -172,7 +182,7 @@
         const start = i * this.pageSize + 1
         const end = Math.min((i + 1) * this.pageSize, this.totalCount)
         list.push({
-          label: `${start} - ${end} 章`,
+          label: `${start} ~ ${end} 章`,
           startIndex: i * this.pageSize,
           count: end - i * this.pageSize,
         })
@@ -251,6 +261,17 @@
         },
       })
     },
+    input() {
+      router.push({
+        uri: 'pages/inputNum',
+        params: {
+          pageTitle: '跳转章节',
+          bookId: this.bookId,
+          bookName: this.bookName,
+          chapterCount: this.totalCount,
+        },
+      })
+    },
   }
 </script>
 
@@ -279,7 +300,32 @@
       }
     }
   }
-
+  .inputView {
+    .wrapper();
+    padding-top: 20px;
+    @media screen and (device: watch-round) {
+      padding-top: 10px;
+    }
+    .input {
+      .wrapper();
+      background-color: #262626;
+      border-radius: 20px;
+      width: 400px;
+      @media screen and (device: watch-round) {
+        width: 320px;
+      }
+      text {
+        color: #808080;
+        line-height: 60px;
+        @media screen and (device: watch-round) {
+          line-height: 50px;
+        }
+      }
+    }
+    :active {
+      opacity: 0.5;
+    }
+  }
   .loading {
     width: 100%;
     padding-top: 150px;
@@ -304,6 +350,20 @@
     border-bottom-color: #333;
     border-bottom-width: 1px;
     padding: 0 20px;
+    .textWrapper {
+      width: 100%;
+      justify-content: space-between;
+      padding: 0 10px;
+      @media screen and (device: watch-round) {
+        padding: 0 20px;
+      }
+      marquee {
+        max-width: 340px;
+        @media screen and (device: watch-round) {
+          max-width: 320px;
+        }
+      }
+    }
   }
 
   .chapter-text {
@@ -311,7 +371,6 @@
     font-size: 30px;
     lines: 1;
     text-overflow: ellipsis;
-    flex: 1;
   }
 
   .range-item {
@@ -321,6 +380,9 @@
     justify-content: center;
     align-items: center;
     padding: 0 20px;
+    @media screen and (device: watch-round) {
+      height: 80px;
+    }
   }
 
   .range-text {

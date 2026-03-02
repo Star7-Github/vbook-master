@@ -1,0 +1,174 @@
+<template>
+  <div class="page">
+    <div class="vwTitleWrapper" @click="back">
+      <div class="vwTitle">
+        <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+        <marquee>{{ pageTitle }}</marquee>
+      </div>
+    </div>
+    <div class="preview">
+      <marquee>{{ index }}</marquee>
+    </div>
+    <div class="keyboard">
+      <div
+        class="grid"
+        for="(idx, num) in [1,2,3,4,5,6,7,8,9]"
+        @click="input(num)">
+        <div class="btn">
+          <text>{{ num }}</text>
+        </div>
+      </div>
+      <div class="grid" @click="input(0)">
+        <div class="btn">
+          <text>0</text>
+        </div>
+      </div>
+      <div class="grid" @click="ok">
+        <div class="btn">
+          <text>确定</text>
+        </div>
+      </div>
+      <div class="grid" @click="del">
+        <div class="btn">
+          <text>退格</text>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+  import prompt from '@blueos.window.prompt'
+  export default {
+    data: {
+      pageTitle: '',
+      index: '',
+      bookId: '',
+      bookName: '',
+      chapterCount: '',
+    },
+
+    onInit() {},
+    input(num) {
+      if (this.index === '0' && num !== 0) {
+        this.index = num.toString()
+        return
+      }
+      if (this.index === '0' && num === 0) {
+        return
+      }
+      this.index += num.toString()
+    },
+    del() {
+      this.index = this.index.slice(0, -1)
+    },
+    ok() {
+      if (this.index == '') {
+        prompt.showToast({
+          message: `输入为空`,
+        })
+      } else if (Number(this.index) > Number(this.chapterCount)) {
+        prompt.showToast({
+          message: `超过最大章节数: ${this.chapterCount}`,
+        })
+      } else {
+        router.replace({
+          uri: '/pages/Reader',
+          params: {
+            bookId: this.bookId,
+            bookName: this.bookName,
+            chapterIndex: this.index - 1,
+            chapterCount: this.chapterCount,
+          },
+        })
+      }
+    },
+    back() {
+      router.back()
+    },
+  }
+</script>
+
+<style lang="less">
+  .page {
+    flex-direction: column;
+  }
+  .wrapper {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .vwTitleWrapper {
+    height: 80px;
+    width: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    .vwTitle {
+      align-items: center;
+      justify-content: center;
+      marquee {
+        color: #ffffff;
+        text-align: center;
+        font-size: 38px;
+        font-weight: bold;
+        margin-right: 48px;
+        max-width: 190px;
+        @media screen and (device: watch-square) {
+          max-width: 320px;
+        }
+      }
+    }
+    :active {
+      opacity: 0.5;
+    }
+  }
+  .preview {
+    .wrapper();
+    height: 50px;
+    @media screen and (device: watch-square) {
+      height: 70px;
+    }
+    marquee {
+      color: #ffffff;
+      font-weight: bold;
+      max-width: 350px;
+      @media screen and (device: watch-square) {
+        font-size: 40px;
+        max-width: 420px;
+      }
+    }
+  }
+  .keyboard {
+    flex-wrap: wrap;
+    padding: 0px 70px;
+    @media screen and (device: watch-square) {
+      padding: 0px 20px;
+    }
+    .grid {
+      width: 33.3%;
+      .btn {
+        width: 100%;
+        padding: 5px;
+        text {
+          width: 100%;
+          text-align: center;
+          color: #ffffff;
+          background-color: #262626;
+          font-weight: bold;
+          border-radius: 20px;
+          line-height: 60px;
+          @media screen and (device: watch-square) {
+            border-radius: 25px;
+            line-height: 80px;
+            font-size: 40px;
+          }
+        }
+      }
+      :active {
+        opacity: 0.5;
+      }
+    }
+  }
+</style>

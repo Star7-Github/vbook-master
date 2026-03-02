@@ -1,8 +1,8 @@
 {
   "package": "com.yyh.vbook",
   "name": "简阅",
-  "versionName": "1.0.8",
-  "versionCode": 10,
+  "versionName": "1.0.9",
+  "versionCode": 11,
   "appCategory": [
     "other"
   ],
@@ -74,6 +74,9 @@
         "component": "index"
       },
       "pages/Bookshelf/delAlert": {
+        "component": "index"
+      },
+      "pages/inputNum": {
         "component": "index"
       }
     }

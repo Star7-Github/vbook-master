@@ -93,6 +93,16 @@
         </div>
       </div>
     </list-item>
+    <!-- <list-item type="li" class="itemWrapper" @change="timeRefresh">
+      <div class="setting-item">
+        <div class="label-des">
+          <text class="label">时钟每秒刷新</text>
+          <div></div>
+          <text class="des">{{ timeRefreshDes }}</text>
+        </div>
+        <switch checked="{{ fastRefresh }}"></switch>
+      </div>
+    </list-item> -->
     <list-item type="li">
       <div style="height: 80px"></div>
     </list-item>
@@ -108,6 +118,8 @@
       fontSize: 32,
       lineHeight: 48,
       theme: 'dark', // dark, light, green
+      // fastRefresh: true,
+      // timeRefreshDes: '阅读页时钟每秒刷新',
     },
     onInit() {
       console.log('设置页 初始化')
@@ -225,6 +237,15 @@
       background-color: rgba(255, 255, 255, 0.1);
       padding: 10px 30px;
       border-radius: 30px;
+      .label-des {
+        flex-direction: column;
+        .des {
+          color: #9fa2a7;
+          font-size: 24px;
+          line-height: 24px;
+          margin-bottom: 6px;
+        }
+      }
     }
   }
 

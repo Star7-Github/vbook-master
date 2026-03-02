@@ -174,7 +174,7 @@
       const USE_MOCK = false
 
       if (USE_MOCK) {
-        this.title = '三体三体三体三体三体三体三体三体三体三体三体'
+        this.title = '如果在冬夜，一个旅人'
         this.currentChapter = 8886
         this.totalChapters = 8888
         this.chapterTitle = '第6章 宇宙闪烁宇宙闪烁宇宙闪烁'
