@@ -11,7 +11,15 @@
     <list-item>
       <div style="height: 20px"></div>
     </list-item>
-    <list-item if="{{bookList.length === 0}}" type="li">
+    <list-item if="{{isLoading}}" type="li">
+      <div class="wrapper loading">
+        <vw-loading></vw-loading>
+        <div class="wrapper">
+          <text>正在加载...</text>
+        </div>
+      </div>
+    </list-item>
+    <list-item elif="{{ bookList.length === 0}}" type="li">
       <div class="wrapper empty">
         <vw-icon icon="delete"></vw-icon>
         <div class="wrapper">
@@ -74,6 +82,7 @@
       downloadTask: null,
       refreshTimer: null, // 刷新定时器 ID
       isDeleting: false, // 删除中状态
+      isLoading: true,
     },
     onInit() {
       console.log('书架页 初始化')
@@ -189,6 +198,7 @@
           console.log(`获取文件列表失败: ${code}, ${data}`)
         },
       })
+      this.isLoading = false
     },
     goBack() {
       router.back()
@@ -231,6 +241,16 @@
         font-weight: bold;
         margin-right: 48px;
       }
+    }
+  }
+  .loading {
+    width: 100%;
+    padding-top: 140px;
+    @media screen and (device: watch-round) {
+      padding-top: 100px;
+    }
+    text {
+      color: #ffffff;
     }
   }
   .empty {

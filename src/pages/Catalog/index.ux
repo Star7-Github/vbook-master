@@ -5,7 +5,7 @@
         <div class="vwTitleWrapper">
           <div class="vwTitle">
             <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
-            <marquee>目录-选择分页</marquee>
+            <marquee>选择分页</marquee>
           </div>
         </div>
       </list-item>
@@ -24,8 +24,7 @@
       title="true"
       scrollbar="true"
       class="range-list"
-      if="{{!isLoading && showRanges}}"
-      style="columns: 2">
+      if="{{!isLoading && showRanges}}">
       <list-item type="li">
         <div style="flex-direction: column">
           <div class="vwTitleWrapper" @click="handleBack">

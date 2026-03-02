@@ -104,7 +104,10 @@
       </div>
     </list-item> -->
     <list-item type="li">
-      <div style="height: 80px"></div>
+      <text class="version">{{ version }}</text>
+    </list-item>
+    <list-item type="li">
+      <div style="height: 50px"></div>
     </list-item>
   </list>
 </template>
@@ -112,6 +115,7 @@
 <script>
   import storage from '@blueos.storage.storage'
   import router from '@system.router'
+  import app from '@blueos.app.context'
 
   export default {
     data: {
@@ -120,10 +124,12 @@
       theme: 'dark', // dark, light, green
       // fastRefresh: true,
       // timeRefreshDes: '阅读页时钟每秒刷新',
+      version: undefined,
     },
     onInit() {
       console.log('设置页 初始化')
       this.loadSettings()
+      this.version = `简阅 v${app.getInfo().versionName}(${app.getInfo().versionCode})`
     },
     getPreviewBgColor() {
       if (this.theme === 'light') return '#ffffff'
@@ -283,6 +289,12 @@
     font-size: 30px;
     color: #fff;
     font-weight: bold;
+  }
+  .version {
+    width: 100%;
+    text-align: center;
+    color: #808080;
+    font-size: 24px;
   }
 
   /* 适配圆形手表 */
