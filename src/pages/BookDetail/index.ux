@@ -101,6 +101,7 @@
             content: this.content,
             // 标记为local，Reader需要处理content参数
             bookId: 'local_' + this.bookName,
+            entryType: 'continue',
           },
         })
       } else {
@@ -112,6 +113,7 @@
             bookName: this.bookName,
             chapterIndex: this.currentChapter,
             chapterCount: this.chapterCount,
+            entryType: 'continue',
           },
         })
       }
@@ -140,7 +142,8 @@
       file.delete({
         uri: metaUri,
         success: () => console.log('[BookDetail] Meta deleted'),
-        fail: (data, code) => console.log(`[BookDetail] Meta delete fail: ${code}`),
+        fail: (data, code) =>
+          console.log(`[BookDetail] Meta delete fail: ${code}`),
       })
 
       // 3. 删除书籍内容目录（大目录可能需要较长时间）

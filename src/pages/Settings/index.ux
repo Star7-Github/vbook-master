@@ -129,7 +129,7 @@
     onInit() {
       console.log('设置页 初始化')
       this.loadSettings()
-      this.version = `简阅 v${app.getInfo().versionName}(${app.getInfo().versionCode})`
+      this.version = `${app.getInfo().name} v${app.getInfo().versionName}(${app.getInfo().versionCode})`
     },
     getPreviewBgColor() {
       if (this.theme === 'light') return '#ffffff'

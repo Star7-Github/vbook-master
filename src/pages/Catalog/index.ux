@@ -257,6 +257,7 @@
           bookName: this.bookName,
           chapterIndex: index,
           chapterCount: this.totalCount,
+          entryType: 'catalog',
         },
       })
     },
@@ -268,6 +269,7 @@
           bookId: this.bookId,
           bookName: this.bookName,
           chapterCount: this.totalCount,
+          entryType: 'catalog',
         },
       })
     },

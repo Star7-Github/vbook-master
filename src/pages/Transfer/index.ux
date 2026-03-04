@@ -43,6 +43,13 @@
             <div
               class="progress"
               style="width: {{downloadProgress}}px;height:{{downloadProgress<60?downloadProgress:60}}px;"></div>
+            <!-- <div
+              class="progress"
+              style="
+                width: 100px;
+                height: 60px;
+                background: linear-gradient(to right, #295aff {{downloadProgress}}%, #333333 {{downloadProgress+1}}%);
+              "></div> -->
           </div>
           <div class="progressTxt">
             <text>{{ downloadProgress }}%</text>
@@ -64,7 +71,7 @@
         <div
           if="{{!$item.isDownloaded}}"
           class="download-btn"
-          onclick="startDownload($item)">
+          @click="startDownload($item)">
           <text class="btn-icon">下载</text>
         </div>
         <div if="{{$item.isDownloaded}}" class="downloaded-tag">
