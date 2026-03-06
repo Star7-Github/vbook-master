@@ -170,10 +170,15 @@
         const task = this.$app.$def.getTask(this.monitorId)
         if (task) {
           this.downloadProgress = task.progress || 0
-          if (task.phase === 'download') {
-            this.phaseText = `下载中 ${this.downloadProgress}%`
+          const pct = this.downloadProgress.toFixed(2)
+          if (task.phase === 'catalog') {
+            this.phaseText = `获取目录 ${pct}%`
+          } else if (task.phase === 'check') {
+            this.phaseText = `检查进度 ${pct}%`
+          } else if (task.phase === 'download') {
+            this.phaseText = `下载中 ${pct}%`
           } else if (task.phase === 'batch') {
-            this.phaseText = `备用下载 ${this.downloadProgress}%`
+            this.phaseText = `备用下载 ${pct}%`
           } else {
             this.phaseText = '下载中...'
           }
