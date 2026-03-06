@@ -178,6 +178,29 @@
         cardBgColor: '#333333',
       },
     },
+    onRefresh(query) {
+      console.log('Reader onRefresh (singleTask)', JSON.stringify(query))
+      this.bookId = query.bookId || this.bookId
+      this.bookName = query.bookName || this.bookName
+      this.chapterIndex = query.chapterIndex != null ? query.chapterIndex : this.chapterIndex
+      this.chapterCount = query.chapterCount || this.chapterCount
+      this.entryType = query.entryType || 'catalog'
+
+      this.currentChapter = Number(this.chapterIndex) || 0
+      this.totalChapters = Number(this.chapterCount) || 0
+      this.title = this.bookName || '书名'
+      this.isLoading = true
+      this.paragraphs = []
+      this.fullParagraphs = []
+      this.loadedCount = 0
+      this.hasMore = false
+      this.curParaIdx = 0
+      this.chapterTitles = []
+      this.loadChapterTitles()
+      this.loadChapter(this.currentChapter)
+
+      this._needScrollTop = true
+    },
     onInit() {
       console.log('阅读器 初始化', this.bookId, this.chapterIndex)
 
@@ -279,9 +302,11 @@
       }
     },
     onHide() {
+      this.saveProgress()
       this.stopUpdateTime()
     },
     onDestroy() {
+      this.saveProgress()
       this.stopUpdateTime()
     },
     startUpdateTime() {
@@ -576,23 +601,14 @@
       console.log('Rendering complete, setting isLoading=false')
       this.isLoading = false
 
-      // 处理“继续阅读”的滚动
-      if (this.entryType === 'continue') {
-        // 延迟一小会儿确保 DOM 渲染完成
-        setTimeout(() => {
-          this.handleContinueReading()
-        }, 50)
+      if (this._needScrollTop) {
+        this._needScrollTop = false
+        setTimeout(() => { this.scrollToTop() }, 300)
+      } else if (this.entryType === 'continue') {
+        setTimeout(() => { this.handleContinueReading() }, 50)
       } else {
-        // 普通进入（如目录点击），滚到顶部
-        setTimeout(() => {
-          this.scrollToTop()
-        }, 50)
+        setTimeout(() => { this.scrollToTop() }, 50)
       }
-
-      // Scroll to top with delay to ensure DOM is updated
-      setTimeout(() => {
-        this.scrollToTop()
-      }, 100)
     },
     scrollToTop() {
       const listElement = this.$element('contentList')

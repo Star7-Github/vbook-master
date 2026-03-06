@@ -74,10 +74,27 @@
     },
     onInit() {
       console.log('书籍详情页 初始化', this.bookName)
-      // 强制转换 isLocal 为布尔值，防止路由传递字符串 "false" 导致判断错误
       if (typeof this.isLocal === 'string') {
         this.isLocal = this.isLocal === 'true'
       }
+    },
+    onShow() {
+      if (this.isLocal || !this.bookId) return
+      const metaUri = `internal://files/book_${this.bookId}.json`
+      file.readText({
+        uri: metaUri,
+        success: (res) => {
+          try {
+            const meta = JSON.parse(res.text)
+            if (typeof meta.currentChapter === 'number') {
+              this.currentChapter = meta.currentChapter
+            }
+            if (typeof meta.chapterCount === 'number') {
+              this.chapterCount = meta.chapterCount
+            }
+          } catch (e) {}
+        },
+      })
     },
     computed: {
       progressPercent() {

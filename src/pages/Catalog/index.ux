@@ -242,7 +242,7 @@
       })
     },
     selectChapter(index) {
-      router.replace({
+      router.push({
         uri: '/pages/Reader',
         params: {
           bookId: this.bookId,
