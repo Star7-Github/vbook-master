@@ -2,6 +2,8 @@
   <stack>
     <list
       id="contentList"
+      @scrollindex="readAtPara"
+      bounces="false"
       scrollbar="true"
       style="background-color: {{readerStyle.bgColor}}">
       <list-item type="li">
@@ -20,12 +22,7 @@
           </div>
         </div>
       </list-item>
-      <list-item
-        type="li"
-        class="text-item"
-        for="{{paragraphs}}"
-        id="para{{$idx}}"
-        @touchstart="readAtPara($idx)">
+      <list-item type="li" class="text-item" for="{{paragraphs}}">
         <text
           class="text-content"
           style="font-size: {{readerStyle.fontSize}}px; line-height: {{readerStyle.lineHeight}}px; color: {{readerStyle.textColor}}">
@@ -42,30 +39,34 @@
           </text>
         </div>
       </list-item>
-      <list-item type="li" class="cmd-item">
-        <div
-          class="cmd-btn"
-          @click="prevChapter"
-          style="background-color: {{readerStyle.cardBgColor}}">
-          <text style="color: {{readerStyle.dimColor}}">
-            {{ '上一章' }}
-          </text>
-        </div>
-        <div
-          class="cmd-btn"
-          @click="openCatalog"
-          style="background-color: {{readerStyle.cardBgColor}}">
-          <text style="color: {{readerStyle.dimColor}}">
-            {{ '目录' }}
-          </text>
-        </div>
-        <div
-          class="cmd-btn"
-          @click="nextChapter"
-          style="background-color: {{readerStyle.cardBgColor}}">
-          <text style="color: {{readerStyle.dimColor}}">
-            {{ '下一章' }}
-          </text>
+      <list-item type="li">
+        <div class="cmd-item">
+          <div
+            show="{{currentChapter != 0}}"
+            class="cmd-btn"
+            @click="prevChapter"
+            style="background-color: {{readerStyle.cardBgColor}}">
+            <text style="color: {{readerStyle.dimColor}}">
+              {{ '上一章' }}
+            </text>
+          </div>
+          <div
+            class="cmd-btn"
+            @click="openCatalog"
+            style="background-color: {{readerStyle.cardBgColor}}">
+            <text style="color: {{readerStyle.dimColor}}">
+              {{ '目录' }}
+            </text>
+          </div>
+          <div
+            show="{{currentChapter+1 != totalChapters}}"
+            class="cmd-btn"
+            @click="nextChapter"
+            style="background-color: {{readerStyle.cardBgColor}}">
+            <text style="color: {{readerStyle.dimColor}}">
+              {{ '下一章' }}
+            </text>
+          </div>
         </div>
       </list-item>
       <list-item type="li">
@@ -167,6 +168,11 @@
       readPercentage: 0,
       isScrolling: true,
       scrollText: '加载中',
+      targetParaIdx: 0,
+      viewParaIdx: {
+        first: null,
+        last: null,
+      },
 
       // Reading Style defaults
       readerStyle: {
@@ -191,7 +197,7 @@
         this.chapterTitle = '第6章 宇宙闪烁宇宙闪烁宇宙闪烁'
 
         // 模拟段落
-        const mockParagraphs = Array.from({ length: 100 }, (_, i) =>
+        const mockParagraphs = Array.from({ length: 200 }, (_, i) =>
           `这是模拟的第 ${i + 1} 段文字。用于测试阅读器的排版、滚动、分页和主题切换功能。`.repeat(
             2
           )
@@ -199,9 +205,9 @@
         this.fullParagraphs = mockParagraphs
         // 模拟从“继续阅读”进入
         this.entryType = 'continue'
-        this.curParaIdx = 90
+        this.targetParaIdx = 170
 
-        if (this.entryType === 'continue' && this.curParaIdx > 20) {
+        if (this.entryType === 'continue' && this.targetParaIdx > 20) {
           this.loadedCount = 20
           this.paragraphs = mockParagraphs.slice(0, 20)
           this.hasMore = true
@@ -421,42 +427,37 @@
             // 只有当章节匹配时才恢复进度，否则从头开始
             if (
               meta.currentChapter === this.currentChapter &&
-              typeof meta.curParaIdx === 'number'
+              typeof meta.targetParaIdx === 'number'
             ) {
-              this.curParaIdx = meta.curParaIdx
-              console.log(`恢复阅读进度：第 ${this.curParaIdx} 段`)
+              this.targetParaIdx = meta.targetParaIdx
+              console.log(`恢复阅读进度：第 ${this.targetParaIdx} 段`)
             } else {
-              this.curParaIdx = 0
+              this.targetParaIdx = 0
               console.log('章节不匹配或无进度，从头开始')
             }
           } catch (e) {
-            this.curParaIdx = 0
+            this.targetParaIdx = 0
           } finally {
             if (callback) callback()
           }
         },
         fail: () => {
-          this.curParaIdx = 0
+          this.targetParaIdx = 0
           if (callback) callback()
         },
       })
     },
     // 新增：处理继续阅读的核心逻辑
     handleContinueReading() {
-      // 确保 curParaIdx 有效
-      if (typeof this.curParaIdx !== 'number' || this.curParaIdx < 0) {
-        this.curParaIdx = 0
-      }
-
       // 如果目标段落超出总长度，修正为最后一段
-      if (this.curParaIdx >= this.fullParagraphs.length) {
-        this.curParaIdx = this.fullParagraphs.length - 1
+      if (this.targetParaIdx >= this.fullParagraphs.length) {
+        this.targetParaIdx = this.fullParagraphs.length - 1
       }
 
-      console.log(
-        `尝试滚动到段落: ${this.curParaIdx}, 当前已加载: ${this.loadedCount}`
-      )
-      if (this.curParaIdx < this.loadedCount) {
+      // console.log(
+      //   `尝试滚动到段落: ${this.targetParaIdx}, 当前已加载: ${this.loadedCount}`
+      // )
+      if (this.targetParaIdx < this.loadedCount) {
         // 情况1：目标段落已在当前加载范围内，直接滚动
         this.scroll2historyPara()
       } else {
@@ -495,45 +496,99 @@
         this.hasMore = false
       }
 
-      console.log(
-        `自动加载批次，当前已加载: ${this.loadedCount}, 目标: ${this.curParaIdx}`
+      // console.log(
+      //   `自动加载批次，当前已加载: ${this.loadedCount}, 目标: ${this.targetParaIdx}`
+      // )
+      const p = Math.min(
+        98,
+        Math.floor((this.loadedCount / this.targetParaIdx) * 100)
       )
-      const p = Math.floor((this.loadedCount / this.curParaIdx) * 100)
-      this.scrollText = `加载中: ${p >= 98 ? 98 : p}%`
+      this.scrollText = `加载中: ${p}%`
 
       // 检查是否已覆盖目标
-      if (this.loadedCount > this.curParaIdx) {
+      if (this.loadedCount > this.targetParaIdx) {
         // 覆盖到了，执行滚动
         this.scroll2historyPara()
       } else {
         // 还没到，继续加载下一批
         // 使用 setTimeout 避免阻塞 UI 线程，让 loading 动画有机会渲染
+        // 实测删了确实会影响UI渲染
         setTimeout(() => {
           this.load2historyPara()
         }, 50)
       }
     },
 
+    // 分步滚动到目标段落
+    stepScrollTo(targetIndex) {
+      const list = this.$element('contentList')
+      if (!list) return
+
+      const step = 20 // 每次滚动20行
+      let current = this.viewParaIdx.last || 0
+
+      const scrollStep = () => {
+        if (current >= targetIndex - 1) {
+          // 接近目标，直接跳过去（留一点余量避免边界问题）
+          list.scrollTo({
+            index: Math.min(targetIndex, this.loadedCount - 1),
+            behavior: 'smooth',
+          })
+          // 等待最后一次滚动完成
+          setTimeout(() => {
+            this.isScrolling = false
+            this.scrollText = ''
+          }, 300)
+          return
+        }
+
+        current += step
+        const nextIndex = Math.min(current, this.loadedCount - 1, targetIndex)
+
+        list.scrollTo({
+          index: nextIndex,
+          behavior: 'smooth',
+        })
+
+        // 继续下一步（等一小会儿让滚动和渲染发生）
+        setTimeout(() => {
+          // 如果已经滚到底或超出，就停止
+          if (nextIndex >= this.loadedCount - 1 || nextIndex >= targetIndex) {
+            // this.isScrolling = false
+            // this.scrollText = ''
+            return
+          }
+          scrollStep()
+        }, 200) // 根据手表性能调整，200~300ms 较安全
+      }
+
+      scrollStep()
+    },
     // 新增：执行滚动动作
     scroll2historyPara() {
       const listElement = this.$element('contentList')
       if (listElement) {
-        console.log(`执行滚动到 index: ${this.curParaIdx}`)
-        const p = (this.loadedCount / this.curParaIdx) * 100
-        this.scrollText = `加载中: ${p >= 99 ? 99 : p}%`
+        // console.log(`执行滚动到 index: ${this.targetParaIdx}`)
+        const p = Math.min(
+          99,
+          Math.floor((this.loadedCount / this.targetParaIdx) * 100)
+        )
+        this.scrollText = `加载中: ${p}%`
 
         // 稍微延迟确保 DOM 更新
         setTimeout(() => {
-          listElement.scrollTo({
-            index: this.curParaIdx,
-            // behavior: 'smooth',
-          })
+          const safeTarget = Math.min(this.targetParaIdx, this.loadedCount - 1)
+
+          // 使用分步滚动
+          this.stepScrollTo(safeTarget)
+          // listElement.scrollTo({
+          //   index: this.targetParaIdx,
+          //   behavior: 'smooth',
+          // })
           // 滚动完成后，标记结束，隐藏全屏动画
-          this.isScrolling = false
-          console.log('滚动完成，isScrolling 设为 false')
-          this.scrollText = '加载完成'
-          // 保存一次进度确保无误（虽然 readAtPara 也会存）
-          this.saveProgress()
+          // this.isScrolling = false
+          // console.log('滚动完成，isScrolling 设为 false')
+          this.scrollText = '定位上次阅读位置中'
         }, 100)
       } else {
         console.error('List element not found for scrolling')
@@ -590,17 +645,16 @@
       }
 
       // Scroll to top with delay to ensure DOM is updated
-      setTimeout(() => {
-        this.scrollToTop()
-      }, 100)
+      // setTimeout(() => {
+      //   this.scrollToTop()
+      // }, 100)
     },
     scrollToTop() {
       const listElement = this.$element('contentList')
       if (listElement) {
-        // listElement.scrollTo({
-        //   index: 0,
-        // })
-        listElement.scrollTop()
+        listElement.scrollTo({
+          index: 0,
+        })
         console.log('Scrolled to top')
       } else {
         console.log('List element not found')
@@ -632,7 +686,7 @@
     },
     prevChapter() {
       console.log('Prev chapter clicked')
-
+      this.targetParaIdx = 0
       if (this.currentChapter > 0) {
         this.currentChapter--
         this.loadChapter(this.currentChapter)
@@ -642,7 +696,7 @@
     },
     nextChapter() {
       console.log('Next chapter clicked')
-
+      this.targetParaIdx = 0
       // 如果不知道总章数，暂时无限制? 或者限制
       if (
         this.totalChapters > 0 &&
@@ -655,6 +709,7 @@
       this.loadChapter(this.currentChapter)
     },
     saveProgress() {
+      // console.log(`读到第 ${this.viewParaIdx.last}/${this.loadedCount} 段`)
       // 先读取现有 meta，只更新 currentChapter，保留 chapters/isOffline 等字段
       const fileName = `book_${this.bookId}.json`
       const simplePath = `internal://files/${fileName}`
@@ -671,7 +726,7 @@
           meta.currentChapter = this.currentChapter
           meta.name = this.bookName
           meta.chapterCount = this.totalChapters
-          meta.curParaIdx = this.curParaIdx
+          meta.targetParaIdx = this.curParaIdx
 
           file.writeText({
             uri: simplePath,
@@ -685,7 +740,7 @@
             name: this.bookName,
             chapterCount: this.totalChapters,
             currentChapter: this.currentChapter,
-            curParaIdx: this.curParaIdx,
+            targetParaIdx: this.targetParaIdx,
           }
           file.writeText({
             uri: simplePath,
@@ -708,13 +763,19 @@
         },
       })
     },
-    readAtPara(idx) {
-      console.log(`读到第 ${idx + 1}/${this.loadedCount} 段`)
-      console.log(`加载了 ${this.loadedCount} 段`)
-      this.curParaIdx = idx
-      this.saveProgress()
+    readAtPara(event) {
+      this.viewParaIdx.first = event.first
+      this.viewParaIdx.last = event.last
+      // console.log(`读到第 ${this.viewParaIdx.last + 1}/${this.loadedCount} 段`)
+      // console.log(`加载了 ${this.loadedCount} 段`)
+      this.curParaIdx = this.viewParaIdx.first
+      if (this.targetParaIdx <= event.last) {
+        this.saveProgress()
+        this.isScrolling = false
+        this.targetParaIdx = null
+      }
       if (this.fullParagraphs && this.fullParagraphs.length > 0) {
-        let currentIndex = Number(idx)
+        let currentIndex = Number(this.viewParaIdx.first)
         if (isNaN(currentIndex)) return 0
 
         let p = Math.ceil(
@@ -726,7 +787,7 @@
         // Improve stability: only update if changed significantly or larger?
         // No, current view is truth.
         this.readPercentage = p
-        console.log(`读到 ${currentIndex + 1} 段，本章阅读: ${p}%`)
+        // console.log(`读到 ${currentIndex + 1} 段，本章阅读: ${p}%`)
       }
     },
   }
@@ -771,6 +832,9 @@
       text {
         color: #ffffff;
       }
+      :active {
+        opacity: 0.5;
+      }
     }
   }
   .cmd-item {
@@ -785,6 +849,9 @@
       border-radius: 100px;
       text {
         color: #ffffff;
+      }
+      :active {
+        opacity: 0.5;
       }
     }
   }

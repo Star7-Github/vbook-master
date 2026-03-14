@@ -1,12 +1,12 @@
 {
-  "package": "com.yyh.vbook",
-  "name": "简阅",
-  "versionName": "1.1.1",
-  "versionCode": 14,
+  "package": "com.yyh.vbook0",
+  "name": "简阅beta",
+  "versionName": "1.1.2",
+  "versionCode": 15,
   "appCategory": [
     "other"
   ],
-  "icon": "/assets/images/logo.png",
+  "icon": "/assets/images/logo0.png",
   "features": [
     {
       "name": "blueos.app.appmanager.router"

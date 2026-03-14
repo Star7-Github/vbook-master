@@ -47,6 +47,9 @@
         onclick="selectRange($idx)">
         <text class="range-text">{{ $item.label }}</text>
       </list-item>
+      <list-item>
+        <div style="height: 50px"></div>
+      </list-item>
     </list>
 
     <!-- 模式2：章节列表 -->
@@ -73,9 +76,11 @@
             class="chapter-text {{ $item.index === currentIndex ? 'active' : '' }}">
             {{ $item.title }}
           </marquee>
-          <!-- <text if="{{$item.cached}}" class="cached-tag">已缓存</text> -->
-          <text class="cached-tag">已缓存</text>
+          <text if="{{$item.cached}}" class="cached-tag">已缓存</text>
         </div>
+      </list-item>
+      <list-item>
+        <div style="height: 80px"></div>
       </list-item>
     </list>
   </div>
@@ -99,12 +104,15 @@
       showRanges: true,
       ranges: [],
       chapters: [],
-      allChaptersMeta: [], // Store chapter titles
+      currentRangeIndex: -1,
     },
     computed: {
       titleText() {
-        if (this.showRanges) {
-          return '目录-选择分页'
+        if (
+          this.currentRangeIndex >= 0 &&
+          this.ranges[this.currentRangeIndex]
+        ) {
+          return this.ranges[this.currentRangeIndex].label
         }
         return '目录'
       },
@@ -112,34 +120,34 @@
     onInit() {
       this.currentIndex = parseInt(this.currentIndex) || 0
 
-      // ====== MOCK MODE ======
-      const USE_MOCK = false // 设置为 true 启用模拟数据
+      // // ====== MOCK MODE ======
+      // const USE_MOCK = false // 设置为 true 启用模拟数据
 
-      if (USE_MOCK) {
-        this.bookId = 'mock-book-id'
-        this.bookName = '【调试用】UI测试书'
-        this.totalCount = 320 // 总章节数
-        this.allChaptersMeta = Array.from(
-          { length: this.totalCount },
-          (_, index) => ({
-            title: `第 ${index + 1} 章 标题标题标题标题`,
-            index: index,
-          })
-        )
+      // if (USE_MOCK) {
+      //   this.bookId = 'mock-book-id'
+      //   this.bookName = '【调试用】UI测试书'
+      //   this.totalCount = 1500 // 总章节数
+      //   this.allChaptersMeta = Array.from(
+      //     { length: this.totalCount },
+      //     (_, index) => ({
+      //       title: `第 ${index + 1} 章 标题标题标题标题`,
+      //       index: index,
+      //     })
+      //   )
 
-        // 模拟分段列表
-        if (this.totalCount > this.pageSize) {
-          this.showRanges = true
-          this.generateRanges()
-        } else {
-          this.showRanges = false
-          this.loadChapters(0, this.totalCount)
-        }
+      //   // 模拟分段列表
+      //   if (this.totalCount > this.pageSize) {
+      //     this.showRanges = true
+      //     this.generateRanges()
+      //   } else {
+      //     this.showRanges = false
+      //     this.loadChapters(0, this.totalCount)
+      //   }
 
-        this.isLoading = false
-        return // 跳过真实加载逻辑
-      }
-      // ====== END MOCK MODE ======
+      //   this.isLoading = false
+      //   return // 跳过真实加载逻辑
+      // }
+      // // ====== END MOCK MODE ======
 
       this.loadMeta()
     },
@@ -150,9 +158,6 @@
         if (metaRes) {
           const meta = JSON.parse(metaRes)
           this.totalCount = parseInt(meta.chapterCount) || 0
-          if (Array.isArray(meta.chapters)) {
-            this.allChaptersMeta = meta.chapters
-          }
         }
       } catch (e) {
         console.log('Read meta failed')
@@ -166,13 +171,13 @@
 
       // 超过一页则显示分段
       if (this.totalCount > this.pageSize) {
-        this.showRanges = true
         this.generateRanges()
+        const rangeIdx = Math.floor(this.currentIndex / this.pageSize)
+        this.selectRange(rangeIdx)
       } else {
         this.showRanges = false
-        this.loadChapters(0, this.totalCount)
+        this.loadPageTitles(0, this.totalCount)
       }
-      this.isLoading = false
     },
     generateRanges() {
       const list = []
@@ -188,38 +193,67 @@
       }
       this.ranges = list
     },
-    loadChapters(start, count) {
+    async loadPageTitles(start, count) {
+      const pageNum = Math.floor(start / this.pageSize)
+
       const list = []
       for (let i = 0; i < count; i++) {
-        const realIndex = start + i
-        let title = `第 ${realIndex + 1} 章`
-        if (this.allChaptersMeta && this.allChaptersMeta[realIndex]) {
-          title = this.allChaptersMeta[realIndex].title || title
-        }
-
         list.push({
-          title: title,
-          index: realIndex,
+          title: `第 ${start + i + 1} 章`,
+          index: start + i,
           cached: false,
         })
       }
       this.chapters = list
-      this.checkCachedStatus(list)
-    },
-    async checkCachedStatus(currentList) {
-      const dirPath = `internal://files/book_data_${this.bookId}`
-      const results = await Promise.all(
-        currentList.map((item) =>
-          this.checkFileExists(`${dirPath}/${item.index}.txt`)
-        )
-      )
+      this.isLoading = false
 
-      // Update list with statuses
-      const newList = currentList.map((item, i) => ({
-        ...item,
-        cached: results[i],
-      }))
-      this.chapters = newList
+      try {
+        const uri = `internal://files/catalog_titles_${this.bookId}_${pageNum}.json`
+        const text = await this.readText(uri)
+        if (text) {
+          const titles = JSON.parse(text)
+          if (Array.isArray(titles)) {
+            for (let i = 0; i < titles.length && i < list.length; i++) {
+              if (titles[i]) {
+                list[i].title = titles[i]
+              }
+            }
+            this.chapters = list.slice()
+          }
+        }
+      } catch (e) {
+        console.log('Read title page failed')
+      }
+
+      this.checkCachedBatched(list)
+    },
+    async checkCachedBatched(currentList) {
+      const dirPath = `internal://files/book_data_${this.bookId}`
+      const batchSize = 3
+      for (let i = 0; i < currentList.length; i += batchSize) {
+        if (
+          this.chapters.length > 0 &&
+          currentList.length > 0 &&
+          this.chapters[0].index !== currentList[0].index
+        )
+          return
+        const batch = currentList.slice(i, i + batchSize)
+        const results = await Promise.all(
+          batch.map((item) =>
+            this.checkFileExists(`${dirPath}/${item.index}.txt`)
+          )
+        )
+        let changed = false
+        for (let j = 0; j < batch.length; j++) {
+          if (results[j]) {
+            currentList[i + j].cached = true
+            changed = true
+          }
+        }
+        if (changed) {
+          this.chapters = currentList.slice()
+        }
+      }
     },
     checkFileExists(uri) {
       return new Promise((r) =>
@@ -227,13 +261,15 @@
       )
     },
     selectRange(index) {
+      if (index < 0) index = 0
+      if (index >= this.ranges.length) index = this.ranges.length - 1
       const range = this.ranges[index]
-      this.loadChapters(range.startIndex, range.count)
+      this.currentRangeIndex = index
       this.showRanges = false
+      this.loadPageTitles(range.startIndex, range.count)
     },
     handleBack() {
       if (!this.showRanges && this.totalCount > this.pageSize) {
-        // Return to range list
         this.showRanges = true
         this.chapters = []
       } else {
