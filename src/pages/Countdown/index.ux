@@ -1,0 +1,532 @@
+<template>
+  <div class="root-container">
+    <div class="page" if="{{!showSettings}}">
+      <!-- 顶部事件名称 - 点击进入设置 -->
+      <text class="label" @click="openSettings">距离{{ eventName }}还有</text>
+
+      <!-- 核心倒计时数字 - 暗门入口：连续点击20次进入书架 -->
+      <div class="days-row" @click="handleSecretTap">
+        <text class="days-num">{{ days }}</text>
+        <text class="days-unit">天</text>
+      </div>
+
+      <!-- 时分秒 -->
+      <div class="time-row">
+        <div class="time-cell">
+          <text class="time-num">{{ hours }}</text>
+          <text class="time-sep">时</text>
+        </div>
+        <div class="time-cell">
+          <text class="time-num">{{ minutes }}</text>
+          <text class="time-sep">分</text>
+        </div>
+        <div class="time-cell">
+          <text class="time-num">{{ seconds }}</text>
+          <text class="time-sep">秒</text>
+        </div>
+      </div>
+
+      <!-- 进度条 -->
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ progressWidth }}%;"></div>
+      </div>
+      <text class="progress-text">已过 {{ progressText }}%</text>
+
+      <!-- 底部励志语 -->
+      <text class="motto">{{ motto }}</text>
+    </div>
+
+    <!-- ====== 设置页面 ====== -->
+    <list class="page settings-page" if="{{showSettings}}">
+      <list-item type="title" class="list-item-center">
+        <text class="settings-title">倒计时设置</text>
+      </list-item>
+
+      <!-- 事件名称选择 -->
+      <list-item type="label" class="list-item-center">
+        <text class="settings-label">目标事件</text>
+      </list-item>
+      <list-item type="picker" class="list-item-center">
+        <picker
+          class="settings-picker"
+          type="text"
+          range="{{eventOptions}}"
+          selected="{{eventSelectedIndex}}"
+          @change="onEventChange"
+        ></picker>
+      </list-item>
+
+      <!-- 开始日期 -->
+      <list-item type="label" class="list-item-center">
+        <text class="settings-label">开始日期</text>
+      </list-item>
+      <list-item type="picker" class="list-item-center">
+        <picker
+          class="settings-picker date-picker"
+          type="date"
+          start="2026-01-01"
+          end="2035-12-31"
+          selected="{{startDateStr}}"
+          @change="onStartDateChange"
+        ></picker>
+      </list-item>
+
+      <!-- 结束日期 -->
+      <list-item type="label" class="list-item-center">
+        <text class="settings-label">结束日期</text>
+      </list-item>
+      <list-item type="picker" class="list-item-center">
+        <picker
+          class="settings-picker date-picker"
+          type="date"
+          start="2026-01-01"
+          end="2035-12-31"
+          selected="{{targetDateStr}}"
+          @change="onDateChange"
+        ></picker>
+      </list-item>
+
+      <!-- 保存按钮 -->
+      <list-item type="btn" class="list-item-center">
+        <div class="save-btn" @click="saveSettings">
+          <text class="save-btn-text">保存</text>
+        </div>
+      </list-item>
+    </list>
+  </div>
+</template>
+
+<script>
+  import router from '@blueos.app.appmanager.router'
+  import storage from '@blueos.storage.storage'
+
+  // 暗门参数
+  const SECRET_TAP_COUNT = 20
+  const SECRET_TAP_WINDOW = 800 // 两次点击的最大间隔(毫秒)，中途停顿超时则清空计数
+
+  const EVENT_OPTIONS = ['中考', '高考', '期末考试', '开学', '模拟考', '自定义']
+
+  const MOTTOS = [
+    '书山有路勤为径，学海无涯苦作舟',
+    '宝剑锋从磨砺出，梅花香自苦寒来',
+    '长风破浪会有时，直挂云帆济沧海',
+    '千磨万击还坚劲，任尔东西南北风',
+    '不积跬步，无以至千里',
+    '天道酬勤，功不唐捐',
+    '博观而约取，厚积而薄发',
+    '少壮不努力，老大徒伤悲',
+  ]
+
+  const DEFAULT_EVENT = '自定义'
+
+  // 获取日期字符串 (可传天数偏移量)
+  function getDateStrWithOffset(offsetDays = 0) {
+    const d = new Date()
+    d.setDate(d.getDate() + offsetDays)
+    const y = d.getFullYear()
+    const monthVal = d.getMonth() + 1
+    const dayVal = d.getDate()
+    const m = monthVal < 10 ? '0' + monthVal : '' + monthVal
+    const day = dayVal < 10 ? '0' + dayVal : '' + dayVal
+    return `${y}-${m}-${day}`
+  }
+  const TODAY_STR = getDateStrWithOffset(0)
+  const DEFAULT_DATE = getDateStrWithOffset(7)
+
+  export default {
+    data: {
+      days: 0,
+      hours: '00',
+      minutes: '00',
+      seconds: '00',
+      progressWidth: 0,
+      progressText: '0.0',
+      motto: '',
+      eventName: DEFAULT_EVENT,
+      targetDateStr: DEFAULT_DATE,
+      startDateStr: TODAY_STR,
+      showSettings: false,
+      eventOptions: EVENT_OPTIONS,
+      eventSelectedIndex: EVENT_OPTIONS.indexOf(DEFAULT_EVENT) >= 0 ? EVENT_OPTIONS.indexOf(DEFAULT_EVENT) : 0,
+      // 临时保存设置中的值
+      pendingEvent: DEFAULT_EVENT,
+      pendingTargetDate: DEFAULT_DATE,
+      pendingStartDate: TODAY_STR,
+    },
+    onInit() {
+      this.tapCount = 0
+      this.tapTimer = null
+      this.timer = null
+      this.targetTimestamp = new Date(DEFAULT_DATE + 'T00:00:00').getTime()
+      this.semesterStart = new Date(TODAY_STR + 'T00:00:00').getTime()
+      this.motto = MOTTOS[Math.floor(Math.random() * MOTTOS.length)]
+      this.loadSettings()
+    },
+    onShow() {
+      this.updateCountdown()
+      this.timer = setInterval(() => {
+        this.updateCountdown()
+      }, 1000)
+    },
+    onHide() {
+      if (this.timer) clearInterval(this.timer)
+    },
+    onDestroy() {
+      if (this.timer) clearInterval(this.timer)
+      if (this.tapTimer) clearTimeout(this.tapTimer)
+    },
+
+    // ====== 持久化存储 ======
+
+    loadSettings() {
+      storage.get({
+        key: 'countdown_settings',
+        success: (data) => {
+          if (!data) return
+          try {
+            const settings = JSON.parse(data)
+            if (settings.eventName) {
+              this.eventName = settings.eventName
+              this.pendingEvent = settings.eventName
+              const idx = EVENT_OPTIONS.indexOf(settings.eventName)
+              this.eventSelectedIndex = idx >= 0 ? idx : 0
+            }
+            if (settings.targetDate) {
+              this.targetDateStr = settings.targetDate
+              this.pendingTargetDate = settings.targetDate
+              this.targetTimestamp = new Date(settings.targetDate + 'T00:00:00').getTime()
+            }
+            if (settings.startDate) {
+              this.startDateStr = settings.startDate
+              this.pendingStartDate = settings.startDate
+              this.semesterStart = new Date(settings.startDate + 'T00:00:00').getTime()
+            }
+            this.updateCountdown()
+          } catch (e) {
+            console.log('[Countdown] parse settings fail: ' + e)
+          }
+        },
+        fail: () => {
+          console.log('[Countdown] no saved settings, using defaults')
+        },
+      })
+    },
+
+    persistSettings() {
+      const data = JSON.stringify({
+        eventName: this.eventName,
+        targetDate: this.targetDateStr,
+        startDate: this.startDateStr,
+      })
+      storage.set({
+        key: 'countdown_settings',
+        value: data,
+        success: () => console.log('[Countdown] settings saved'),
+        fail: (d, c) => console.log('[Countdown] save fail: ' + c),
+      })
+    },
+
+    // ====== 倒计时更新 ======
+
+    updateCountdown() {
+      const now = Date.now()
+      const diff = Math.max(this.targetTimestamp - now, 0)
+
+      this.days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      const s = Math.floor((diff % (1000 * 60)) / 1000)
+
+      this.hours = h < 10 ? '0' + h : '' + h
+      this.minutes = m < 10 ? '0' + m : '' + m
+      this.seconds = s < 10 ? '0' + s : '' + s
+
+      // 学期进度
+      const totalSpan = this.targetTimestamp - this.semesterStart
+      const elapsed = now - this.semesterStart
+      if (totalSpan > 0) {
+        const pct = Math.min(Math.max((elapsed / totalSpan) * 100, 0), 100)
+        this.progressWidth = Math.round(pct)
+        this.progressText = pct.toFixed(1)
+      }
+    },
+
+    // ====== 设置页面 ======
+
+    openSettings() {
+      this.pendingEvent = this.eventName
+      this.pendingTargetDate = this.targetDateStr
+      this.pendingStartDate = this.startDateStr
+      const idx = EVENT_OPTIONS.indexOf(this.eventName)
+      this.eventSelectedIndex = idx >= 0 ? idx : 0
+      this.showSettings = true
+    },
+
+    onEventChange(e) {
+      this.pendingEvent = e.newValue
+      this.eventSelectedIndex = e.newSelected
+    },
+
+    onDateChange(e) {
+      const y = e.year
+      const m = e.month < 10 ? '0' + e.month : '' + e.month
+      const d = e.day < 10 ? '0' + e.day : '' + e.day
+      this.pendingTargetDate = y + '-' + m + '-' + d
+    },
+
+    onStartDateChange(e) {
+      const y = e.year
+      const m = e.month < 10 ? '0' + e.month : '' + e.month
+      const d = e.day < 10 ? '0' + e.day : '' + e.day
+      this.pendingStartDate = y + '-' + m + '-' + d
+    },
+
+    saveSettings() {
+      this.eventName = this.pendingEvent
+      this.targetDateStr = this.pendingTargetDate
+      this.startDateStr = this.pendingStartDate
+      this.targetTimestamp = new Date(this.targetDateStr + 'T00:00:00').getTime()
+      this.semesterStart = new Date(this.startDateStr + 'T00:00:00').getTime()
+      this.persistSettings()
+      this.updateCountdown()
+      this.motto = MOTTOS[Math.floor(Math.random() * MOTTOS.length)]
+      this.showSettings = false
+    },
+
+    // ====== 暗门 ======
+
+    handleSecretTap() {
+      this.tapCount++
+      if (this.tapTimer) clearTimeout(this.tapTimer)
+
+      if (this.tapCount >= SECRET_TAP_COUNT) {
+        this.tapCount = 0
+        router.push({ uri: '/pages/Home' })
+        return
+      }
+
+      this.tapTimer = setTimeout(() => {
+        this.tapCount = 0
+      }, SECRET_TAP_WINDOW)
+    },
+  }
+</script>
+
+<style lang="less">
+  .root-container {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+  }
+
+  .page {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 15px 20px;
+    @media screen and (device: watch-round) {
+      padding: 55px 30px;
+    }
+  }
+
+  .label {
+    color: #999999;
+    font-size: 26px;
+    margin-bottom: 5px;
+    @media screen and (device: watch-round) {
+      font-size: 24px;
+    }
+    :active {
+      color: #bbbbbb;
+    }
+  }
+
+  .days-row {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    margin: 8px 0;
+  }
+
+  .days-num {
+    color: #ffffff;
+    font-size: 88px;
+    font-weight: bold;
+    @media screen and (device: watch-round) {
+      font-size: 76px;
+    }
+  }
+
+  .days-unit {
+    color: #bbbbbb;
+    font-size: 30px;
+    margin-bottom: 16px;
+    margin-left: 6px;
+    @media screen and (device: watch-round) {
+      font-size: 26px;
+      margin-bottom: 14px;
+    }
+  }
+
+  .time-row {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    @media screen and (device: watch-round) {
+      margin-bottom: 10px;
+    }
+  }
+
+  .time-cell {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 6px;
+  }
+
+  .time-num {
+    color: #4fc3f7;
+    font-size: 28px;
+    @media screen and (device: watch-round) {
+      font-size: 24px;
+    }
+  }
+
+  .time-sep {
+    color: #666666;
+    font-size: 22px;
+    margin-left: 2px;
+    @media screen and (device: watch-round) {
+      font-size: 20px;
+    }
+  }
+
+  .progress-bar {
+    width: 80%;
+    height: 6px;
+    background-color: #333333;
+    border-radius: 3px;
+    margin: 10px auto 10px auto;
+    @media screen and (device: watch-round) {
+      width: 70%;
+    }
+  }
+
+  .progress-fill {
+    height: 100%;
+    background-color: #4fc3f7;
+    border-radius: 3px;
+  }
+
+  .progress-text {
+    color: #666666;
+    font-size: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+    @media screen and (device: watch-round) {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+  }
+
+  .motto {
+    color: #555555;
+    font-size: 22px;
+    text-align: center;
+    @media screen and (device: watch-round) {
+      font-size: 20px;
+    }
+  }
+
+  /* ====== 设置页面样式 ====== */
+
+  .settings-page {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding-top: 30px;
+    padding-bottom: 50px;
+    @media screen and (device: watch-round) {
+      padding-top: 60px;
+    }
+  }
+
+  .settings-title {
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    @media screen and (device: watch-round) {
+      font-size: 30px;
+    }
+  }
+
+  .settings-label {
+    color: #4fc3f7;
+    font-size: 24px;
+    margin-bottom: 10px;
+    margin-top: 30px;
+    font-weight: bold;
+    @media screen and (device: watch-round) {
+      font-size: 22px;
+    }
+  }
+
+  .settings-picker {
+    width: 380px;
+    height: 280px;
+    background-color: #1a1a1a;
+    border-radius: 30px;
+    margin-bottom: 10px;
+    color: #ffffff;
+    selected-color: #4fc3f7;
+    @media screen and (device: watch-round) {
+      width: 340px;
+      height: 260px;
+    }
+  }
+
+  .date-picker {
+    width: 420px;
+    @media screen and (device: watch-round) {
+      width: 380px;
+    }
+  }
+
+  .list-item-center {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .save-btn {
+    margin-top: 50px;
+    margin-bottom: 60px;
+    background-color: #4fc3f7;
+    border-radius: 25px;
+    padding: 12px 50px;
+    justify-content: center;
+    align-items: center;
+    @media screen and (device: watch-round) {
+      margin-top: 10px;
+      padding: 10px 40px;
+    }
+    :active {
+      opacity: 0.7;
+    }
+  }
+
+  .save-btn-text {
+    color: #000000;
+    font-size: 28px;
+    font-weight: bold;
+    @media screen and (device: watch-round) {
+      font-size: 24px;
+    }
+  }
+</style>
