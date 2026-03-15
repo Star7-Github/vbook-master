@@ -1,12 +1,12 @@
 {
-  "package": "com.yyh.vbook0",
-  "name": "简阅beta",
+  "package": "com.yyh.camouBook",
+  "name": "倒计时",
   "versionName": "1.1.2",
   "versionCode": 15,
   "appCategory": [
     "other"
   ],
-  "icon": "/assets/images/logo0.png",
+  "icon": "/assets/images/camouflage.png",
   "features": [
     {
       "name": "blueos.app.appmanager.router"
@@ -47,8 +47,11 @@
     }
   },
   "router": {
-    "entry": "pages/Home",
+    "entry": "pages/Countdown",
     "pages": {
+      "pages/Countdown": {
+        "component": "index"
+      },
       "pages/Home": {
         "component": "index"
       },
