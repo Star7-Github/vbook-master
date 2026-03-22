@@ -91,55 +91,44 @@
   }
 
   /**
-   * 获取书籍的章节目录信息（标题等）
+   * 使用系统级底层下载完整目录信息直接写入磁盘 (规避JS大字符串内存溢出)
    */
-  function fetchCatalog(bookId) {
+  function downloadCatalogBySystem(bookId) {
     return new Promise((resolve) => {
-      const fetchFn = getFetch()
-      if (!fetchFn) {
-        resolve(null)
+      if (!request || typeof request.download !== 'function') {
+        resolve(false)
         return
       }
-      fetchFn({
-        url: `${SERVER}/api/novel/catalog?id=${bookId}`,
-        method: 'GET',
-        responseType: 'json',
-        success: (res) => {
-          if (res.code === 200 || res.code === 206) {
-            let data = res.data
-            if (typeof data === 'string') {
-              try {
-                data = JSON.parse(data)
-              } catch (e) {
-                resolve(null)
-                return
-              }
-            }
 
-            // 兼容多种数据结构
-            let chapters = null
-            if (data && Array.isArray(data.chapters)) {
-              chapters = data.chapters
-            } else if (data && data.data && Array.isArray(data.data.chapters)) {
-              chapters = data.data.chapters
-            }
+      const tempUri = `internal://files/catalog_${bookId}.json`
+      const url = `${SERVER}/api/novel/catalog?id=${bookId}`
 
-            console.log(
-              `[App] fetchCatalog: got ${chapters ? chapters.length : 0} chapters`
-            )
-            resolve(chapters)
-          } else {
-            console.log(`[App] fetchCatalog: unexpected code ${res.code}`)
-            resolve(null)
-          }
-        },
-        fail: (data, code) => {
-          console.log(`[App] fetchCatalog fail: ${code}`)
-          resolve(null)
-        },
+      // 先删掉老的文件（如果有），确保是最新的
+      deleteFile(tempUri).then(() => {
+        request.download({
+          url,
+          filename: tempUri,
+          success: (data) => {
+            const token = data.token
+            request.onDownloadComplete({
+              token,
+              success: () => {
+                file.access({
+                  uri: tempUri,
+                  success: () => resolve(true),
+                  fail: () => resolve(false),
+                })
+              },
+              fail: () => resolve(false),
+            })
+          },
+          fail: () => resolve(false),
+        })
       })
     })
   }
+
+
 
   // ====== 方案一：request.download 批量下载 + 本地拆分（主路径） ======
 
@@ -293,6 +282,74 @@
     })
   }
 
+  const CATALOG_PAGE_SIZE = 50
+
+  /**
+   * 逐页从服务端获取标题（每次仅 20 个），存成小文件供离线目录页使用
+   * 手表 JS 内存中永远只有一页的数据量（~1KB）
+   */
+  async function splitCatalogTitlePages(bookId, totalCount, task) {
+    const fetchFn = getFetch()
+    if (!fetchFn || !totalCount) return
+
+    const pageCount = Math.ceil(totalCount / CATALOG_PAGE_SIZE)
+    if (task) {
+      task.phase = 'catalog'
+      task.progress = 0
+    }
+    for (let p = 0; p < pageCount; p++) {
+      if (task && task.status !== 'running') break
+      const from = p * CATALOG_PAGE_SIZE
+      const to = Math.min(from + CATALOG_PAGE_SIZE, totalCount) - 1
+      try {
+        const data = await new Promise((resolve) => {
+          fetchFn({
+            url: `${SERVER}/api/novel/catalog/page?id=${bookId}&from=${from}&to=${to}`,
+            method: 'GET',
+            responseType: 'json',
+            success: (res) => {
+              if (res.code === 200 || res.code === 206) {
+                let d = res.data
+                if (typeof d === 'string') {
+                  try { d = JSON.parse(d) } catch (e) { resolve(null); return }
+                }
+                resolve(d)
+              } else {
+                resolve(null)
+              }
+            },
+            fail: () => resolve(null),
+          })
+        })
+
+        const titles = []
+        if (Array.isArray(data)) {
+          for (let j = 0; j < data.length; j++) {
+            titles.push((data[j] && data[j].title) || `第 ${from + j + 1} 章`)
+          }
+        } else {
+          for (let j = from; j <= to; j++) {
+            titles.push(`第 ${j + 1} 章`)
+          }
+        }
+        await new Promise((r) => {
+          file.writeText({
+            uri: `internal://files/catalog_titles_${bookId}_${p}.json`,
+            text: JSON.stringify(titles),
+            success: () => r(true),
+            fail: () => r(false),
+          })
+        })
+      } catch (e) {
+        console.log(`[App] splitCatalogTitlePages page ${p} failed: ${e}`)
+      }
+      if (task) {
+        task.progress = Math.round(((p + 1) / pageCount) * 10000) / 100
+      }
+    }
+    console.log(`[App] Catalog titles split into ${pageCount} pages`)
+  }
+
   // ====== 主下载流程 ======
 
   async function downloadLoop(book) {
@@ -300,11 +357,13 @@
     const count = parseInt(book.chapterCount) || 0
     const task = downloadTasks[bookId]
 
-    // 0. 获取章节目录（含标题），保存到 meta
-    const catalogData = await fetchCatalog(bookId)
-    const chaptersMeta = Array.isArray(catalogData)
-      ? catalogData.map((ch) => ({ title: ch.title || '' }))
-      : []
+    // 整个下载流程保持屏幕常亮
+    setScreenOn(true)
+
+    // 逐页获取目录标题并存为小文件，每页 50 个标题（~2KB），手表离线可读
+    await splitCatalogTitlePages(bookId, count, task)
+
+    const chaptersMeta = []
 
     const bookMeta = {
       id: book.id,
@@ -342,22 +401,79 @@
       return
     }
 
-    // 2. 检查已有章节
-    const fileList = await listFiles(dirPath)
+    // 2. 二分查找断点 + 空洞扫描，极速检测已下载章节
+    task.phase = 'check'
+    task.progress = 0
     const existingSet = new Set()
-    for (const f of fileList) {
-      let name = f.filename
-      if (!name && f.uri) {
-        const parts = f.uri.split('/')
-        name = parts[parts.length - 1]
-      }
-      existingSet.add(name)
+
+    function checkExists(idx) {
+      return new Promise((r) =>
+        file.access({
+          uri: `${dirPath}/${idx}.txt`,
+          success: () => r(true),
+          fail: () => r(false),
+        })
+      )
     }
 
-    let needCount = 0
-    for (let ii = 0; ii < count; ii++) {
-      if (!existingSet.has(`${ii}.txt`)) needCount++
+    // 二分查找：找到第一个不存在的章节位置
+    let lo = 0, hi = count - 1, boundary = 0
+    if (await checkExists(count - 1)) {
+      // 最后一章都存在，大概率全下完了
+      boundary = count
+    } else if (!(await checkExists(0))) {
+      // 第一章都没有，全新下载
+      boundary = 0
+    } else {
+      while (lo <= hi) {
+        const mid = Math.floor((lo + hi) / 2)
+        if (await checkExists(mid)) {
+          lo = mid + 1
+        } else {
+          hi = mid - 1
+        }
+      }
+      boundary = lo
     }
+
+    // boundary 之前的章节大概率连续存在，先全部标记
+    for (let i = 0; i < boundary; i++) {
+      existingSet.add(`${i}.txt`)
+    }
+    task.progress = 30
+
+    // 在 boundary 之前抽样检查空洞（每隔 50 章查一个，发现空洞再细查）
+    const sampleStep = 50
+    for (let s = 0; s < boundary; s += sampleStep) {
+      if (!(await checkExists(s))) {
+        // 发现空洞，细查这个区间
+        const rangeEnd = Math.min(s + sampleStep, boundary)
+        for (let j = s; j < rangeEnd; j++) {
+          if (!(await checkExists(j))) {
+            existingSet.delete(`${j}.txt`)
+          }
+        }
+      }
+    }
+    task.progress = 60
+
+    // boundary 之后：分批检查（可能有零星已下载的）
+    const tailBatch = 10
+    for (let ci = boundary; ci < count; ci += tailBatch) {
+      const batch = []
+      for (let j = ci; j < ci + tailBatch && j < count; j++) {
+        batch.push(j)
+      }
+      const results = await Promise.all(
+        batch.map((idx) => checkExists(idx).then((ok) => ok ? idx : -1))
+      )
+      for (const idx of results) {
+        if (idx >= 0) existingSet.add(`${idx}.txt`)
+      }
+      task.progress = 60 + Math.round(((ci - boundary + batch.length) / Math.max(count - boundary, 1)) * 40 * 100) / 100
+    }
+
+    const needCount = count - existingSet.size
 
     if (needCount === 0) {
       task.progress = 100
@@ -377,9 +493,6 @@
     }
 
     console.log(`[App] Need to download ${needCount}/${count} chapters`)
-
-    // 下载期间保持屏幕常亮，防止息屏后暂停
-    setScreenOn(true)
 
     // 3. 主路径：request.download 每次5章 + 本地拆分
     const useSystemDownload = request && typeof request.download === 'function'
@@ -412,7 +525,7 @@
         if (missingIndices.length === 0) {
           // 整批已存在，跳过
           processedChapters = batchEnd + 1
-          task.progress = Math.floor((processedChapters / count) * 100)
+          task.progress = Math.round((processedChapters / count) * 10000) / 100
           i = batchEnd + 1
           continue
         }
@@ -449,7 +562,7 @@
         }
 
         processedChapters = batchEnd + 1
-        task.progress = Math.floor((processedChapters / count) * 100)
+        task.progress = Math.round((processedChapters / count) * 10000) / 100
         i = batchEnd + 1
       }
 
@@ -504,7 +617,7 @@
 
       if (missingIndices.length === 0) {
         i = batchEnd + 1
-        task.progress = Math.floor((i / count) * 100)
+        task.progress = Math.round((i / count) * 10000) / 100
         continue
       }
 
@@ -525,7 +638,7 @@
             fetchFailCount++
             consecutiveFailCount++
           }
-          task.progress = Math.floor(((idx + 1) / count) * 100)
+          task.progress = Math.round(((idx + 1) / count) * 10000) / 100
         }
       } else {
         for (const idx of missingIndices) {
@@ -539,7 +652,7 @@
             consecutiveFailCount++
             fetchFailCount++
           }
-          task.progress = Math.floor(((idx + 1) / count) * 100)
+          task.progress = Math.round(((idx + 1) / count) * 10000) / 100
         }
       }
 
