@@ -1,0 +1,73 @@
+<template>
+  <div class="toast-wrapper {{show ? 'toast-fade-in' : 'toast-fade-out'}}" if="{{show}}">
+    <div class="toast-box">
+      <text class="toast-message">{{ msg }}</text>
+    </div>
+  </div>
+</template>
+
+<script>
+  export default {
+    props: {
+      show: {
+        type: Boolean,
+        default: false
+      },
+      msg: {
+        type: String,
+        default: ''
+      }
+    }
+  }
+</script>
+
+<style>
+  .toast-wrapper {
+    position: absolute;
+    bottom: 80px;
+    left: 0px;
+    width: 466px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .toast-box {
+    background-color: #3A3A3C;
+    border-radius: 40px;
+    padding: 18px 40px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .toast-message {
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  @keyframes toastFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes toastFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  .toast-fade-in {
+    animation-name: toastFadeIn;
+    animation-duration: 200ms;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+
+  .toast-fade-out {
+    animation-name: toastFadeOut;
+    animation-duration: 200ms;
+    animation-fill-mode: forwards;
+  }
+</style>
