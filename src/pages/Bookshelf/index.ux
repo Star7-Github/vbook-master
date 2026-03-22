@@ -1,80 +1,107 @@
+<import name="apple-toast" src="../../components/AppleToast/index.ux"></import>
 <template>
-  <list title="true" scrollbar="true">
-    <list-item type="li" @click="goBack">
-      <div class="vwTitleWrapper">
-        <div class="vwTitle">
-          <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
-          <text>我的书架</text>
+  <div class="page-container">
+    <list title="true" scrollbar="true">
+      <list-item type="li" @click="goBack">
+        <div class="vwTitleWrapper">
+          <div class="vwTitle">
+            <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
+            <text>我的书架</text>
+          </div>
         </div>
-      </div>
-    </list-item>
-    <list-item>
-      <div style="height: 20px"></div>
-    </list-item>
-    <list-item if="{{isLoading}}" type="li">
-      <div class="wrapper loading">
-        <vw-loading></vw-loading>
-        <div class="wrapper">
-          <text>正在加载...</text>
+      </list-item>
+      <list-item>
+        <div style="height: 20px"></div>
+      </list-item>
+      <list-item if="{{isLoading}}" type="li">
+        <div class="wrapper loading">
+          <vw-loading></vw-loading>
+          <div class="wrapper">
+            <text>正在加载...</text>
+          </div>
         </div>
-      </div>
-    </list-item>
-    <list-item elif="{{ bookList.length === 0}}" type="li">
-      <div class="wrapper empty">
-        <vw-icon icon="delete"></vw-icon>
-        <div class="wrapper">
-          <text>暂无书籍</text>
+      </list-item>
+      <list-item elif="{{ bookList.length === 0}}" type="li">
+        <div class="wrapper empty">
+          <vw-icon icon="delete"></vw-icon>
+          <div class="wrapper">
+            <text>暂无书籍</text>
+          </div>
         </div>
-      </div>
-    </list-item>
-    <list-item
-      type="book"
-      class="bookItemWrapper"
-      for="{{bookList}}"
-      onclick="openBookDetail($item)">
-      <div class="book-item">
-        <div class="book-cover">
-          <text class="book-cover-text">
-            {{ $item.name.substring(0, 1) }}
-          </text>
+      </list-item>
+      <list-item
+        type="book"
+        class="bookItemWrapper"
+        for="{{bookList}}"
+        onclick="openBookDetail($item)"
+        onlongpress="confirmDelete($item)">
+        <div class="book-item">
+          <div class="book-cover">
+            <text class="book-cover-text">
+              {{ $item.name.substring(0, 1) }}
+            </text>
+          </div>
+          <div class="book-info">
+            <marquee class="book-title">{{ $item.name }}</marquee>
+            <text class="book-progress">
+              已读{{ ' ' + $item.progress }}% ({{
+                Number($item.currentChapter) || 0
+              }}/{{ Number($item.chapterCount) || 1 }}章)
+            </text>
+          </div>
         </div>
-        <div class="book-info">
-          <marquee class="book-title">{{ $item.name }}</marquee>
-          <text class="book-progress">
-            已读{{ ' ' + $item.progress }}% ({{
-              Number($item.currentChapter) || 0
-            }}/{{ Number($item.chapterCount) || 1 }}章)
-          </text>
+      </list-item>
+      <list-item>
+        <div style="height: 80px"></div>
+      </list-item>
+    </list>
+
+    <!-- iOS 风格确认弹窗 -->
+    <div class="dialog-mask {{ isHiding ? 'mask-hide' : 'mask-show' }}" if="{{showDialog}}" onclick="cancelDelete">
+      <div class="dialog-panel {{ isHiding ? 'pop-out' : 'pop-in' }}" onclick="stopPropagation">
+        <div class="dialog-content">
+          <text class="dialog-title">删除此书籍?</text>
+          <text class="dialog-subtitle" style="lines: 2; text-overflow: ellipsis; margin-top: 8px;">{{ deleteTargetItem ? deleteTargetItem.name : '' }}</text>
         </div>
-      </div>
-      <div @click="deleteBook($item)" slot="right" class="slot">
-        <image
-          src="/assets/images/icon-delete.png"
-          object-fit="scale-down"></image>
-      </div>
-    </list-item>
-    <list-item>
-      <div style="height: 80px"></div>
-    </list-item>
-  </list>
-  <!-- <div class="page">
-    <div class="wrapper">
-      <div
-        class="global-progress"
-        if="{{downloadTask}}"
-        onclick="handleTaskClick">
-        <text class="progress-detail">{{ downloadTask.name }} 下载:&nbsp;</text>
-        <text class="progress-text">{{ downloadTask.progress }}%</text>
-      </div>
+        <div class="dialog-divider"></div>
+        <div class="dialog-btn-area">
+          <div class="dialog-btn" onclick="cancelDelete">
+            <text class="dialog-cancel-text">取消</text>
+          </div>
+          <div class="dialog-divider-v"></div>
+          <div class="dialog-btn" onclick="executeDelete">
+            <text class="dialog-confirm-text">删除</text>
+          </div>
+        </div>
       </div>
     </div>
-  </div> -->
+
+    <!-- 全屏删除中遮罩 -->
+    <div
+      if="{{isDeleting}}"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.7);
+      ">
+      <div style="flex-direction: column; align-items: center;">
+        <vw-loading></vw-loading>
+        <text style="color: #ffffff; font-size: 30px; margin-top: 20px;">删除中...</text>
+      </div>
+    </div>
+
+    <apple-toast show="{{showToast}}" msg="{{toastMsg}}"></apple-toast>
+  </div>
 </template>
 
 <script>
   import router from '@blueos.app.appmanager.router'
   import file from '@blueos.storage.file'
-  import prompt from '@blueos.window.prompt'
 
   export default {
     data: {
@@ -83,6 +110,13 @@
       refreshTimer: null, // 刷新定时器 ID
       isDeleting: false, // 删除中状态
       isLoading: true,
+      showToast: false,
+      toastMsg: '',
+      
+      // iOS 弹窗相关
+      showDialog: false,
+      isHiding: false,
+      deleteTargetItem: null,
     },
     onInit() {
       console.log('书架页 初始化')
@@ -101,6 +135,9 @@
     onDestroy() {
       if (this.pollTimer) clearInterval(this.pollTimer)
       if (this.refreshTimer) clearTimeout(this.refreshTimer)
+      if (this.dialogHideCb) clearTimeout(this.dialogHideCb)
+      if (this.deleteCb) clearTimeout(this.deleteCb)
+      if (this.toastCb) clearTimeout(this.toastCb)
     },
     startPolling() {
       if (!this.$app || !this.$app.$def || !this.$app.$def.getRunningTask)
@@ -132,13 +169,86 @@
       // Maybe navigate to transfer page?
       router.push({ uri: 'pages/Transfer' })
     },
-    deleteBook(item) {
-      router.push({
-        uri: 'pages/Bookshelf/delAlert',
-        params: {
-          bookItem: item,
-        },
+    confirmDelete(item) {
+      if (item.isLocal) {
+        this.showAppleToast('内置书籍无法删除')
+        return
+      }
+
+      // 显示 iOS 弹窗
+      this.deleteTargetItem = item
+      this.isHiding = false
+      this.showDialog = true
+    },
+    stopPropagation(e) {
+      if (e && e.stopPropagation) e.stopPropagation()
+    },
+    cancelDelete() {
+      this.hideDialog()
+    },
+    hideDialog() {
+      this.isHiding = true
+      if (this.dialogHideCb) clearTimeout(this.dialogHideCb)
+      this.dialogHideCb = setTimeout(() => {
+        this.showDialog = false
+        this.deleteTargetItem = null
+      }, 250)
+    },
+    executeDelete() {
+      if (!this.deleteTargetItem || this.isDeleting) return
+      
+      const item = this.deleteTargetItem
+      
+      // 直接隐藏弹窗（不播放淡出动画，因为全屏幕 Loading 马上出来盖住）
+      if (this.dialogHideCb) clearTimeout(this.dialogHideCb)
+      this.showDialog = false
+      this.isHiding = false
+      this.deleteTargetItem = null
+      
+      this.isDeleting = true
+
+      // 1. 清理可能的下载任务
+      if (this.$app && this.$app.$def && this.$app.$def.clearTask) {
+        this.$app.$def.clearTask(item.id)
+      }
+
+      // 2. 删除元数据文件
+      const metaUri = item._uri || `internal://files/book_${item.id}.json`
+      file.delete({
+        uri: metaUri,
+        success: () => console.log('Meta deleted'),
+        fail: (data, code) => console.log(`Meta delete fail: ${code}`),
       })
+
+      // 3. 删除书籍内容目录
+      if (item.id) {
+        const dir = `internal://files/book_data_${item.id}`
+        file.rmdir({
+          uri: dir,
+          recursive: true,
+          success: () => console.log('Content folder deleted'),
+          fail: (data, code) => console.log(`Content folder delete fail: ${code}`),
+        })
+      }
+
+      // 4. 先在 UI 层面移除这部分，避免再次刷新时的突兀
+      this.bookList = this.bookList.filter((b) => b.id !== item.id)
+
+      // 延迟给大目录文件系统时间处理，然后关闭 loading
+      if (this.deleteCb) clearTimeout(this.deleteCb)
+      this.deleteCb = setTimeout(() => {
+        this.isDeleting = false
+        this.showAppleToast('删除成功')
+        // 不需要全量 refreshBooks，在 UI 上已经移除了
+      }, 1500)
+    },
+    showAppleToast(msg) {
+      if (this.toastCb) clearTimeout(this.toastCb)
+      this.toastMsg = msg
+      this.showToast = true
+      this.toastCb = setTimeout(() => {
+        this.showToast = false
+      }, 2000)
     },
     refreshBooks() {
       const uri = 'internal://files/'
@@ -188,14 +298,16 @@
                 let p = Math.floor(((cur + 1) * 100) / total)
                 if (p > 100) p = 100
                 b.progress = p
+                // 剥离巨大的 chapters 数组，避免模拟器内存崩溃
+                delete b.chapters
                 return b
               })
 
             this.bookList = validBooks
           })
         },
-        fail: (data, code) => {
-          console.log(`获取文件列表失败: ${code}, ${data}`)
+        fail: (errData, code) => {
+          console.log(`获取文件列表失败: ${code}, ${errData}`)
         },
       })
       this.isLoading = false
@@ -204,16 +316,16 @@
       router.back()
     },
     openBookDetail(item) {
+      console.log('准备跳转到 BookDetail, bookName:', item.name)
       router.push({
         uri: 'pages/BookDetail',
         params: {
           bookId: item.id || '',
-          bookName: item.name,
+          bookName: item.name || '未知',
           chapterCount: item.chapterCount || 0,
           currentChapter: item.currentChapter || 0,
           rawUri: item._uri || '',
           isLocal: item.isLocal || false,
-          content: item.content || '', // For legacy local books
         },
       })
     },
@@ -221,6 +333,140 @@
 </script>
 
 <style lang="less">
+  .page-container {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+  }
+
+  /* ---------------- iOS 风格弹窗 ---------------- */
+  .dialog-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dialog-panel {
+    width: 360px;
+    flex-direction: column;
+    align-items: center;
+    background-color: #252525;
+    border-radius: 28px;
+  }
+
+  .dialog-content {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 30px 30px 30px;
+    width: 100%;
+  }
+
+  .dialog-title {
+    font-size: 34px;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+  }
+
+  .dialog-subtitle {
+    font-size: 26px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    width: 100%;
+  }
+
+  .dialog-divider {
+    width: 100%;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .dialog-btn-area {
+    width: 100%;
+    height: 90px;
+    flex-direction: row;
+  }
+
+  .dialog-btn {
+    flex: 1;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+  }
+
+  .dialog-divider-v {
+    width: 2px;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .dialog-cancel-text {
+    font-size: 34px;
+    color: #0A84FF;
+  }
+
+  .dialog-confirm-text {
+    font-size: 34px;
+    font-weight: bold;
+    color: #FF453A;
+  }
+
+  /* --- 弹窗动画 --- */
+  @keyframes maskFadeIn {
+    from { background-color: rgba(0, 0, 0, 0); }
+    to { background-color: rgba(0, 0, 0, 0.6); }
+  }
+
+  @keyframes maskFadeOut {
+    from { background-color: rgba(0, 0, 0, 0.6); }
+    to { background-color: rgba(0, 0, 0, 0); }
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes popOut {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(0.8); opacity: 0; }
+  }
+
+  .mask-show {
+    animation-name: maskFadeIn;
+    animation-duration: 250ms;
+    animation-fill-mode: forwards;
+  }
+
+  .mask-hide {
+    animation-name: maskFadeOut;
+    animation-duration: 250ms;
+    animation-fill-mode: forwards;
+  }
+
+  .pop-in {
+    animation-name: popIn;
+    animation-duration: 350ms;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation-fill-mode: forwards;
+  }
+
+  .pop-out {
+    animation-name: popOut;
+    animation-duration: 200ms;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
+  }
+
+  /* ---------------- 原有样式 ---------------- */
   .wrapper {
     flex-direction: column;
     justify-content: center;
@@ -319,24 +565,6 @@
       :active {
         opacity: 0.3;
       }
-    }
-  }
-  .slot {
-    .wrapper();
-    background-color: #262626;
-    width: 100px;
-    border-radius: 30px;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    :active {
-      opacity: 0.3;
-    }
-    image {
-      width: 50px;
-    }
-    @media screen and (device: watch-round) {
-      border-radius: 50px;
-      margin-right: 30px;
     }
   }
   .empty-state {

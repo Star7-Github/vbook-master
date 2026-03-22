@@ -59,7 +59,7 @@
         <div class="vwTitleWrapper">
           <div class="vwTitle">
             <vw-icon icon="arrow-left" [size]="sm"></vw-icon>
-            <marquee>{{ titleText }}</marquee>
+            <marquee>{{ currentRangeTitle }}</marquee>
           </div>
         </div>
       </list-item>
@@ -98,15 +98,7 @@
       showRanges: true,
       ranges: [],
       chapters: [],
-      currentRangeIndex: -1,
-    },
-    computed: {
-      titleText() {
-        if (this.currentRangeIndex >= 0 && this.ranges[this.currentRangeIndex]) {
-          return this.ranges[this.currentRangeIndex].label
-        }
-        return '目录'
-      },
+      currentRangeTitle: '目录', // selectRange 时直接赋值
     },
     onInit() {
       this.currentIndex = parseInt(this.currentIndex) || 0
@@ -132,10 +124,11 @@
 
       if (this.totalCount > this.pageSize) {
         this.generateRanges()
-        const rangeIdx = Math.floor(this.currentIndex / this.pageSize)
-        this.selectRange(rangeIdx)
+        // 不自动跳到具体分段，让用户先看到完整的分段列表
+        this.isLoading = false
       } else {
         this.showRanges = false
+        this.currentRangeTitle = `1 ~ ${this.totalCount} 章`
         this.loadPageTitles(0, this.totalCount)
       }
     },
@@ -220,7 +213,7 @@
       if (index < 0) index = 0
       if (index >= this.ranges.length) index = this.ranges.length - 1
       const range = this.ranges[index]
-      this.currentRangeIndex = index
+      this.currentRangeTitle = range.label
       this.showRanges = false
       this.loadPageTitles(range.startIndex, range.count)
     },

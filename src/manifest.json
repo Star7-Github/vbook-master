@@ -31,6 +31,9 @@
     },
     {
       "name": "blueos.hardware.display.brightness"
+    },
+    {
+      "name": "system.device"
     }
   ],
   "deviceTypeList": [

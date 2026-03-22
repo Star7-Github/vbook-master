@@ -1,137 +1,56 @@
 <template>
-  <stack>
-    <list
-      id="contentList"
-      scrollbar="true"
-      style="background-color: {{readerStyle.bgColor}}">
-      <list-item type="li">
-        <div
-          if="$device.deviceType == 'watch-square'"
-          style="height: 80px"></div>
-        <div
-          elif="$device.deviceType == 'watch-round'"
-          style="height: 100px"></div>
-      </list-item>
-      <list-item if="{{isLoading}}" type="li">
-        <div class="wrapper loading">
-          <vw-loading></vw-loading>
-          <div class="wrapper">
-            <text style="color: {{readerStyle.dimColor}}">加载中...</text>
-          </div>
-        </div>
-      </list-item>
-      <list-item
-        type="li"
-        class="text-item"
-        for="{{paragraphs}}"
-        id="para{{$idx}}"
-        @touchstart="readAtPara($idx)">
-        <text
-          class="text-content"
-          style="font-size: {{readerStyle.fontSize}}px; line-height: {{readerStyle.lineHeight}}px; color: {{readerStyle.textColor}}">
-          {{ $item }}
-        </text>
-      </list-item>
-      <list-item type="li" class="loadmore-item" if="{{hasMore}}">
-        <div
-          class="loadmore-btn"
-          @click="loadMore"
-          style="background-color: {{readerStyle.cardBgColor}}">
-          <text class="loadmore-text" style="color: {{readerStyle.dimColor}}">
-            点击加载更多 ({{ loadedCount }}/{{ fullParagraphs.length }})
-          </text>
-        </div>
-      </list-item>
-      <list-item type="li" class="cmd-item">
-        <div
-          class="cmd-btn"
-          @click="prevChapter"
-          style="background-color: {{readerStyle.cardBgColor}}">
-          <text style="color: {{readerStyle.dimColor}}">
-            {{ '上一章' }}
-          </text>
-        </div>
-        <div
-          class="cmd-btn"
-          @click="openCatalog"
-          style="background-color: {{readerStyle.cardBgColor}}">
-          <text style="color: {{readerStyle.dimColor}}">
-            {{ '目录' }}
-          </text>
-        </div>
-        <div
-          class="cmd-btn"
-          @click="nextChapter"
-          style="background-color: {{readerStyle.cardBgColor}}">
-          <text style="color: {{readerStyle.dimColor}}">
-            {{ '下一章' }}
-          </text>
-        </div>
-      </list-item>
-      <list-item type="li">
-        <div
-          if="$device.deviceType == 'watch-square'"
-          style="height: 20px"></div>
-        <div
-          elif="$device.deviceType == 'watch-round'"
-          style="height: 100px"></div>
-      </list-item>
-    </list>
-    <div if="{{isScrolling}}" @click="scrollback" class="scrolling">
-      <vw-loading></vw-loading>
-      <text>{{ scrollText }}</text>
-    </div>
-    <div
-      class="topBar square"
-      if="$device.deviceType == 'watch-square'"
-      style="height: 80px;
-        background-color: 
-          {{readerStyle.bgColor}};">
-      <div class="info-row">
-        <text class="info-time" style="color: {{readerStyle.dimColor}}">
-          {{ currentTime }}
-        </text>
-        <text class="info-chapter" style="color: {{readerStyle.dimColor}}">
-          {{ currentChapter + 1 }}/{{ totalChapters }}章
-        </text>
+  <stack style="background-color: {{readerStyle.bgColor}}; width: 100%; height: 100%;">
+    <!-- 主布局，垂直排列，流式占位避免重叠 -->
+    <div class="reader-container" style="flex-direction: column; width: 100%; height: 100%;">
+      
+      <div if="{{isLoading}}" class="wrapper loading" style="flex: 1; justify-content: center; align-items: center; flex-direction: column;">
+         <vw-loading></vw-loading>
+         <text style="color: {{readerStyle.dimColor}}; margin-top: 20px;">加载中...</text>
       </div>
-      <marquee
-        class="info-title"
-        style="color: {{readerStyle.dimColor}};double-ended-shadow-color:{{readerStyle.bgColor}};">
-        {{ title }}
-      </marquee>
-    </div>
-    <div
-      class="topBar round"
-      elif="$device.deviceType == 'watch-round'"
-      style="
-        height: 90px;
-        background-color: 
-          {{readerStyle.bgColor}};">
-      <marquee
-        class="info-title"
-        style="color: {{readerStyle.dimColor}};double-ended-shadow-color:{{readerStyle.bgColor}};">
-        {{ title }}
-      </marquee>
-      <div class="info-row">
-        <text class="info-time" style="color: {{readerStyle.dimColor}}">
-          {{ currentTime }}
-        </text>
-        <text class="info-chapter" style="color: {{readerStyle.dimColor}}">
-          {{ currentChapter + 1 }}/{{ totalChapters }}章
-        </text>
+
+      <!-- 顶部状态栏 (占据物理空间) -->
+      <div if="{{!isLoading}}" style="height: 50px; margin-top: {{$device.deviceType == 'watch-round' ? '30px' : '15px'}}; width: 100%; justify-content: center; align-items: center; padding: 0 40px;">
+         <text style="color: {{readerStyle.dimColor}}; font-size: 22px; text-overflow: ellipsis; lines: 1;">{{ title }}</text>
       </div>
+
+      <!-- 内容区，占据剩余全部空间 -->
+      <div if="{{!isLoading}}" class="page-content" style="flex: 1; padding: {{$device.deviceType == 'watch-round' ? '5px 65px' : '10px 30px'}}; flex-direction: column; justify-content: flex-start;">
+         <!-- 翻页热区覆盖在文字上方 -->
+         <stack style="flex: 1; width: 100%;">
+           <text style="font-size: {{readerStyle.fontSize}}px; line-height: {{readerStyle.lineHeight}}px; color: {{readerStyle.textColor}}; text-overflow: clip;">
+              {{ pages[currentPageIdx] || '' }}
+           </text>
+           <!-- 左右半区翻页，只覆盖内容区不挡底部按钮 -->
+           <div style="width: 100%; height: 100%; flex-direction: row; position: absolute;">
+             <div style="width: 50%; height: 100%;" @click="prevPage"></div>
+             <div style="width: 50%; height: 100%;" @click="nextPage"></div>
+           </div>
+         </stack>
+      </div>
+
+      <!-- 章节导航按钮 (常驻显示) -->
+      <div if="{{!isLoading}}" style="height: 50px; width: 100%; justify-content: center; align-items: center; padding: 0 10px;">
+         <div @click="prevChapter" style="background-color: {{readerStyle.cardBgColor}}; padding: 8px 20px; border-radius: 30px; margin: 0 5px;">
+           <text style="color: {{readerStyle.dimColor}}; font-size: 22px;">上一章</text>
+         </div>
+         <div @click="openCatalog" style="background-color: {{readerStyle.cardBgColor}}; padding: 8px 20px; border-radius: 30px; margin: 0 5px;">
+           <text style="color: {{readerStyle.dimColor}}; font-size: 22px;">目录</text>
+         </div>
+         <div @click="nextChapter" style="background-color: {{readerStyle.cardBgColor}}; padding: 8px 20px; border-radius: 30px; margin: 0 5px;">
+           <text style="color: {{readerStyle.dimColor}}; font-size: 22px;">下一章</text>
+         </div>
+      </div>
+
+      <!-- 底部状态栏 -->
+      <div if="{{!isLoading}}" style="height: 35px; width: 100%; justify-content: {{$device.deviceType == 'watch-round' ? 'center' : 'space-around'}}; align-items: center; padding: 0 {{$device.deviceType == 'watch-round' ? '65px' : '30px'}};">
+         <text style="color: {{readerStyle.dimColor}}; font-size: 20px; margin-left: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}}; margin-right: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}};">{{ currentTime }}</text>
+         <text style="color: {{readerStyle.dimColor}}; font-size: 20px; margin-left: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}}; margin-right: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}};">{{ currentPageIdx + 1 }}/{{ pages.length }}</text>
+         <text style="color: {{readerStyle.dimColor}}; font-size: 20px; margin-left: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}}; margin-right: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}};">{{ currentChapter + 1 }}/{{ totalChapters }}章</text>
+      </div>
+      <!-- 底部占位空间 -->
+      <div if="{{!isLoading}}" style="height: {{$device.deviceType == 'watch-round' ? '40px' : '30px'}};"></div>
     </div>
   </stack>
-  <!-- <div class="page">
-      <text
-        class="chapter-title"
-        if="{{chapterTitle}}"
-        style="color: {{readerStyle.textColor}}">
-        {{ chapterTitle }}
-      </text>
-    </div>
-  </div> -->
 </template>
 
 <script>
@@ -140,38 +59,36 @@
   import file from '@blueos.storage.file'
   import storage from '@blueos.storage.storage'
   import prompt from '@blueos.window.prompt'
+  import device from '@system.device'
 
   export default {
     data: {
-      entryType: '', // 'continue' | 'catalog' | ''
-      // 'continue'则滚到上次阅读段落，'catalog'则滚到顶部
-
+      devWindowWidth: 466,
+      devWindowHeight: 466,
+      entryType: '', 
       bookId: '',
       bookName: '',
       chapterIndex: 0,
       chapterCount: 0,
 
-      title: '', // 显示的书名
+      title: '', 
       chapterTitle: '',
-      paragraphs: [],
-      fullParagraphs: [], // 完整章节内容
-      loadedCount: 0, // 已加载段落数
-      hasMore: false, // 是否还有更多内容
+      pages: [],
+      currentPageIdx: 0,
+      showMenu: false,
       currentTime: '12:00',
       timeUpdater: null,
 
-      currentChapter: 0, // 内部使用的index
+      currentChapter: 0, 
       totalChapters: 0,
-      curParaIdx: 0,
+      curParaIdx: 0, // 以前代表段落，现在代表百分比 0-100
       isLoading: false,
-      readPercentage: 0,
-      isScrolling: true,
-      scrollText: '加载中',
+      lastChapterText: '', // 缓存当前章节原始文本，用于字号变化后重新分页
 
       // Reading Style defaults
       readerStyle: {
-        fontSize: 32,
-        lineHeight: 48,
+        fontSize: 36,
+        lineHeight: 54,
         bgColor: '#000000',
         textColor: '#ffffff',
         dimColor: '#888888',
@@ -190,115 +107,79 @@
       this.totalChapters = Number(this.chapterCount) || 0
       this.title = this.bookName || '书名'
       this.isLoading = true
-      this.paragraphs = []
-      this.fullParagraphs = []
-      this.loadedCount = 0
-      this.hasMore = false
+      this.pages = []
+      this.currentPageIdx = 0
       this.curParaIdx = 0
+      this.showMenu = false
       this.chapterTitles = []
       this.loadChapterTitles()
       this.loadChapter(this.currentChapter)
-
-      this._needScrollTop = true
     },
     onInit() {
       console.log('阅读器 初始化', this.bookId, this.chapterIndex)
 
-      // ====== MOCK MODE ======
-      const USE_MOCK = false
-
-      if (USE_MOCK) {
-        this.title = '如果在冬夜，一个旅人'
-        this.currentChapter = 8886
-        this.totalChapters = 8888
-        this.chapterTitle = '第6章 宇宙闪烁宇宙闪烁宇宙闪烁'
-
-        // 模拟段落
-        const mockParagraphs = Array.from({ length: 100 }, (_, i) =>
-          `这是模拟的第 ${i + 1} 段文字。用于测试阅读器的排版、滚动、分页和主题切换功能。`.repeat(
-            2
-          )
-        )
-        this.fullParagraphs = mockParagraphs
-        // 模拟从“继续阅读”进入
-        this.entryType = 'continue'
-        this.curParaIdx = 90
-
-        if (this.entryType === 'continue' && this.curParaIdx > 20) {
-          this.loadedCount = 20
-          this.paragraphs = mockParagraphs.slice(0, 20)
-          this.hasMore = true
-        } else {
-          this.loadedCount = Math.min(20, mockParagraphs.length)
-          this.paragraphs = mockParagraphs.slice(0, this.loadedCount)
-          this.hasMore = mockParagraphs.length > 20
-        }
-
-        // this.fullParagraphs = mockParagraphs
-        // this.loadedCount = Math.min(20, mockParagraphs.length)
-        // this.paragraphs = mockParagraphs.slice(0, this.loadedCount)
-        // this.hasMore = mockParagraphs.length > 20
-
-        this.isLoading = false
-        this.updateTime()
-        this.loadReaderSettings() // 仍加载主题设置
-
-        setTimeout(() => {
-          if (this.entryType === 'continue') {
-            this.handleContinueReading()
-          } else {
-            this.scrollToTop()
-          }
-        }, 100)
-
-        return
-      }
-      // ====== END MOCK MODE ======
-
-      console.log('Initial isLoading:', this.isLoading)
       this.title = this.bookName || '书名'
       this.currentChapter = Number(this.chapterIndex) || 0
       this.totalChapters = Number(this.chapterCount) || 0
-      this.chapterTitles = [] // 章节标题列表
+      this.chapterTitles = [] 
+
+      try {
+        const info = device.getInfoSync()
+        if (info.windowWidth && info.windowHeight) {
+          this.devWindowWidth = info.windowWidth
+          this.devWindowHeight = info.windowHeight
+          console.log(`device.getInfoSync 成功: ${info.windowWidth}x${info.windowHeight}`)
+        }
+      } catch (e) {
+        console.log('device.getInfoSync 失败，使用默认尺寸')
+      }
 
       this.updateTime()
       this.startUpdateTime()
-      this.loadReaderSettings()
-      this.loadChapterTitles() // 加载章节标题
+      this.loadChapterTitles() 
 
-      // 加载章节
-      if (this.content) {
-        console.log('Loading from content param')
-        this.renderChapter(this.content)
-      } else if (this.bookId) {
-        if (this.entryType === 'continue') {
-          this.loadHistoryParaIdx(() => {
+      // 必须等待配置加载（字号、行高）完毕后再执行分页！否则分页计算字数会出错
+      this.loadReaderSettings(() => {
+        if (this.content) {
+          this.paginateChapter(this.content)
+        } else if (this.bookId) {
+          if (this.entryType === 'continue') {
+            this.loadHistoryParaIdx(() => {
+              this.loadChapter(this.currentChapter)
+            })
+          } else {
             this.loadChapter(this.currentChapter)
-          })
+          }
         } else {
-          this.loadChapter(this.currentChapter)
-          this.isScrolling = false
+          this.pages = ['未找到书籍内容']
+          this.isLoading = false
         }
-      } else {
-        // Fallback for demo
-        this.paragraphs = ['未找到书籍内容']
-        this.isLoading = false
-      }
-      console.log('onInit complete, isLoading:', this.isLoading)
+      })
     },
     onShow() {
-      console.log('Reader onShow, isLoading:', this.isLoading)
-      this.loadReaderSettings()
+      const oldFz = this.readerStyle.fontSize
+      const oldLh = this.readerStyle.lineHeight
+      this.loadReaderSettings(() => {
+        // 字号或行高变了 → 必须用新参数重新分页
+        if ((this.readerStyle.fontSize !== oldFz || this.readerStyle.lineHeight !== oldLh)
+            && this.lastChapterText) {
+          console.log(`字号变化 ${oldFz} → ${this.readerStyle.fontSize}，重新分页`)
+          // 记住当前阅读百分比位置
+          const pct = this.pages.length > 1
+            ? this.currentPageIdx / (this.pages.length - 1)
+            : 0
+          this.paginateChapter(this.lastChapterText)
+          // 恢复到接近的位置
+          this.currentPageIdx = Math.round(pct * (this.pages.length - 1))
+        }
+      })
       this.startUpdateTime()
-
-      // Safety check: if stuck in loading for too long (e.g. no callback), force clear
       if (this.isLoading) {
         setTimeout(() => {
           if (this.isLoading) {
             this.isLoading = false
-            console.log('Force clearing isLoading state')
           }
-        }, 2000)
+        }, 3000)
       }
     },
     onHide() {
@@ -310,13 +191,10 @@
       this.stopUpdateTime()
     },
     startUpdateTime() {
-      // 防止重复启动
       if (this.timeUpdater) return
-
       this.timeUpdater = setInterval(() => {
         this.updateTime()
       }, 1000)
-      // 可以考虑30秒刷新一次降低功耗
     },
     stopUpdateTime() {
       if (this.timeUpdater) {
@@ -330,7 +208,7 @@
       const minutes = now.getMinutes().toString().padStart(2, '0')
       this.currentTime = `${hours}:${minutes}`
     },
-    loadReaderSettings() {
+    loadReaderSettings(callback) {
       storage.get({
         key: 'reader_settings',
         success: (data) => {
@@ -338,8 +216,8 @@
             try {
               const settings = JSON.parse(data)
               const theme = settings.theme || 'dark'
-              this.readerStyle.fontSize = settings.fontSize || 32
-              this.readerStyle.lineHeight = settings.lineHeight || 48
+              this.readerStyle.fontSize = settings.fontSize || 36
+              this.readerStyle.lineHeight = settings.lineHeight || 54
 
               if (theme === 'light') {
                 this.readerStyle.bgColor = '#ffffff'
@@ -352,17 +230,18 @@
                 this.readerStyle.dimColor = '#557744'
                 this.readerStyle.cardBgColor = '#aacc99'
               } else {
-                // dark
                 this.readerStyle.bgColor = '#000000'
                 this.readerStyle.textColor = '#ffffff'
                 this.readerStyle.dimColor = '#888888'
                 this.readerStyle.cardBgColor = '#333333'
               }
-            } catch (e) {
-              console.error('Reader settings parse error', e)
-            }
+            } catch (e) {}
           }
+          if (callback) callback()
         },
+        fail: () => {
+          if (callback) callback()
+        }
       })
     },
     loadChapterTitles() {
@@ -374,12 +253,10 @@
             const meta = JSON.parse(res.text)
             if (Array.isArray(meta.chapters)) {
               this.chapterTitles = meta.chapters
-              // 立即更新当前章节标题
               this.updateTitle(this.currentChapter)
             }
           } catch (e) {}
         },
-        fail: () => {},
       })
     },
     updateTitle(index) {
@@ -394,45 +271,23 @@
       }
     },
     loadChapter(index) {
-      console.log(`Loading chapter ${index}, setting isLoading=true`)
       this.isLoading = true
-      this.paragraphs = []
-
-      // 更新顶部标题为章节名
+      this.pages = []
       this.updateTitle(index)
 
       const dirPath = `internal://files/book_data_${this.bookId}`
       const localPath = `${dirPath}/${index}.txt`
 
-      // 1. Try local file first
       file.readText({
         uri: localPath,
         success: (res) => {
-          console.log('本地章节加载成功')
-          this.renderChapter(res.text)
+          this.paginateChapter(res.text)
         },
         fail: () => {
-          console.log('本地章节未找到，尝试网络加载')
-          // 2. Fallback to network
-          this.loadFromNetwork(index)
-        },
-      })
-    },
-    loadFromNetwork(index) {
-      sysFetch.fetch({
-        url: `http://127.0.0.1:23101/api/novel/chapter?id=${this.bookId}&index=${index}`,
-        method: 'GET',
-        responseType: 'text',
-        success: (response) => {
-          console.log('网络章节加载成功')
-          this.renderChapter(response.data)
-        },
-        fail: (data, code) => {
-          console.log(`网络加载失败: ${code}`)
-          prompt.showToast({ message: '加载失败' })
-          this.paragraphs = ['内容加载失败，请检查网络或重新下载']
+          prompt.showToast({ message: '该章节未下载，请前往OrbitV继续下载' })
+          this.pages = ['该章节尚未下载\n\n请打开手机端 OrbitV 应用，进入本书详情页继续下载后续章节。']
+          this.currentPageIdx = 0
           this.isLoading = false
-          this.isScrolling = false
         },
       })
     },
@@ -443,16 +298,13 @@
         success: (res) => {
           try {
             const meta = JSON.parse(res.text)
-            // 只有当章节匹配时才恢复进度，否则从头开始
             if (
               meta.currentChapter === this.currentChapter &&
               typeof meta.curParaIdx === 'number'
             ) {
               this.curParaIdx = meta.curParaIdx
-              console.log(`恢复阅读进度：第 ${this.curParaIdx} 段`)
             } else {
               this.curParaIdx = 0
-              console.log('章节不匹配或无进度，从头开始')
             }
           } catch (e) {
             this.curParaIdx = 0
@@ -466,200 +318,152 @@
         },
       })
     },
-    // 新增：处理继续阅读的核心逻辑
-    handleContinueReading() {
-      // 确保 curParaIdx 有效
-      if (typeof this.curParaIdx !== 'number' || this.curParaIdx < 0) {
-        this.curParaIdx = 0
-      }
-
-      // 如果目标段落超出总长度，修正为最后一段
-      if (this.curParaIdx >= this.fullParagraphs.length) {
-        this.curParaIdx = this.fullParagraphs.length - 1
-      }
-
-      console.log(
-        `尝试滚动到段落: ${this.curParaIdx}, 当前已加载: ${this.loadedCount}`
-      )
-      if (this.curParaIdx < this.loadedCount) {
-        // 情况1：目标段落已在当前加载范围内，直接滚动
-        this.scroll2historyPara()
-      } else {
-        // 情况2：目标段落尚未加载，需要分批加载
-        this.load2historyPara()
-      }
-    },
-
-    // 新增：循环加载直到覆盖目标段落
-    load2historyPara() {
-      if (!this.hasMore) {
-        // 没有更多了，直接滚到最后（或当前最大）
-        this.scroll2historyPara()
-        return
-      }
-
-      const batchSize = 20
-      const remaining = this.fullParagraphs.length - this.loadedCount
-      const toLoad = Math.min(batchSize, remaining)
-
-      if (toLoad <= 0) {
-        this.scroll2historyPara()
-        return
-      }
-
-      // 模拟异步加载感（可选，如果数据量大瞬间完成可去掉 setTimeout）
-      // 这里直接同步操作数组，因为 fullParagraphs 已经在内存里了
-      const nextBatch = this.fullParagraphs.slice(
-        this.loadedCount,
-        this.loadedCount + toLoad
-      )
-      this.paragraphs = this.paragraphs.concat(nextBatch)
-      this.loadedCount += toLoad
-
-      if (this.loadedCount >= this.fullParagraphs.length) {
-        this.hasMore = false
-      }
-
-      console.log(
-        `自动加载批次，当前已加载: ${this.loadedCount}, 目标: ${this.curParaIdx}`
-      )
-      const p = Math.floor((this.loadedCount / this.curParaIdx) * 100)
-      this.scrollText = `加载中: ${p >= 98 ? 98 : p}%`
-
-      // 检查是否已覆盖目标
-      if (this.loadedCount > this.curParaIdx) {
-        // 覆盖到了，执行滚动
-        this.scroll2historyPara()
-      } else {
-        // 还没到，继续加载下一批
-        // 使用 setTimeout 避免阻塞 UI 线程，让 loading 动画有机会渲染
-        setTimeout(() => {
-          this.load2historyPara()
-        }, 50)
-      }
-    },
-
-    // 新增：执行滚动动作
-    scroll2historyPara() {
-      const listElement = this.$element('contentList')
-      if (listElement) {
-        console.log(`执行滚动到 index: ${this.curParaIdx}`)
-        const p = (this.loadedCount / this.curParaIdx) * 100
-        this.scrollText = `加载中: ${p >= 99 ? 99 : p}%`
-
-        // 稍微延迟确保 DOM 更新
-        setTimeout(() => {
-          listElement.scrollTo({
-            index: this.curParaIdx,
-            // behavior: 'smooth',
-          })
-          // 滚动完成后，标记结束，隐藏全屏动画
-          this.isScrolling = false
-          console.log('滚动完成，isScrolling 设为 false')
-          this.scrollText = '加载完成'
-          // 保存一次进度确保无误（虽然 readAtPara 也会存）
-          this.saveProgress()
-        }, 100)
-      } else {
-        console.error('List element not found for scrolling')
-        this.isScrolling = false
-      }
-    },
-    scrollback() {
-      this.isScrolling = false
-    },
-    renderChapter(text) {
+    // 核心算法：按字符数分页，让 <text> 组件自己处理自动换行
+    paginateChapter(text) {
       if (!text) {
-        this.paragraphs = ['章节内容为空']
-        this.fullParagraphs = []
-        this.hasMore = false
+        this.pages = ['章节内容为空']
+        this.currentPageIdx = 0
         this.isLoading = false
-        this.isScrolling = false
-      } else {
-        // 保存完整内容
-        this.fullParagraphs = text
-          .split('\n')
-          .filter((p) => p.trim() !== '')
-          .map((p) => '\u3000\u3000' + p.trim())
+        return
+      }
+      this.lastChapterText = text // 缓存原文，用于字号变化后重新分页
 
-        // 分批加载以避免卡顿
-        const batchSize = 20
-        if (this.fullParagraphs.length > batchSize) {
-          this.paragraphs = this.fullParagraphs.slice(0, batchSize)
-          this.loadedCount = batchSize
-          this.hasMore = true
-          console.log(
-            `Chapter has ${this.fullParagraphs.length} paragraphs, loaded first ${batchSize}`
-          )
-        } else {
-          this.paragraphs = this.fullParagraphs
-          this.loadedCount = this.fullParagraphs.length
-          this.hasMore = false
+      const isRound = this.$device && this.$device.deviceType === 'watch-round'
+
+      // 根据屏幕大小和字号估算每页能容纳的字符数
+      const fz = parseInt(this.readerStyle.fontSize) || 36
+      const lh = parseInt(this.readerStyle.lineHeight) || 54
+
+      // 动态计算可用区域
+      // 垂直扣除: 顶栏(50+30) + 文字区上下内边距(10) + 导航按钮(50) + 底栏(35) + 占位(40) = 215px（安全值取 230）
+      // 方表垂直扣除: 顶栏(50+15) + 文字区边距(20) + 导航(50) + 底栏(35) + 占位(30) = 200px
+      const verticalPadding = isRound ? 230 : 200
+      
+      // 水平扣除: 圆表左右为适应圆形弧度，大幅向内收缩 (65px * 2) = 130px
+      const horizontalPadding = isRound ? 130 : 60
+
+      const contentW = Math.max(250, this.devWindowWidth - horizontalPadding)
+      const contentH = Math.max(200, this.devWindowHeight - verticalPadding)
+
+      // 关键修正：中文字的实际渲染宽度约为 font-size 的 75%
+      const charWidth = fz * 0.75
+      const charsPerLine = Math.floor(contentW / charWidth)
+      const linesPerPage = Math.floor(contentH / lh)
+      const charsPerPage = Math.max(charsPerLine * linesPerPage, 30)
+      
+      console.log(`屏幕: ${this.devWindowWidth}x${this.devWindowHeight}, 内容区: ${contentW}x${contentH}`)
+      console.log(`字宽: ${charWidth}, ${charsPerLine}字/行, ${linesPerPage}行/页, 共${charsPerPage}字/页`)
+
+      // 1. 先把原文处理成带缩进的完整文本
+      const paras = text.split('\n').filter(p => p.trim() !== '')
+      const fullText = paras.map(p => '\u3000\u3000' + p.trim()).join('\n')
+
+      // 2. 简单字符计数分页，\n 额外收取 3 字符（半行的代价）
+      let pagesList = []
+      let start = 0
+
+      while (start < fullText.length) {
+        let budget = charsPerPage
+        let pos = start
+
+        while (pos < fullText.length && budget > 0) {
+          if (fullText[pos] === '\n') {
+            budget -= 3 // 换行只收取固定小额罚金
+          } else {
+            budget--
+          }
+          pos++
         }
+
+        if (pos >= fullText.length) {
+          pagesList.push(fullText.substring(start).trim())
+          break
+        }
+
+        // 在 [75%~100%] 范围内找最佳断点
+        let bestBreak = -1
+        const minPos = start + Math.floor((pos - start) * 0.75)
+
+        // 优先找句号、感叹号、问号、换行
+        for (let i = pos; i >= minPos; i--) {
+          const c = fullText[i]
+          if (c === '。' || c === '！' || c === '？' || c === '；' || c === '\n') {
+            bestBreak = i + 1
+            break
+          }
+        }
+
+        // 其次找逗号、顿号
+        if (bestBreak === -1) {
+          for (let i = pos; i >= minPos; i--) {
+            const c = fullText[i]
+            if (c === '，' || c === '、' || c === '"' || c === '"' || c === '）') {
+              bestBreak = i + 1
+              break
+            }
+          }
+        }
+
+        if (bestBreak === -1) bestBreak = pos
+
+        const pageText = fullText.substring(start, bestBreak).trim()
+        if (pageText) {
+          pagesList.push(pageText)
+        }
+        start = bestBreak
       }
-      this.saveProgress()
-      console.log('Rendering complete, setting isLoading=false')
+      
+      this.pages = pagesList.length > 0 ? pagesList : ['暂无内容']
+      console.log(`本章共 ${fullText.length} 字，分为 ${this.pages.length} 页`)
+      
+      // 恢复进度：curParaIdx 代表百分比进度 (0-100)
+      if (this.entryType === 'continue' && this.curParaIdx > 0) {
+         let idx = Math.floor((this.curParaIdx / 100) * (this.pages.length - 1))
+         this.currentPageIdx = Math.max(0, Math.min(idx, this.pages.length - 1))
+      } else if (this.entryType === 'prev') {
+         this.currentPageIdx = this.pages.length - 1
+      } else {
+         this.currentPageIdx = 0
+      }
+      
+      this.entryType = ''
       this.isLoading = false
-
-      if (this._needScrollTop) {
-        this._needScrollTop = false
-        setTimeout(() => { this.scrollToTop() }, 300)
-      } else if (this.entryType === 'continue') {
-        setTimeout(() => { this.handleContinueReading() }, 50)
+      this.saveProgress()
+    },
+    prevPage() {
+      if (this.currentPageIdx > 0) {
+        this.currentPageIdx--
+        this.saveProgress()
+      } else if (this.currentChapter > 0) {
+        // 翻页到头 → 切上一章，从末页开始（连续翻页体验）
+        this.currentChapter--
+        this.entryType = 'prev'
+        this.loadChapter(this.currentChapter)
       } else {
-        setTimeout(() => { this.scrollToTop() }, 50)
+        prompt.showToast({ message: '已经是第一页了' })
       }
     },
-    scrollToTop() {
-      const listElement = this.$element('contentList')
-      if (listElement) {
-        // listElement.scrollTo({
-        //   index: 0,
-        // })
-        listElement.scrollTop()
-        console.log('Scrolled to top')
+    nextPage() {
+      if (this.currentPageIdx < this.pages.length - 1) {
+        this.currentPageIdx++
+        this.saveProgress()
       } else {
-        console.log('List element not found')
+        this.nextChapter()
       }
-      this.isScrolling = false
     },
-    loadMore() {
-      if (!this.hasMore) return
-
-      const batchSize = 20
-      const remaining = this.fullParagraphs.length - this.loadedCount
-      const toLoad = Math.min(batchSize, remaining)
-
-      const nextBatch = this.fullParagraphs.slice(
-        this.loadedCount,
-        this.loadedCount + toLoad
-      )
-
-      this.paragraphs = this.paragraphs.concat(nextBatch)
-      this.loadedCount += toLoad
-
-      if (this.loadedCount >= this.fullParagraphs.length) {
-        this.hasMore = false
-      }
-
-      console.log(
-        `Loaded ${toLoad} more paragraphs, total: ${this.loadedCount}/${this.fullParagraphs.length}`
-      )
+    toggleMenu() {
+      this.showMenu = !this.showMenu
     },
     prevChapter() {
-      console.log('Prev chapter clicked')
-
       if (this.currentChapter > 0) {
         this.currentChapter--
+        this.entryType = '' // 点按钮进上一章 → 从第一页开始
         this.loadChapter(this.currentChapter)
       } else {
         prompt.showToast({ message: '已经是第一章了' })
       }
     },
     nextChapter() {
-      console.log('Next chapter clicked')
-
-      // 如果不知道总章数，暂时无限制? 或者限制
       if (
         this.totalChapters > 0 &&
         this.currentChapter >= this.totalChapters - 1
@@ -668,10 +472,10 @@
         return
       }
       this.currentChapter++
+      this.entryType = 'next'
       this.loadChapter(this.currentChapter)
     },
     saveProgress() {
-      // 先读取现有 meta，只更新 currentChapter，保留 chapters/isOffline 等字段
       const fileName = `book_${this.bookId}.json`
       const simplePath = `internal://files/${fileName}`
 
@@ -683,11 +487,15 @@
             meta = JSON.parse(res.text)
           } catch (e) {}
 
-          // 只更新阅读进度，保留原有字段
           meta.currentChapter = this.currentChapter
           meta.name = this.bookName
           meta.chapterCount = this.totalChapters
-          meta.curParaIdx = this.curParaIdx
+          
+          if (this.pages && this.pages.length > 1) {
+            meta.curParaIdx = Math.floor((this.currentPageIdx / (this.pages.length - 1)) * 100)
+          } else {
+            meta.curParaIdx = 0
+          }
 
           file.writeText({
             uri: simplePath,
@@ -695,13 +503,12 @@
           })
         },
         fail: () => {
-          // 读取失败则用基础信息创建
           const bookMeta = {
             id: this.bookId,
             name: this.bookName,
             chapterCount: this.totalChapters,
             currentChapter: this.currentChapter,
-            curParaIdx: this.curParaIdx,
+            curParaIdx: this.pages && this.pages.length > 1 ? Math.floor((this.currentPageIdx / (this.pages.length - 1)) * 100) : 0,
           }
           file.writeText({
             uri: simplePath,
@@ -709,10 +516,6 @@
           })
         },
       })
-    },
-    handleTap() {},
-    openJump() {
-      // router.push({ uri: '/pages/Jump' });
     },
     openCatalog() {
       router.push({
@@ -724,212 +527,9 @@
         },
       })
     },
-    readAtPara(idx) {
-      console.log(`读到第 ${idx + 1}/${this.loadedCount} 段`)
-      console.log(`加载了 ${this.loadedCount} 段`)
-      this.curParaIdx = idx
-      this.saveProgress()
-      if (this.fullParagraphs && this.fullParagraphs.length > 0) {
-        let currentIndex = Number(idx)
-        if (isNaN(currentIndex)) return 0
-
-        let p = Math.ceil(
-          ((currentIndex + 1) / this.fullParagraphs.length) * 100
-        )
-        if (p > 100) p = 100
-        if (p < 1) p = 1 // Ensure at least 1% if content exists
-
-        // Improve stability: only update if changed significantly or larger?
-        // No, current view is truth.
-        this.readPercentage = p
-        console.log(`读到 ${currentIndex + 1} 段，本章阅读: ${p}%`)
-      }
-    },
   }
 </script>
 
 <style lang="less">
-  .wrapper {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  stack {
-    height: 100%;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-  }
-  .loading {
-    width: 100%;
-    padding-top: 150px;
-    @media screen and (device: watch-round) {
-      padding-top: 120px;
-    }
-    text {
-      color: #ffffff;
-    }
-  }
-  .text-item {
-    padding: 0 10px;
-    @media screen and (device: watch-round) {
-      padding: 0 40px;
-    }
-  }
-  .loadmore-item {
-    width: 100%;
-    .wrapper();
-    .loadmore-btn {
-      background-color: #262626;
-      padding: 5px 20px;
-      margin-top: 20px;
-      border-radius: 100px;
-      text {
-        color: #ffffff;
-      }
-    }
-  }
-  .cmd-item {
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    .cmd-btn {
-      .wrapper();
-      background-color: #262626;
-      padding: 5px 15px;
-      margin: 20px 7px 0px;
-      border-radius: 100px;
-      text {
-        color: #ffffff;
-      }
-    }
-  }
-  .scrolling {
-    height: 100%;
-    width: 100%;
-    .wrapper();
-    background-color: #000;
-    opacity: 0.9;
-    text {
-      color: white;
-    }
-  }
-  .topBar.square {
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    .info-row {
-      width: 100%;
-      justify-content: space-between;
-      padding: 0 70px;
-      .info-time,
-      .info-chapter {
-        font-size: 26px;
-        line-height: 26px;
-        margin-top: 5px;
-      }
-    }
-    .info-title {
-      font-size: 26px;
-      width: 420px;
-      margin-top: 5px;
-      text-align: center;
-    }
-  }
-  .topBar.round {
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    .info-title {
-      width: 180px;
-      margin-top: 20px;
-      font-size: 26px;
-      text-align: center;
-    }
-    .info-row {
-      width: 100%;
-      justify-content: space-between;
-      padding: 0 85px;
-      .info-time,
-      .info-chapter {
-        font-size: 26px;
-        line-height: 26px;
-        margin-top: 3px;
-      }
-    }
-  }
-  /* .chapter-title {
-    font-weight: bold;
-    margin-top: 30px;
-    @media screen and (device: watch-round) {
-      margin-top: 55px;
-    }
-    marquee {
-      text-align: center;
-      width: 420px;
-      @media screen and (device: watch-round) {
-        width: 270px;
-      }
-    }
-  } */
-  /* 
-
-  .loading-mask {
-    position: fixed;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-  }
-  .page {
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-
-  .wrapper {
-    flex-direction: column;
-    background-color: #000000;
-    padding: 20px;
-  }
-
-  .content-list {
-    flex: 1;
-    flex-direction: column;
-  }
-
-  .text-item {
-    margin-bottom: 20px;
-  }
-
-  .text-content {
-    font-size: 32px;
-    line-height: 48px;
-    color: #ffffff;
-  }
-
-  .bottom-progress {
-    color: $grey;
-    font-size: 24px;
-    text-align: center;
-    height: 40px;
-    margin-top: 10px;
-  }
-
-  .loading-layer {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.9);
-    padding: 30px 50px;
-    border-radius: 15px;
-    border-width: 2px;
-    border-color: rgba(15, 174, 255, 0.5);
-    z-index: 1000;
-  }
-*/
+  /* 使用空样式块或仅保持必须的 less，其余全采用 inline styles 以保证兼容性 */
 </style>
