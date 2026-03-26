@@ -8,47 +8,49 @@
          <text style="color: {{readerStyle.dimColor}}; margin-top: 20px;">加载中...</text>
       </div>
 
-      <!-- 顶部状态栏 (占据物理空间) -->
-      <div if="{{!isLoading}}" style="height: 50px; margin-top: {{$device.deviceType == 'watch-round' ? '30px' : '15px'}}; width: 100%; justify-content: center; align-items: center; padding: 0 40px;">
+      <!-- 圆表：顶部弧形区显示时间 -->
+      <div if="{{!isLoading && $device.deviceType == 'watch-round'}}" style="height: 25px; margin-top: 5px; width: 100%; justify-content: center; align-items: center;">
+         <text style="color: {{readerStyle.dimColor}}; font-size: 20px;">{{ currentTime }}</text>
+      </div>
+
+      <!-- 顶部状态栏：章节标题 -->
+      <div if="{{!isLoading}}" style="height: {{$device.deviceType == 'watch-round' ? '35px' : '50px'}}; margin-top: {{$device.deviceType == 'watch-round' ? '0' : '15px'}}; width: 100%; justify-content: center; align-items: center; padding: 0 {{$device.deviceType == 'watch-round' ? '80px' : '40px'}};">
          <text style="color: {{readerStyle.dimColor}}; font-size: 22px; text-overflow: ellipsis; lines: 1;">{{ title }}</text>
       </div>
 
-      <!-- 内容区，占据剩余全部空间 -->
-      <div if="{{!isLoading}}" class="page-content" style="flex: 1; padding: {{$device.deviceType == 'watch-round' ? '5px 65px' : '10px 30px'}}; flex-direction: column; justify-content: flex-start;">
-         <!-- 翻页热区覆盖在文字上方 -->
-         <stack style="flex: 1; width: 100%;">
-           <text style="font-size: {{readerStyle.fontSize}}px; line-height: {{readerStyle.lineHeight}}px; color: {{readerStyle.textColor}}; text-overflow: clip;">
-              {{ pages[currentPageIdx] || '' }}
-           </text>
-           <!-- 左右半区翻页，只覆盖内容区不挡底部按钮 -->
-           <div style="width: 100%; height: 100%; flex-direction: row; position: absolute;">
-             <div style="width: 50%; height: 100%;" @click="prevPage"></div>
-             <div style="width: 50%; height: 100%;" @click="nextPage"></div>
-           </div>
-         </stack>
+      <!-- 内容区，点击翻页 + 可滚动 -->
+      <div if="{{!isLoading}}" @touchstart="onContentTouchStart" @touchend="onContentTouchEnd" style="flex: 1; padding: {{$device.deviceType == 'watch-round' ? '5px 65px' : '10px 30px'}}; flex-direction: column; justify-content: flex-start;">
+         <list style="flex: 1; width: 100%;" scrollbar="false">
+           <list-item type="content">
+             <text style="font-size: {{readerStyle.fontSize}}px; line-height: {{readerStyle.lineHeight}}px; color: {{readerStyle.textColor}};">
+                {{ pages[currentPageIdx] || '' }}
+             </text>
+           </list-item>
+         </list>
       </div>
 
       <!-- 章节导航按钮 (常驻显示) -->
       <div if="{{!isLoading}}" style="height: 50px; width: 100%; justify-content: center; align-items: center; padding: 0 10px;">
-         <div @click="prevChapter" style="background-color: {{readerStyle.cardBgColor}}; padding: 8px 20px; border-radius: 30px; margin: 0 5px;">
+         <div @click="prevChapter" style="background-color: {{readerStyle.cardBgColor}}; padding: 10px 28px; border-radius: 30px; margin: 0 5px;">
            <text style="color: {{readerStyle.dimColor}}; font-size: 22px;">上一章</text>
          </div>
-         <div @click="openCatalog" style="background-color: {{readerStyle.cardBgColor}}; padding: 8px 20px; border-radius: 30px; margin: 0 5px;">
+         <div @click="openCatalog" style="background-color: {{readerStyle.cardBgColor}}; padding: 10px 28px; border-radius: 30px; margin: 0 5px;">
            <text style="color: {{readerStyle.dimColor}}; font-size: 22px;">目录</text>
          </div>
-         <div @click="nextChapter" style="background-color: {{readerStyle.cardBgColor}}; padding: 8px 20px; border-radius: 30px; margin: 0 5px;">
+         <div @click="nextChapter" style="background-color: {{readerStyle.cardBgColor}}; padding: 10px 28px; border-radius: 30px; margin: 0 5px;">
            <text style="color: {{readerStyle.dimColor}}; font-size: 22px;">下一章</text>
          </div>
       </div>
 
       <!-- 底部状态栏 -->
-      <div if="{{!isLoading}}" style="height: 35px; width: 100%; justify-content: {{$device.deviceType == 'watch-round' ? 'center' : 'space-around'}}; align-items: center; padding: 0 {{$device.deviceType == 'watch-round' ? '65px' : '30px'}};">
-         <text style="color: {{readerStyle.dimColor}}; font-size: 20px; margin-left: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}}; margin-right: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}};">{{ currentTime }}</text>
+      <div if="{{!isLoading}}" style="height: {{$device.deviceType == 'watch-round' ? '25px' : '28px'}}; width: 100%; justify-content: {{$device.deviceType == 'watch-round' ? 'center' : 'space-around'}}; align-items: center; padding: 0 {{$device.deviceType == 'watch-round' ? '65px' : '30px'}};">
+         <!-- 方表显示时间，圆表时间已在顶部 -->
+         <text if="{{$device.deviceType != 'watch-round'}}" style="color: {{readerStyle.dimColor}}; font-size: 20px;">{{ currentTime }}</text>
          <text style="color: {{readerStyle.dimColor}}; font-size: 20px; margin-left: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}}; margin-right: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}};">{{ currentPageIdx + 1 }}/{{ pages.length }}</text>
          <text style="color: {{readerStyle.dimColor}}; font-size: 20px; margin-left: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}}; margin-right: {{$device.deviceType == 'watch-round' ? '10px' : '0px'}};">{{ currentChapter + 1 }}/{{ totalChapters }}章</text>
       </div>
       <!-- 底部占位空间 -->
-      <div if="{{!isLoading}}" style="height: {{$device.deviceType == 'watch-round' ? '40px' : '30px'}};"></div>
+      <div if="{{!isLoading}}" style="height: {{$device.deviceType == 'watch-round' ? '15px' : '0px'}};" />
     </div>
   </stack>
 </template>
@@ -334,83 +336,90 @@
       const fz = parseInt(this.readerStyle.fontSize) || 36
       const lh = parseInt(this.readerStyle.lineHeight) || 54
 
-      // 动态计算可用区域
-      // 垂直扣除: 顶栏(50+30) + 文字区上下内边距(10) + 导航按钮(50) + 底栏(35) + 占位(40) = 215px（安全值取 230）
-      // 方表垂直扣除: 顶栏(50+15) + 文字区边距(20) + 导航(50) + 底栏(35) + 占位(30) = 200px
-      const verticalPadding = isRound ? 230 : 200
+      // ---------- 将物理像素转换为 CSS(Design) 像素 ----------
+      // 快应用的 designWidth 是 466，CSS的长度都是基于宽度的等比缩放
+      const scale = 466 / this.devWindowWidth
+      const cssWidth = 466 // 缩放后的CSS逻辑宽度恒等于设计宽度
+      const cssHeight = this.devWindowHeight * scale
+
+      // 动态计算可用区域 (这里的 padding 全都是 CSS 像素)
+      // 垂直扣除: 顶栏(50+30) + 文字上下内边距(10) + 导航按钮(50) + 底栏(35) + 占位(40) = 215px（安全值230）
+      // 方表垂直扣除: 顶栏(50+15) + 文字边距(20) + 导航(50) + 底栏(35) + 占位(30) + 安全余量(20) = 220px
+      const verticalPadding = isRound ? 130 : 160
       
-      // 水平扣除: 圆表左右为适应圆形弧度，大幅向内收缩 (65px * 2) = 130px
+      // 水平扣除: 圆表左右为适应圆形弧度收缩 (130px), 方表正常内边距(60px)
       const horizontalPadding = isRound ? 130 : 60
 
-      const contentW = Math.max(250, this.devWindowWidth - horizontalPadding)
-      const contentH = Math.max(200, this.devWindowHeight - verticalPadding)
+      const contentW = Math.max(250, cssWidth - horizontalPadding)
+      const contentH = Math.max(200, cssHeight - verticalPadding)
 
-      // 关键修正：中文字的实际渲染宽度约为 font-size 的 75%
-      const charWidth = fz * 0.75
+      // 关键修正：中文字的实际渲染宽度约为 font-size 的 0.8 倍 (测量实际结果)
+      const charWidth = fz * Math.max(0.7, (isRound ? 0.8 : 0.8))
+      
+      // 取容纳字数的保守值(盡量满载但不溢出换行)
       const charsPerLine = Math.floor(contentW / charWidth)
       const linesPerPage = Math.floor(contentH / lh)
-      const charsPerPage = Math.max(charsPerLine * linesPerPage, 30)
       
-      console.log(`屏幕: ${this.devWindowWidth}x${this.devWindowHeight}, 内容区: ${contentW}x${contentH}`)
-      console.log(`字宽: ${charWidth}, ${charsPerLine}字/行, ${linesPerPage}行/页, 共${charsPerPage}字/页`)
+      console.log(`物理屏: ${this.devWindowWidth}x${this.devWindowHeight}, 逻辑高度: ${cssHeight}`)
+      console.log(`内容区: ${contentW}x${contentH}, 计算: ${charsPerLine}字/行, ${linesPerPage}行/页`)
 
       // 1. 先把原文处理成带缩进的完整文本
+      // 每段开头空两格中文空格
       const paras = text.split('\n').filter(p => p.trim() !== '')
-      const fullText = paras.map(p => '\u3000\u3000' + p.trim()).join('\n')
+      const fullText = paras.map(p => '\u3000\u3000' + p.trim().replace(/\s/g, '')).join('\n')
 
-      // 2. 简单字符计数分页，\n 额外收取 3 字符（半行的代价）
+      // 2. 模拟渲染过程，按行统计
       let pagesList = []
       let start = 0
 
       while (start < fullText.length) {
-        let budget = charsPerPage
-        let pos = start
+        // 跳过每一页开头多余的换行符，防止页面顶部出现整行空隙
+        while (start < fullText.length && (fullText[start] === '\n' || fullText[start] === '\r')) {
+          start++
+        }
+        if (start >= fullText.length) break
 
-        while (pos < fullText.length && budget > 0) {
+        let pos = start
+        let currentLineChars = 0
+        let lineCount = 0
+
+        while (pos < fullText.length && lineCount < linesPerPage) {
+          const charCode = fullText.charCodeAt(pos)
+          
           if (fullText[pos] === '\n') {
-            budget -= 3 // 换行只收取固定小额罚金
+            // 遇到换行，物理上消耗一整行
+            lineCount++
+            currentLineChars = 0
           } else {
-            budget--
+            // 中文字符宽度为1，英文/数字为0.5
+            currentLineChars += (charCode > 255 ? 1 : 0.5)
+
+            // 如果本行文字塞满了，换到下一行
+            if (currentLineChars >= charsPerLine) {
+              lineCount++
+              currentLineChars = 0
+            }
           }
+          
+          if (lineCount === linesPerPage) {
+            // 如果正好塞满整页，不包含当前导致超页的字符（因为它是下一页的开头），除非它是由于满行导致的
+            if (fullText[pos] === '\n') {
+                pos++ // 把这个\n吃掉，因为它属于上一页最后的回车，不要留在开头
+            } else if (currentLineChars === 0) {
+                // 是因为满行引发的 break，不吃这个字，留在下一页
+            }
+            break
+          }
+          
           pos++
         }
 
-        if (pos >= fullText.length) {
-          pagesList.push(fullText.substring(start).trim())
-          break
-        }
-
-        // 在 [75%~100%] 范围内找最佳断点
-        let bestBreak = -1
-        const minPos = start + Math.floor((pos - start) * 0.75)
-
-        // 优先找句号、感叹号、问号、换行
-        for (let i = pos; i >= minPos; i--) {
-          const c = fullText[i]
-          if (c === '。' || c === '！' || c === '？' || c === '；' || c === '\n') {
-            bestBreak = i + 1
-            break
-          }
-        }
-
-        // 其次找逗号、顿号
-        if (bestBreak === -1) {
-          for (let i = pos; i >= minPos; i--) {
-            const c = fullText[i]
-            if (c === '，' || c === '、' || c === '"' || c === '"' || c === '）') {
-              bestBreak = i + 1
-              break
-            }
-          }
-        }
-
-        if (bestBreak === -1) bestBreak = pos
-
-        const pageText = fullText.substring(start, bestBreak).trim()
+        // 截出文本，去掉头尾潜在的空白符(保留缩进的空格，也就是保留\u3000)
+        let pageText = fullText.substring(start, pos).replace(/[\r\n]+$/, '')
         if (pageText) {
           pagesList.push(pageText)
         }
-        start = bestBreak
+        start = pos
       }
       
       this.pages = pagesList.length > 0 ? pagesList : ['暂无内容']
@@ -429,6 +438,31 @@
       this.entryType = ''
       this.isLoading = false
       this.saveProgress()
+    },
+    onContentTouchStart(e) {
+      const t = e.touches && e.touches[0]
+      this._touchX = t ? (t.clientX || t.pageX || t.screenX || 0) : 0
+      this._touchY = t ? (t.clientY || t.pageY || t.screenY || 0) : 0
+      this._touchTime = Date.now()
+      console.log('touchStart x=' + this._touchX + ' y=' + this._touchY)
+    },
+    onContentTouchEnd(e) {
+      const t = e.changedTouches && e.changedTouches[0]
+      const endX = t ? (t.clientX || t.pageX || t.screenX || 0) : this._touchX
+      const endY = t ? (t.clientY || t.pageY || t.screenY || 0) : this._touchY
+      const dx = Math.abs(endX - this._touchX)
+      const dy = Math.abs(endY - this._touchY)
+      const dt = Date.now() - this._touchTime
+      // 只有短按且移动距离小才算翻页（区分滚动）
+      if (dx < 30 && dy < 30 && dt < 500) {
+        const mid = this.devWindowWidth / 2
+        console.log('tap! x=' + this._touchX + ' mid=' + mid)
+        if (this._touchX < mid) {
+          this.prevPage()
+        } else {
+          this.nextPage()
+        }
+      }
     },
     prevPage() {
       if (this.currentPageIdx > 0) {
