@@ -84,6 +84,7 @@
   import router from '@blueos.app.appmanager.router'
   import file from '@blueos.storage.file'
   import prompt from '@blueos.window.prompt'
+  import storage from '@blueos.storage.storage'
 
   export default {
     data: {
@@ -235,15 +236,29 @@
       })
     },
     selectChapter(index) {
-      router.push({
-        uri: '/pages/Reader',
-        params: {
-          bookId: this.bookId,
-          bookName: this.bookName,
-          chapterIndex: index,
-          chapterCount: this.totalCount,
-          entryType: 'catalog',
+      this.getReaderUri((uri) => {
+        router.push({
+          uri: uri,
+          params: {
+            bookId: this.bookId,
+            bookName: this.bookName,
+            chapterIndex: index,
+            chapterCount: this.totalCount,
+            entryType: 'catalog',
+          },
+        })
+      })
+    },
+    getReaderUri(callback) {
+      storage.get({
+        key: 'reader_settings',
+        success: (data) => {
+          try {
+            const s = JSON.parse(data)
+            callback(s.readMode === 'scroll' ? '/pages/ScrollReader' : '/pages/Reader')
+          } catch (e) { callback('/pages/Reader') }
         },
+        fail: () => { callback('/pages/Reader') },
       })
     },
     input() {

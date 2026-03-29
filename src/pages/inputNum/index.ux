@@ -40,6 +40,7 @@
 <script>
   import router from '@blueos.app.appmanager.router'
   import prompt from '@blueos.window.prompt'
+  import storage from '@blueos.storage.storage'
   export default {
     data: {
       pageTitle: '',
@@ -73,16 +74,30 @@
           message: `超过最大章节数: ${this.chapterCount}`,
         })
       } else {
-        router.replace({
-          uri: '/pages/Reader',
-          params: {
-            bookId: this.bookId,
-            bookName: this.bookName,
-            chapterIndex: this.index - 1,
-            chapterCount: this.chapterCount,
-          },
+        this.getReaderUri((uri) => {
+          router.replace({
+            uri: uri,
+            params: {
+              bookId: this.bookId,
+              bookName: this.bookName,
+              chapterIndex: this.index - 1,
+              chapterCount: this.chapterCount,
+            },
+          })
         })
       }
+    },
+    getReaderUri(callback) {
+      storage.get({
+        key: 'reader_settings',
+        success: (data) => {
+          try {
+            const s = JSON.parse(data)
+            callback(s.readMode === 'scroll' ? '/pages/ScrollReader' : '/pages/Reader')
+          } catch (e) { callback('/pages/Reader') }
+        },
+        fail: () => { callback('/pages/Reader') },
+      })
     },
     back() {
       router.back()

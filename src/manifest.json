@@ -2,7 +2,7 @@
   "package": "com.yyh.camouBook",
   "name": "倒计时",
   "versionName": "1.1.2",
-  "versionCode": 15,
+  "versionCode": 16,
   "appCategory": [
     "other"
   ],
@@ -65,6 +65,10 @@
         "component": "index"
       },
       "pages/Reader": {
+        "launchMode": "singleTask",
+        "component": "index"
+      },
+      "pages/ScrollReader": {
         "launchMode": "singleTask",
         "component": "index"
       },

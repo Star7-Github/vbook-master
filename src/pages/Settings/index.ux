@@ -23,6 +23,19 @@
     </list-item>
     <list-item type="li" class="itemWrapper">
       <div class="setting-item">
+        <text class="label" style="lines: 1; min-width: 100px;">阅读模式</text>
+        <div class="control">
+          <div class="mode-btn" style="background-color: {{readMode === 'page' ? '#3399ff' : '#333'}};" onclick="selectReadMode('page')">
+            <text>翻页</text>
+          </div>
+          <div class="mode-btn" style="background-color: {{readMode === 'scroll' ? '#3399ff' : '#333'}};" onclick="selectReadMode('scroll')">
+            <text>滚动</text>
+          </div>
+        </div>
+      </div>
+    </list-item>
+    <list-item type="li" class="itemWrapper">
+      <div class="setting-item">
         <text class="label">字体大小</text>
         <div class="control">
           <div class="btn">
@@ -122,6 +135,7 @@
       fontSize: 32,
       lineHeight: 48,
       theme: 'dark', // dark, light, green
+      readMode: 'page', // page, scroll
       // fastRefresh: true,
       // timeRefreshDes: '阅读页时钟每秒刷新',
       version: undefined,
@@ -150,6 +164,7 @@
               this.fontSize = settings.fontSize || 32
               this.lineHeight = settings.lineHeight || 48
               this.theme = settings.theme || 'dark'
+              this.readMode = settings.readMode || 'page'
             } catch (e) {
               console.error('Settings parse error', e)
             }
@@ -162,6 +177,7 @@
         fontSize: this.fontSize,
         lineHeight: this.lineHeight,
         theme: this.theme,
+        readMode: this.readMode,
       }
       storage.set({
         key: 'reader_settings',
@@ -187,6 +203,10 @@
     },
     selectTheme(theme) {
       this.theme = theme
+      this.saveSettings()
+    },
+    selectReadMode(mode) {
+      this.readMode = mode
       this.saveSettings()
     },
     back() {
@@ -284,6 +304,17 @@
     margin: 0 15px;
     justify-content: center;
     align-items: center;
+  }
+  .mode-btn {
+    background-color: #333;
+    padding: 6px 14px;
+    border-radius: 30px;
+    margin: 0 4px;
+    border: 2px solid transparent;
+    text { color: #fff; font-size: 26px; lines: 1; }
+  }
+  .mode-btn.active {
+    border: 2px solid #3399ff;
   }
   .icon {
     font-size: 30px;
