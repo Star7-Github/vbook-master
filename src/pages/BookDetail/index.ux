@@ -27,6 +27,7 @@
 <script>
   import router from '@blueos.app.appmanager.router'
   import file from '@blueos.storage.file'
+  import storage from '@blueos.storage.storage'
 
   export default {
     data: {
@@ -79,27 +80,41 @@
       this.progressPercent = p
     },
     startReading() {
-      if (this.isLocal) {
-        router.push({
-          uri: 'pages/Reader',
-          params: {
-            title: this.bookName,
-            bookId: 'local_' + this.bookName,
-            entryType: 'continue',
-          },
-        })
-      } else {
-        router.push({
-          uri: 'pages/Reader',
-          params: {
-            bookId: this.bookId,
-            bookName: this.bookName,
-            chapterIndex: this.currentChapter,
-            chapterCount: this.chapterCount,
-            entryType: 'continue',
-          },
-        })
-      }
+      this.getReaderUri((uri) => {
+        if (this.isLocal) {
+          router.push({
+            uri: uri,
+            params: {
+              title: this.bookName,
+              bookId: 'local_' + this.bookName,
+              entryType: 'continue',
+            },
+          })
+        } else {
+          router.push({
+            uri: uri,
+            params: {
+              bookId: this.bookId,
+              bookName: this.bookName,
+              chapterIndex: this.currentChapter,
+              chapterCount: this.chapterCount,
+              entryType: 'continue',
+            },
+          })
+        }
+      })
+    },
+    getReaderUri(callback) {
+      storage.get({
+        key: 'reader_settings',
+        success: (data) => {
+          try {
+            const s = JSON.parse(data)
+            callback(s.readMode === 'scroll' ? 'pages/ScrollReader' : 'pages/Reader')
+          } catch (e) { callback('pages/Reader') }
+        },
+        fail: () => { callback('pages/Reader') },
+      })
     },
   }
 </script>
